@@ -488,10 +488,10 @@ class PixivArtWorker(context: Context, workerParams: WorkerParameters) :
         settingMinimumWidth: Int,
         settingMinimumHeight: Int
     ): RankingArtwork {
-        val normalizedPurity = puritySelection.map { it.lowercase() }
-            .filterNot { it == "nsfw" }
+        val normalizedPurity = puritySelection
+            .map { it.lowercase() }
+            .ifEmpty { listOf("sfw") }
             .toSet()
-            .ifEmpty { setOf("sfw") }
 
         val predicates: List<(RankingArtwork) -> Boolean> = listOf(
             { it.path.isNotBlank() },
