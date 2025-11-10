@@ -65,14 +65,6 @@ class LoginActivityWebview : PixivMuzeiActivity() {
             return
         }
         val uri = Uri.parse(url)
-        if (uri.path?.startsWith("/login") == true) {
-            return
-        }
-        val cookieHeader = cookieManager.getCookie("https://wallhaven.cc") ?: return
-        val hasSessionCookie = cookieHeader.contains("wallhaven_session=")
-        if (!hasSessionCookie) {
-            return
-        }
 
         val usernameFromUrl = uri.pathSegments
             .takeIf { it.size >= 2 && it[0] == "user" }
@@ -80,7 +72,18 @@ class LoginActivityWebview : PixivMuzeiActivity() {
             ?.takeIf { it.isNotBlank() }
 
         if (usernameFromUrl != null) {
+            val cookieHeader = cookieManager.getCookie("https://wallhaven.cc") ?: return
             persistSession(cookieHeader, usernameFromUrl)
+            return
+        }
+
+        if (uri.path?.startsWith("/login") == true) {
+            return
+        }
+
+        val cookieHeader = cookieManager.getCookie("https://wallhaven.cc") ?: return
+        val hasSessionCookie = cookieHeader.contains("wallhaven_session=")
+        if (!hasSessionCookie) {
             return
         }
 
