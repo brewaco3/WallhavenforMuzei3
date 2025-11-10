@@ -57,7 +57,7 @@
 
             <meta-data
                 android:name="settingsActivity"
-                android:value="com.antony.muzei.pixiv.settings.MainActivity" />
+                android:value="com.brewaco3.muzei.wallhaven.settings.MainActivity" />
             <meta-data
                 android:name="color"
                 android:value="#0096db" />

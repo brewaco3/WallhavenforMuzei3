@@ -1,32 +1,12 @@
 <resources>
     <string-array name="pref_updateMode_entries">
-        <item>Daily ranking</item>
-        <item>Weekly ranking</item>
-        <item>Monthly ranking</item>
-        <item>Rookie ranking</item>
-        <item>Original ranking</item>
-        <item>Popular with males ranking</item>
-        <item>Popular with females ranking</item>
-        <item>Follow feed (Login required)</item>
-        <item>Bookmark images (Login Required)</item>
-        <item>Recommended (Login Required)</item>
-        <item>Specific Artist (Login Required)</item>
-        <item>Tag search (Login Required)</item>
+        <item>Toplist</item>
+        <item>Hot</item>
     </string-array>
 
     <string-array name="pref_updateMode_entryValues">
-        <item>daily</item>
-        <item>weekly</item>
-        <item>monthly</item>
-        <item>rookie</item>
-        <item>original</item>
-        <item>male</item>
-        <item>female</item>
-        <item>follow</item>
-        <item>bookmark</item>
-        <item>recommended</item>
-        <item>artist</item>
-        <item>tag_search</item>
+        <item>toplist</item>
+        <item>hot</item>
     </string-array>
 
     <string-array name="pref_authFilterLevel_entries">
@@ -48,14 +28,16 @@
 
     <string-array name="pref_rankingFilterLevel_entries">
         <item>SFW</item>
-        <item>NSFW</item>
+        <item>Sketchy</item>
+        <item>NSFW (login required)</item>
     </string-array>
     <string-array name="pref_rankingFilterLevel_entryvalues">
-        <item>0</item>
-        <item>1</item>
+        <item>sfw</item>
+        <item>sketchy</item>
+        <item>nsfw</item>
     </string-array>
     <string-array name="pref_rankingFilterDefault_entryvalues">
-        <item>0</item>
+        <item>sfw</item>
     </string-array>
 
     <string-array name="pref_aspectRatio_entries">

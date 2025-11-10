@@ -1,19 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
-    <string name="action_bar_title">Pixiv for Muzei 3 Settings</string>
+    <string name="action_bar_title">Wallhaven for Muzei Settings</string>
     <string name="action_sign_in">Login</string>
 
-    <string name="app_name">Pixiv for Muzei 3</string>
+    <string name="app_name">Wallhaven for Muzei</string>
 
     <string name="artwork">Artwork</string>
 
-    <string name="attr_daily">Daily Ranking #</string>
-    <string name="attr_female">Popular with females #</string>
-    <string name="attr_male">Popular with males #</string>
-    <string name="attr_monthly">Monthly Ranking #</string>
-    <string name="attr_original">Original #</string>
-    <string name="attr_rookie">Rookie #</string>
-    <string name="attr_weekly">Weekly Ranking #</string>
+    <string name="attr_toplist">Toplist</string>
+    <string name="attr_hot">Hot</string>
 
     <string name="button_clearCache">Immediately clear image cache</string>
 
@@ -79,7 +74,7 @@
     <string name="prefTitle_enableNetworkBypass">Enable network filter bypass</string>
     <string name="prefTitle_usePixivCat">Use pixiv.cat reverse proxy for image downloads</string>
     <string name="pref_updateMode">Update mode</string>
-    <string name="pref_updateMode_default">daily_rank</string>
+    <string name="pref_updateMode_default">toplist</string>
 
     <string name="snackbar_deletedArtworks">artworks deleted</string>
     <string name="snackbar_selectArtworkFirst">Select at least one artwork to delete</string>
@@ -94,11 +89,11 @@
 
     <string name="title_activity_main" translatable="false">MainActivity</string>
 
-    <string name="toast_addingToBookmarks">Pixiv for Muzei 3: Adding to bookmark</string>
+    <string name="toast_addingToBookmarks">Wallhaven for Muzei: Adding to bookmark</string>
     <string name="toast_authFailed">Authentication failed. Check your username or password</string>
-    <string name="toast_authFailedDown">Pixiv for Muzei 3: Login failed, temporarily downloading daily ranking</string>
-    <string name="toast_authFailedRetry">Pixiv for Muzei 3: Login failed, will try again</string>
-    <string name="toast_authFailedSwitch">Pixiv for Muzei 3: Login failed, switching to daily ranking</string>
+    <string name="toast_authFailedDown">Wallhaven for Muzei: Login failed, temporarily downloading toplist</string>
+    <string name="toast_authFailedRetry">Wallhaven for Muzei: Login failed, will try again</string>
+    <string name="toast_authFailedSwitch">Wallhaven for Muzei: Login failed, switching to toplist</string>
     <string name="toast_clearingCache">Clearing image cache</string>
     <string name="toast_loginFirst">Please login first</string>
     <string name="toast_newArtist">New Artist, clearing image cache</string>
@@ -121,4 +116,5 @@
     <string name="prefSummary_enableNetworkBypass">Disable if you are having problems on VPN</string>
     <string name="prefSummary_usePixivCat">May speed up image downloads in some areas</string>
     <string name="prefTitle_tagLanguage">Tag language</string>
+    <string name="wallhaven_unknown_uploader">Unknown uploader</string>
 </resources>

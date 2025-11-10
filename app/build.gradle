@@ -7,7 +7,7 @@ plugins {
 android {
     compileSdkVersion 35
     defaultConfig {
-        applicationId "com.antony.muzei.pixiv"
+        applicationId "com.brewaco3.muzei.wallhaven"
         minSdkVersion 21
         targetSdkVersion 35
         versionCode getProperty('app.version.code') as int
@@ -17,7 +17,7 @@ android {
         buildConfigField "String", "PIXIV_CLIENT_SEC", "\"${getProperty('pixiv.client.sec')}\""
 
         manifestPlaceholders = [
-                PACKAGE: "com.antony.muzei.pixiv"
+                PACKAGE: "com.brewaco3.muzei.wallhaven"
         ]
 
         javaCompileOptions {
@@ -64,14 +64,14 @@ android {
             versionNameSuffix ':dev'
 
             manifestPlaceholders = [
-                    PACKAGE: "com.antony.muzei.pixiv.dev"
+                    PACKAGE: "com.brewaco3.muzei.wallhaven.dev"
             ]
         }
         prod {
             dimension = 'deliver'
         }
     }
-    namespace 'com.antony.muzei.pixiv'
+    namespace 'com.brewaco3.muzei.wallhaven'
 }
 
 dependencies {
