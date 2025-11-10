@@ -175,7 +175,7 @@ class PixivArtWorker(context: Context, workerParams: WorkerParameters) :
     }
 
     // Function to download images to external storage
-    // External storage in this case refers to /storage/emulated/0/Pictures/PixivForMuzei3
+    // External storage in this case refers to /storage/emulated/0/Pictures/WallhavenForMuzei3
     // Option is also there to store onto an SD card if present
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun downloadImageExternalApi29(
@@ -197,7 +197,7 @@ class PixivArtWorker(context: Context, workerParams: WorkerParameters) :
             put(MediaStore.Images.Media.DISPLAY_NAME, filename)
             put(
                 MediaStore.Images.Media.RELATIVE_PATH,
-                Environment.DIRECTORY_PICTURES + "/PixivForMuzei3"
+                Environment.DIRECTORY_PICTURES + "/WallhavenForMuzei3"
             )
             put(MediaStore.MediaColumns.MIME_TYPE, fileType.toString())
         }
@@ -280,7 +280,7 @@ class PixivArtWorker(context: Context, workerParams: WorkerParameters) :
     ): Uri {
         Log.i(LOG_TAG, "Downloading artwork, external API < 28")
         // Checks if directory exists. If nonexistent, then create it
-        val directory = File("/storage/emulated/0/Pictures/PixivForMuzei3/")
+        val directory = File("/storage/emulated/0/Pictures/WallhavenForMuzei3/")
         if (!directory.exists()) {
             directory.mkdirs()
         }

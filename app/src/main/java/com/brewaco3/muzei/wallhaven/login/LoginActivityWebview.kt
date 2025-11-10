@@ -69,9 +69,18 @@ class LoginActivityWebview : PixivMuzeiActivity() {
             return
         }
         val cookieHeader = cookieManager.getCookie("https://wallhaven.cc") ?: return
-        val hasSessionCookie = cookieHeader.contains("wallhaven_session")
-        val hasRememberToken = cookieHeader.contains("remember_token")
-        if (!hasSessionCookie || !hasRememberToken) {
+        val hasSessionCookie = cookieHeader.contains("wallhaven_session=")
+        if (!hasSessionCookie) {
+            return
+        }
+
+        val usernameFromUrl = uri.pathSegments
+            .takeIf { it.size >= 2 && it[0] == "user" }
+            ?.get(1)
+            ?.takeIf { it.isNotBlank() }
+
+        if (usernameFromUrl != null) {
+            persistSession(cookieHeader, usernameFromUrl)
             return
         }
 
