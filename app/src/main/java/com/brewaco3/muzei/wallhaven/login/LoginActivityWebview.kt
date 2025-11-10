@@ -65,17 +65,19 @@ class LoginActivityWebview : PixivMuzeiActivity() {
             return
         }
         val cookieHeader = cookieManager.getCookie("https://wallhaven.cc") ?: return
-        if (!cookieHeader.contains("remember_token") &&
-            !cookieHeader.contains("XSRF-TOKEN") &&
-            !cookieHeader.contains("wallhaven_session")
-        ) {
+        val hasSessionCookie = cookieHeader.contains("wallhaven_session")
+        val hasRememberToken = cookieHeader.contains("remember_token")
+        if (!hasSessionCookie && !hasRememberToken) {
             return
         }
 
         view.evaluateJavascript(
             "(function(){var name=document.querySelector('a[href^=\\'/user/\\'] span.username');return name?name.textContent:'';})()"
         ) { usernameJson ->
-            val parsedUsername = usernameJson.trim('"').ifBlank { null }
+            val parsedUsername = usernameJson
+                .takeUnless { it == "null" }
+                ?.trim('"')
+                ?.ifBlank { null }
             persistSession(cookieHeader, parsedUsername)
         }
     }

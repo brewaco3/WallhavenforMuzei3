@@ -7,7 +7,7 @@ import com.brewaco3.muzei.wallhaven.provider.network.moshi.Contents
 class ContentsHelper(
     private val updateMode: String,
     private val purity: String,
-    private val categories: String = "111"
+    private val categories: String
 ) {
     private lateinit var contents: Contents
     private val service = RestClient.getRetrofitRankingInstance().create(

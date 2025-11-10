@@ -751,11 +751,39 @@ class PixivArtWorker(context: Context, workerParams: WorkerParameters) :
         return String(purityFlags)
     }
 
+    private fun buildCategoryQuery(selection: Set<String>): String {
+        val normalized = selection.map { it.lowercase() }
+        val categoryFlags = charArrayOf('0', '0', '0')
+        if ("general" in normalized) {
+            categoryFlags[0] = '1'
+        }
+        if ("anime" in normalized) {
+            categoryFlags[1] = '1'
+        }
+        if ("people" in normalized) {
+            categoryFlags[2] = '1'
+        }
+        if (categoryFlags.all { it == '0' }) {
+            categoryFlags[0] = '1'
+            categoryFlags[1] = '1'
+            categoryFlags[2] = '1'
+        }
+        return String(categoryFlags)
+    }
+
     private fun getArtworksRanking(updateMode: String): List<Artwork> {
         val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         val numArtworksToDownload = sharedPrefs.getInt("prefSlider_numToDownload", 2)
         val puritySelection = sharedPrefs.getStringSet("pref_rankingFilterSelect", setOf("sfw")) ?: setOf("sfw")
-        val contentsHelper = ContentsHelper(updateMode, buildPurityQuery(puritySelection))
+        val categorySelection = sharedPrefs.getStringSet(
+            "pref_rankingCategorySelect",
+            setOf("general", "anime", "people")
+        ) ?: setOf("general", "anime", "people")
+        val contentsHelper = ContentsHelper(
+            updateMode,
+            buildPurityQuery(puritySelection),
+            buildCategoryQuery(categorySelection)
+        )
         var contents = contentsHelper.getNewContents()
         val sanitizedPurity = puritySelection.map { it.lowercase() }.filterNot {
             it == "nsfw" && !PixivMuzeiSupervisor.hasSession()

@@ -40,6 +40,22 @@
         <item>sfw</item>
     </string-array>
 
+    <string-array name="pref_rankingCategory_entries">
+        <item>General</item>
+        <item>Anime</item>
+        <item>People</item>
+    </string-array>
+    <string-array name="pref_rankingCategory_entryvalues">
+        <item>general</item>
+        <item>anime</item>
+        <item>people</item>
+    </string-array>
+    <string-array name="pref_rankingCategoryDefault_entryvalues">
+        <item>general</item>
+        <item>anime</item>
+        <item>people</item>
+    </string-array>
+
     <string-array name="pref_aspectRatio_entries">
         <item>Portrait and Landscape</item>
         <item>Portrait</item>

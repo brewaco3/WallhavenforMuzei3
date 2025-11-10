@@ -60,6 +60,7 @@
     <string name="prefTitle_numToDownload">同时下载的作品数量</string>
     <string name="prefTitle_openNsfwWiki">NSFW 级别解释</string>
     <string name="prefTitle_rankingFilterSelect">排行 NSFW 过滤级别</string>
+    <string name="prefTitle_rankingCategorySelect">壁纸分类</string>
     <string name="prefTitle_sendFeedback">发送反馈或建议</string>
     <string name="prefTitle_showManga">显示漫画</string>
     <string name="prefTitle_storeInExtStorage">图片保存到手机存储</string>

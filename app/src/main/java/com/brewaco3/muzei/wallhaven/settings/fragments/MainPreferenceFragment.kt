@@ -43,6 +43,8 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
     private lateinit var newTag: String
     private lateinit var oldArtist: String
     private lateinit var newArtist: String
+    private lateinit var oldRankingFilters: Set<String>
+    private lateinit var oldRankingCategories: Set<String>
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.main_preference_layout, rootKey)
@@ -54,6 +56,12 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
         oldUpdateMode = sharedPrefs.getString("pref_updateMode", "toplist") ?: "toplist"
         oldTag = sharedPrefs.getString("pref_tagSearch", "") ?: ""
         oldArtist = sharedPrefs.getString("pref_artistId", "") ?: ""
+        oldRankingFilters = sharedPrefs.getStringSet("pref_rankingFilterSelect", setOf("sfw"))
+            ?.toSet() ?: setOf("sfw")
+        oldRankingCategories = sharedPrefs.getStringSet(
+            "pref_rankingCategorySelect",
+            setOf("general", "anime", "people")
+        )?.toSet() ?: setOf("general", "anime", "people")
 
         // Ensures that the user has logged in first before selecting any update mode requiring authentication
         // Reveals UI elements as needed depending on Update Mode selection
@@ -79,6 +87,8 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
                 findPreference<Preference>("pref_authFilterSelect")?.isVisible =
                     authFeedModeSelected
                 findPreference<Preference>("pref_rankingFilterSelect")?.isVisible =
+                    !authFeedModeSelected
+                findPreference<Preference>("pref_rankingCategorySelect")?.isVisible =
                     !authFeedModeSelected
                 findPreference<Preference>("pref_tagSearch")?.isVisible = newValue == "tag_search"
                 findPreference<Preference>("pref_tagLanguage")?.isVisible = newValue == "tag_search"
@@ -146,11 +156,39 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
                 )
         }
 
+        findPreference<MultiSelectListPreference>("pref_rankingCategorySelect")?.let { pref ->
+            pref.onPreferenceChangeListener =
+                Preference.OnPreferenceChangeListener setOnPreferenceChangeListener@{ _: Preference?, newValue: Any ->
+                    @Suppress("UNCHECKED_CAST")
+                    val selection = newValue as Set<String>
+                    if (selection.isEmpty()) {
+                        val defaultSelection = setOf("general", "anime", "people")
+                        pref.values = defaultSelection
+                        sharedPrefs.edit().apply {
+                            putStringSet("pref_rankingCategorySelect", defaultSelection)
+                            apply()
+                        }
+                        pref.summary = categorySummaryStringGenerator(defaultSelection)
+                        return@setOnPreferenceChangeListener false
+                    }
+                    pref.summary = categorySummaryStringGenerator(selection)
+                    true
+                }
+            pref.summary = categorySummaryStringGenerator(
+                sharedPrefs.getStringSet(
+                    "pref_rankingCategorySelect",
+                    setOf("general", "anime", "people")
+                ) ?: setOf("general", "anime", "people")
+            )
+        }
+
         // Reveal the tag_search or artist_id EditTextPreference and write the summary if update mode matches
         val updateMode = sharedPrefs.getString("pref_updateMode", "toplist")
         if (AUTH_MODES.contains(updateMode)) {
             findPreference<Preference>("pref_authFilterSelect")?.isVisible = true
             findPreference<Preference>("prefCat_loginSettings")?.isVisible = true
+            findPreference<Preference>("pref_rankingFilterSelect")?.isVisible = false
+            findPreference<Preference>("pref_rankingCategorySelect")?.isVisible = false
             if (updateMode == "tag_search") {
                 findPreference<Preference>("pref_tagSearch")?.let {
                     it.isVisible = true
@@ -165,6 +203,7 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
             }
         } else {
             findPreference<Preference>("pref_rankingFilterSelect")?.isVisible = true
+            findPreference<Preference>("pref_rankingCategorySelect")?.isVisible = true
         }
 
         // Preference that immediately clears Muzei's image cache when pressed
@@ -252,6 +291,19 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
         return summaryValues.joinToString(", ")
     }
 
+    private fun categorySummaryStringGenerator(selection: Set<String>): String {
+        val entries = resources.getStringArray(R.array.pref_rankingCategory_entries)
+        val values = resources.getStringArray(R.array.pref_rankingCategory_entryvalues)
+        val valueToEntry = values.indices.associate { values[it] to entries[it] }
+        val orderedSelection = values.filter { selection.contains(it) }
+        val summaryValues = if (orderedSelection.isEmpty()) {
+            entries.toList()
+        } else {
+            orderedSelection.mapNotNull { valueToEntry[it] }
+        }
+        return summaryValues.joinToString(", ")
+    }
+
     // Returns a comma delimited string of user selections. There is no trailing comma
     // newValue is a HashSet that can contain 2, 4, 6, or 8, and corresponds to
     // SFW, Slightly Ecchi, Fairly Ecchi, and R18 respectively
@@ -277,30 +329,52 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
         newUpdateMode = sharedPrefs.getString("pref_updateMode", "") ?: ""
         newTag = sharedPrefs.getString("pref_tagSearch", "") ?: ""
         newArtist = sharedPrefs.getString("pref_artistId", "") ?: ""
+        val newRankingFilters = sharedPrefs.getStringSet("pref_rankingFilterSelect", setOf("sfw"))
+            ?.toSet() ?: setOf("sfw")
+        val newRankingCategories = sharedPrefs.getStringSet(
+            "pref_rankingCategorySelect",
+            setOf("general", "anime", "people")
+        )?.toSet() ?: setOf("general", "anime", "people")
 
         // If user has changed update, filter mode, or search tag:
         // Immediately stop any pending work, clear the Provider of any Artwork, and then toast
         if (oldUpdateMode != newUpdateMode || oldTag != newTag
-            || oldArtist != newArtist
+            || oldArtist != newArtist || oldRankingFilters != newRankingFilters
+            || oldRankingCategories != newRankingCategories
         ) {
             WorkManager.getInstance(requireContext()).cancelUniqueWork("ANTONY")
             requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
                 ?.deleteRecursively()
             enqueueLoad(true, context)
-            if (oldUpdateMode != newUpdateMode) {
-                Toast.makeText(context, getString(R.string.toast_newUpdateMode), Toast.LENGTH_SHORT)
-                    .show()
-            } else if (oldArtist != newArtist) {
-                Toast.makeText(context, getString(R.string.toast_newArtist), Toast.LENGTH_SHORT)
-                    .show()
-            } else if (oldTag != newTag) {
-                Toast.makeText(context, getString(R.string.toast_newTag), Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(
+            when {
+                oldUpdateMode != newUpdateMode -> Toast.makeText(
                     context,
-                    getString(R.string.toast_newFilterSelect),
+                    getString(R.string.toast_newUpdateMode),
                     Toast.LENGTH_SHORT
                 ).show()
+                oldArtist != newArtist -> Toast.makeText(
+                    context,
+                    getString(R.string.toast_newArtist),
+                    Toast.LENGTH_SHORT
+                ).show()
+                oldTag != newTag -> Toast.makeText(
+                    context,
+                    getString(R.string.toast_newTag),
+                    Toast.LENGTH_SHORT
+                ).show()
+                oldRankingFilters != newRankingFilters || oldRankingCategories != newRankingCategories ->
+                    Toast.makeText(
+                        context,
+                        getString(R.string.toast_newFilterSelect),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                else -> {
+                    Toast.makeText(
+                        context,
+                        getString(R.string.toast_newFilterSelect),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
     }

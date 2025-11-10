@@ -60,6 +60,7 @@
     <string name="prefTitle_numToDownload">Number of artwork to download at a time</string>
     <string name="prefTitle_openNsfwWiki">Explanation of NSFW levels</string>
     <string name="prefTitle_rankingFilterSelect">Ranking NSFW filter level</string>
+    <string name="prefTitle_rankingCategorySelect">Wallpaper categories</string>
     <string name="prefTitle_sendFeedback">Send Feedback or Suggestions</string>
     <string name="prefTitle_showManga">Show manga</string>
     <string name="prefTitle_storeInExtStorage">Save pictures into external storage</string>

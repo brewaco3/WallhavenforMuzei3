@@ -16,6 +16,24 @@
         <item>NSFW（需登录）</item>
     </string-array>
 
+    <string-array name="pref_rankingCategory_entries">
+        <item>综合</item>
+        <item>动漫</item>
+        <item>人物</item>
+    </string-array>
+
+    <string-array name="pref_rankingCategory_entryvalues">
+        <item>general</item>
+        <item>anime</item>
+        <item>people</item>
+    </string-array>
+
+    <string-array name="pref_rankingCategoryDefault_entryvalues">
+        <item>general</item>
+        <item>anime</item>
+        <item>people</item>
+    </string-array>
+
     <string-array name="pref_aspectRatio_entries">
         <item>纵向和横向</item>
         <item>纵向</item>
