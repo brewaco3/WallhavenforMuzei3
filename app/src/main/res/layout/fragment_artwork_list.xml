@@ -25,7 +25,7 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list"
-        android:name="com.antony.muzei.pixiv.ui.adapter.ArtworkFragment"
+        android:name="com.brewaco3.muzei.wallhaven.ui.adapter.ArtworkFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginLeft="16dp"

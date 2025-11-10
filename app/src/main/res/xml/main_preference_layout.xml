@@ -37,6 +37,14 @@
             android:title="@string/prefTitle_rankingFilterSelect"
             app:isPreferenceVisible="false" />
         <MultiSelectListPreference
+            android:defaultValue="@array/pref_rankingCategoryDefault_entryvalues"
+            android:entries="@array/pref_rankingCategory_entries"
+            android:entryValues="@array/pref_rankingCategory_entryvalues"
+            android:key="pref_rankingCategorySelect"
+            android:persistent="true"
+            android:title="@string/prefTitle_rankingCategorySelect"
+            app:isPreferenceVisible="false" />
+        <MultiSelectListPreference
             android:defaultValue="@array/pref_authFilterDefault_entryvalues"
             android:entries="@array/pref_authFilterLevel_entries"
             android:entryValues="@array/pref_authFilterLevel_entryvalues"
