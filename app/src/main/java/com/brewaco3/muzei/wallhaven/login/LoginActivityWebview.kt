@@ -64,10 +64,14 @@ class LoginActivityWebview : PixivMuzeiActivity() {
         if (!url.startsWith("https://wallhaven.cc")) {
             return
         }
+        val uri = Uri.parse(url)
+        if (uri.path?.startsWith("/login") == true) {
+            return
+        }
         val cookieHeader = cookieManager.getCookie("https://wallhaven.cc") ?: return
         val hasSessionCookie = cookieHeader.contains("wallhaven_session")
         val hasRememberToken = cookieHeader.contains("remember_token")
-        if (!hasSessionCookie && !hasRememberToken) {
+        if (!hasSessionCookie || !hasRememberToken) {
             return
         }
 
