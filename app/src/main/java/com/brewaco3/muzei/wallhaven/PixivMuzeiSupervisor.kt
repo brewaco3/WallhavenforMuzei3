@@ -64,6 +64,34 @@ object PixivMuzeiSupervisor {
         PixivInstrumentation.clearSession(appContext)
     }
 
+    fun setApiKey(apiKey: String) {
+        if (!start) {
+            return
+        }
+        appInstrumentation.storeApiKey(appContext, apiKey)
+    }
+
+    fun clearApiKey() {
+        if (!start) {
+            return
+        }
+        appInstrumentation.clearApiKey(appContext)
+    }
+
+    fun getApiKey(): String {
+        if (!start) {
+            return ""
+        }
+        return appInstrumentation.getApiKey(appContext)
+    }
+
+    fun hasApiKey(): Boolean {
+        if (!start) {
+            return false
+        }
+        return appInstrumentation.hasApiKey(appContext)
+    }
+
     fun getSessionCookie(): String {
         if (!start) {
             return ""
@@ -78,7 +106,7 @@ object PixivMuzeiSupervisor {
         return appInstrumentation.hasSession(appContext)
     }
 
-    fun getAccessToken(): String = getSessionCookie()
+    fun getAccessToken(): String = getApiKey()
 
     fun broadcastLocal(intent: Intent) {
         require(intent.action?.isNotEmpty() == true)

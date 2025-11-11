@@ -739,10 +739,10 @@ class PixivArtWorker(context: Context, workerParams: WorkerParameters) :
             purityFlags[1] = '1'
         }
         if ("nsfw" in normalized) {
-            if (PixivMuzeiSupervisor.hasSession()) {
+            if (PixivMuzeiSupervisor.hasApiKey()) {
                 purityFlags[2] = '1'
             } else {
-                Log.i(LOG_TAG, "NSFW selection requires authentication, ignoring for now")
+                Log.i(LOG_TAG, "NSFW selection requires an API key, ignoring for now")
             }
         }
         if (purityFlags.all { it == '0' }) {
@@ -786,7 +786,7 @@ class PixivArtWorker(context: Context, workerParams: WorkerParameters) :
         )
         var contents = contentsHelper.getNewContents()
         val sanitizedPurity = puritySelection.map { it.lowercase() }.filterNot {
-            it == "nsfw" && !PixivMuzeiSupervisor.hasSession()
+            it == "nsfw" && !PixivMuzeiSupervisor.hasApiKey()
         }.toSet()
         return mutableListOf<Artwork>().also {
             while (it.size < numArtworksToDownload) {

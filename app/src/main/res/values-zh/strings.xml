@@ -33,16 +33,17 @@
 
     <string name="prefCat_about">关于</string>
     <string name="prefCat_advFiltering">高级过滤</string>
-    <string name="prefCat_authSettings">登录 Pixiv</string>
+    <string name="prefCat_authSettings">Wallhaven API 访问</string>
     <string name="prefCat_fileOptions">文件选项</string>
     <string name="prefCat_networkingOptions">网络选项</string>
     <string name="prefCat_pullFeedSettings">作品订阅设置</string>
     <string name="prefCat_postProcess">后期处理选项</string>
 
-    <string name="prefSummary_LoggedIn">已登录为</string>
-    <string name="prefSummary_currentlyLoggedInAs">当前登录为</string>
+    <string name="prefTitle_apiKey">Wallhaven API 密钥</string>
+    <string name="prefSummary_apiKey_notSet">尚未设置 API 密钥</string>
+    <string name="prefSummary_apiKey_set">API 密钥已保存</string>
+    <string name="prefDialog_apiKey">请输入 Wallhaven API 密钥</string>
     <string name="prefSummary_noFileSizeLimit">无限制</string>
-    <string name="prefSummary_notLoggedIn">未登录</string>
     <string name="prefSummary_storeInExtStorage">保存在此处的图片不会自动清除</string>
     <string name="prefSummary_stuckApp">如果该应用未工作，请按此处</string>
     <string name="prefSummary_autoCrop">下载时裁剪作品四周空白，会增加电量消耗</string>
@@ -53,8 +54,6 @@
     <string name="prefTitle_authFilterSelect">订阅 NSFW 过滤级别</string>
     <string name="prefTitle_autoClearMode">每天凌晨 1 点自动清除缓存</string>
     <string name="prefTitle_keyContributor">关键贡献者</string>
-    <string name="prefTitle_loginButton">登录</string>
-    <string name="prefTitle_logoutButton">登录管理</string>
     <string name="prefTitle_mainDeveloper">主要开发者</string>
     <string name="prefTitle_minimumViews">作品最低浏览量</string>
     <string name="prefTitle_numToDownload">同时下载的作品数量</string>
@@ -93,7 +92,7 @@
     <string name="toast_authFailedRetry">Wallhaven for Muzei: 登录失败，再次尝试</string>
     <string name="toast_authFailedSwitch">Wallhaven for Muzei: 登录失败，更改为排行榜</string>
     <string name="toast_clearingCache">清除图像缓存</string>
-    <string name="toast_loginFirst">请先登录</string>
+    <string name="toast_loginFirst">请先输入 API 密钥</string>
     <string name="toast_newArtist">艺术家更新，清除图像缓存</string>
     <string name="toast_newFilterMode">过滤模式更新，清除图像缓存</string>
     <string name="toast_newFilterSelect">过滤选择更新，清除图像缓存</string>

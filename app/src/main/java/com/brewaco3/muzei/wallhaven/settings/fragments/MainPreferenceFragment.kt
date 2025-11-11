@@ -16,26 +16,17 @@
  */
 package com.brewaco3.muzei.wallhaven.settings.fragments
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.os.Environment
+import android.text.InputType
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
-import android.webkit.CookieManager
 import androidx.preference.*
 import androidx.work.WorkManager
 import com.brewaco3.muzei.wallhaven.PixivMuzeiSupervisor
 import com.brewaco3.muzei.wallhaven.PixivProviderConst.AUTH_MODES
-import com.brewaco3.muzei.wallhaven.PixivProviderConst.PREFERENCE_SESSION_COOKIE
-import com.brewaco3.muzei.wallhaven.PixivProviderConst.PREFERENCE_SESSION_USERNAME
 import com.brewaco3.muzei.wallhaven.R
-import com.brewaco3.muzei.wallhaven.login.LoginActivityWebview
 import com.brewaco3.muzei.wallhaven.provider.PixivArtWorker.Companion.enqueueLoad
 import com.google.android.material.snackbar.Snackbar
-import java.util.*
-
-
 class MainPreferenceFragment : PreferenceFragmentCompat() {
     private lateinit var oldUpdateMode: String
     private lateinit var newUpdateMode: String
@@ -48,6 +39,8 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.main_preference_layout, rootKey)
+
+        PixivMuzeiSupervisor.start(requireContext().applicationContext)
 
         val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
 
@@ -63,18 +56,14 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
             setOf("general", "anime", "people")
         )?.toSet() ?: setOf("general", "anime", "people")
 
-        // Ensures that the user has logged in first before selecting any update mode requiring authentication
+        // Ensures that the user has provided an API key before selecting any update mode requiring authentication
         // Reveals UI elements as needed depending on Update Mode selection
         val updateModePref = findPreference<DropDownPreference>("pref_updateMode")
         updateModePref?.onPreferenceChangeListener =
             Preference.OnPreferenceChangeListener setOnPreferenceChangeListener@{ _: Preference?, newValue: Any ->
-                // User has selected an authenticated feed mode, but has not yet logged in as evidenced
-                // by the lack of an access token
-                if (AUTH_MODES.contains(newValue) && sharedPrefs.getString(
-                        PREFERENCE_SESSION_COOKIE,
-                        ""
-                    )!!.isEmpty()
-                ) {
+                // User has selected an authenticated feed mode, but has not yet provided
+                // the API key required for those requests
+                if (AUTH_MODES.contains(newValue) && !PixivMuzeiSupervisor.hasApiKey()) {
                     Snackbar.make(
                         requireView(), R.string.toast_loginFirst,
                         Snackbar.LENGTH_SHORT
@@ -222,55 +211,33 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
                 true
             }
 
-        val loginActivityLauncher =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-                if (result.resultCode == Activity.RESULT_OK) {
-                    val data = result.data
-                    val loginButtonMain = findPreference<Preference>("pref_login")
-                    val username = data!!.getStringExtra("username").orEmpty()
-                    PreferenceManager.getDefaultSharedPreferences(requireContext())
-                        .edit()
-                        .putString(PREFERENCE_SESSION_USERNAME, username)
-                        .apply()
-                    loginButtonMain!!.summary = if (username.isBlank()) {
-                        getString(R.string.prefSummary_LoggedIn).trim()
-                    } else {
-                        getString(R.string.prefSummary_LoggedIn).trimEnd() + " " + username
-                    }
-                    loginButtonMain.title = getString(R.string.prefTitle_logoutButton)
+        findPreference<EditTextPreference>("pref_api_key")?.let { pref ->
+            pref.summaryProvider = Preference.SummaryProvider<EditTextPreference> { preference ->
+                if (preference.text.isNullOrBlank()) {
+                    getString(R.string.prefSummary_apiKey_notSet)
+                } else {
+                    getString(R.string.prefSummary_apiKey_set)
                 }
             }
-
-        findPreference<Preference>("pref_login")?.let {
-            // On app launch set the Preference to show to appropriate text if logged in
-            val storedUsername = sharedPrefs.getString(PREFERENCE_SESSION_USERNAME, "").orEmpty()
-            if (sharedPrefs.getString(PREFERENCE_SESSION_COOKIE, "")?.isEmpty() == true) {
-                it.title = getString(R.string.prefTitle_loginButton)
-                it.summary = getString(R.string.prefSummary_notLoggedIn)
-            } else {
-                it.title = getString(R.string.prefTitle_logoutButton)
-                it.summary = if (storedUsername.isBlank()) {
-                    getString(R.string.prefSummary_LoggedIn).trim()
-                } else {
-                    "${getString(R.string.prefSummary_LoggedIn).trimEnd()} $storedUsername"
-                }
+            pref.setOnBindEditTextListener { editText ->
+                editText.inputType =
+                    InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD or
+                        InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
             }
-
-            // Users click this preference to execute the login or logout
-            it.onPreferenceClickListener = Preference.OnPreferenceClickListener { pref ->
-                val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
-                if (prefs.getString(PREFERENCE_SESSION_COOKIE, "").isNullOrEmpty()) {
-                    loginActivityLauncher.launch(Intent(activity, LoginActivityWebview::class.java))
+            val storedApiKey = PixivMuzeiSupervisor.getApiKey()
+            if (pref.text.isNullOrBlank() && storedApiKey.isNotBlank()) {
+                pref.text = storedApiKey
+            }
+            pref.setOnPreferenceChangeListener { preference, newValue ->
+                val sanitized = (newValue as? String).orEmpty().trim()
+                if (sanitized.isEmpty()) {
+                    PixivMuzeiSupervisor.clearApiKey()
                 } else {
-                    PixivMuzeiSupervisor.clearSession()
-                    CookieManager.getInstance().removeAllCookies(null)
-                    CookieManager.getInstance().flush()
-                    prefs.edit()
-                        .remove(PREFERENCE_SESSION_COOKIE)
-                        .remove(PREFERENCE_SESSION_USERNAME)
-                        .apply()
-                    pref.title = getString(R.string.prefTitle_loginButton)
-                    pref.summary = getString(R.string.prefSummary_notLoggedIn)
+                    PixivMuzeiSupervisor.setApiKey(sanitized)
+                }
+                if (sanitized != newValue) {
+                    (preference as EditTextPreference).text = sanitized
+                    return@setOnPreferenceChangeListener false
                 }
                 true
             }
