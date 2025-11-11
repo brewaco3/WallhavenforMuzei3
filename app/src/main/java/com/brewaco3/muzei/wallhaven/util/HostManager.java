@@ -7,7 +7,7 @@ import android.text.TextUtils;
 
 import androidx.preference.PreferenceManager;
 
-import com.brewaco3.muzei.wallhaven.PixivMuzei;
+import com.brewaco3.muzei.wallhaven.WallhavenMuzei;
 
 import java.net.InetAddress;
 import java.util.List;
@@ -24,10 +24,9 @@ This class is called everytime an image is downloaded
  */
 public class HostManager {
 
-    public static final String HOST_OLD = "i.pximg.net";
-    //    public static final String HOST_OLD = "app-api.pixiv.net";
-    public static final String HOST_NEW = "i.pixiv.cat";
-    private static final String HTTP_HEAD = "http://";
+    public static final String HOST_OLD = "w.wallhaven.cc";
+    public static final String HOST_NEW = "w.wallhaven.cc";
+    private static final String HTTP_HEAD = "https://";
 
     public static HostManager get() {
         return SingletonHolder.INSTANCE;
@@ -38,20 +37,19 @@ public class HostManager {
     }
 
     public String replaceUrl(String before) {
-        // See https://pixiv.cat/reverseproxy.html
-        // Its ISP is Cloudflare
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(PixivMuzei.Companion.getContext().getApplicationContext());
+        // Allows routing through a user-provided image proxy when enabled
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(WallhavenMuzei.Companion.getContext().getApplicationContext());
 
-        boolean usePixivCatProxy = false;
-        String pixivProxyHost = "";
+        boolean useWallhavenProxy = false;
+        String wallhavenProxyHost = "";
 
-        if(PixivMuzei.Companion.getContext() != null){
-            usePixivCatProxy = prefs.getBoolean("pref_usePixivCat",false);
+        if(WallhavenMuzei.Companion.getContext() != null){
+            useWallhavenProxy = prefs.getBoolean("pref_useWallhavenProxy",false);
         }
 
-        if (usePixivCatProxy) {
-            pixivProxyHost = prefs.getString("pref_pixivProxyHost", HOST_NEW);
-            return before.replace(HOST_OLD, pixivProxyHost);
+        if (useWallhavenProxy) {
+            wallhavenProxyHost = prefs.getString("pref_wallhavenProxyHost", HOST_NEW);
+            return before.replace(HOST_OLD, wallhavenProxyHost);
         } else {
             return resizeUrl(before);
         }

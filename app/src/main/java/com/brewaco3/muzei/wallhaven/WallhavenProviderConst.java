@@ -17,16 +17,16 @@
 
 package com.brewaco3.muzei.wallhaven;
 
-public final class PixivProviderConst {
+public final class WallhavenProviderConst {
 
-    public static final String PIXIV_RANKING_URL = "https://wallhaven.cc/api/v1/";
-    public static final String PIXIV_API_HOST_URL = PIXIV_RANKING_URL;
+    public static final String WALLHAVEN_API_BASE_URL = "https://wallhaven.cc/api/v1/";
+    public static final String WALLHAVEN_API_HOST_URL = WALLHAVEN_API_BASE_URL;
     public static final String WALLHAVEN_BASE_URL = "https://wallhaven.cc/";
-    public static final String PIXIV_ARTWORK_URL = "https://wallhaven.cc/w/";
-    public static final String PIXIV_REDIRECT_URL = "";
-    public static final String PIXIV_IMAGE_URL = "https://w.wallhaven.cc/";
+    public static final String WALLHAVEN_ARTWORK_URL = "https://wallhaven.cc/w/";
+    public static final String WALLHAVEN_REDIRECT_URL = "";
+    public static final String WALLHAVEN_IMAGE_URL = "https://w.wallhaven.cc/";
     public static final String MEMBER_ILLUST_URL = "";
-    public static final String OAUTH_URL = PIXIV_RANKING_URL;
+    public static final String OAUTH_URL = WALLHAVEN_API_BASE_URL;
 
     // browser strings
     public static final String BROWSER_USER_AGENT =

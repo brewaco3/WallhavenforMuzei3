@@ -19,18 +19,18 @@
     <string name="command_shareImage">分享图像</string>
     <string name="command_viewArtworkDetails">查看详情</string>
 
-    <string name="dialogTitle_muzeiNotActiveSource">Pixiv for Muzei 3 非当前激活源</string><!--未在 Muzei 中激活本源，需润色通顺-->
+    <string name="dialogTitle_muzeiNotActiveSource">Wallhaven for Muzei 3 非当前激活源</string><!--未在 Muzei 中激活本源，需润色通顺-->
     <string name="dialogTitle_muzeiNotInstalled">Muzei 尚未安装</string>
 
     <string name="dialog_installMuzei">您想要安装 Muzei 吗？</string>
     <string name="dialog_no">否</string>
-    <string name="dialog_selectSource">请打开 Muzei 中的“源”标签，然后选择 \"Pixiv for Muzei 3\"</string>
+    <string name="dialog_selectSource">请打开 Muzei 中的“源”标签，然后选择 \"Wallhaven for Muzei 3\"</string>
     <string name="dialog_yes">是</string>
 
     <string name="fab_delete_selected_artwork">删除所选作品</string>
 
-    <string name="login_pixiv_account_hint">请输入 Pixiv 账号</string>
-    <string name="login_pixiv_password_hint">请输入密码</string>
+    <string name="login_wallhaven_account_hint">请输入 Wallhaven 账号</string>
+    <string name="login_wallhaven_password_hint">请输入密码</string>
 
     <string name="prefCat_about">关于</string>
     <string name="prefCat_advFiltering">高级过滤</string>
@@ -74,7 +74,7 @@
     <string name="pref_aspectRatioDefault_entryValues">0</string>
     <string name="pref_authFailActionDropDown">验证失败后措施</string>
     <string name="prefTitle_enableNetworkBypass">绕过网络过滤</string><!--指绕过大陆封锁所用技术，参见 https://gulut.github.io/gulut-blog/post1/2020/05/31/2020-05-31-by-pass-the-gfw-by-sni-->
-    <string name="prefTitle_usePixivCat">使用 PixivCat 反向代理</string>
+    <string name="prefTitle_useWallhavenProxy">使用 Wallhaven 图像代理</string>
     <string name="pref_updateMode">更新模式</string>
     <string name="pref_updateMode_default">toplist</string>
 
@@ -109,7 +109,7 @@
     <string name="toast_bookmark_private_success">非公开收藏成功</string>
     <string name="toast_bookmark_failure">收藏失败</string>
 
-    <string name="login_pixiv_refresh_hint">刷新令牌</string>
+    <string name="login_wallhaven_refresh_hint">刷新令牌</string>
     <string name="action_sign_in_refresh">刷新令牌以登录</string><!--Refresh Token 用作刷新 Access Token，为 OAuth 中一项术语，此处翻译不确定-->
     <string name="dialog_logoutConfirm">您确定要登出吗？</string>
     <string name="prefTitle_nightModePreference">夜间模式偏好</string>
@@ -117,6 +117,6 @@
     <string name="prefTitle_mobileDataSaver">移动数据省流</string>
     <string name="prefSummary_mobileDataSaver">停止下载新作品</string>
     <string name="prefCat_appSettings">应用设置</string>
-    <string name="prefSummary_usePixivCat">加速某些地区的图片下载</string>
+    <string name="prefSummary_useWallhavenProxy">加速某些地区的图片下载</string>
     <string name="wallhaven_unknown_uploader">未知上传者</string>
 </resources>

@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.util.Log
 import androidx.preference.PreferenceManager
 import com.brewaco3.muzei.wallhaven.BuildConfig
-import com.brewaco3.muzei.wallhaven.PixivMuzei
+import com.brewaco3.muzei.wallhaven.WallhavenMuzei
 import com.brewaco3.muzei.wallhaven.provider.network.interceptor.NetworkTrafficLogInterceptor
 import okhttp3.OkHttpClient
 import java.security.cert.X509Certificate
@@ -42,7 +42,7 @@ object OkHttpSingleton {
             instance = OkHttpClient.Builder()
                 .retryOnConnectionFailure(true)
                 .apply {
-                    val prefs = PreferenceManager.getDefaultSharedPreferences(PixivMuzei.context!!.applicationContext)
+                    val prefs = PreferenceManager.getDefaultSharedPreferences(WallhavenMuzei.context!!.applicationContext)
                     val enableNetworkBypass = prefs.getBoolean("pref_enableNetworkBypass", false)
                     Log.d(LOG_TAG,"network bypass was $enableNetworkBypass")
                     if (enableNetworkBypass) {

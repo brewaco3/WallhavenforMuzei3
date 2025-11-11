@@ -1,4 +1,4 @@
-用于新的 Muzei 3 API 的 Pixiv 插件，将 Pixiv 作品作为您的壁纸显示
+用于新的 Muzei 3 API 的 Wallhaven 插件，将 Wallhaven 壁纸作为您的壁纸显示
 
 功能：
 

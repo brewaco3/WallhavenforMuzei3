@@ -32,8 +32,8 @@ import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.IconCompat
 import androidx.preference.PreferenceManager
 import com.brewaco3.muzei.wallhaven.BuildConfig
-import com.brewaco3.muzei.wallhaven.PixivMuzeiSupervisor.getAccessToken
-import com.brewaco3.muzei.wallhaven.PixivProviderConst.PIXIV_ARTWORK_URL
+import com.brewaco3.muzei.wallhaven.WallhavenMuzeiSupervisor.getAccessToken
+import com.brewaco3.muzei.wallhaven.WallhavenProviderConst.WALLHAVEN_ARTWORK_URL
 import com.brewaco3.muzei.wallhaven.R
 import com.brewaco3.muzei.wallhaven.util.IntentUtils
 import com.google.android.apps.muzei.api.provider.Artwork
@@ -92,7 +92,7 @@ class MuzeiCommandManager {
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             context.contentResolver.query(
-                ProviderContract.getProviderClient(context, PixivArtProvider::class.java).contentUri,
+                ProviderContract.getProviderClient(context, WallhavenArtProvider::class.java).contentUri,
                 arrayOf("persistent_uri"),
                 "${ProviderContract.Artwork.TOKEN} = ?",
                 arrayOf("${artwork.token}"),
@@ -143,7 +143,7 @@ class MuzeiCommandManager {
         artwork.token?.takeIf { it.isNotEmpty() }?.let { token ->
             Intent(
                 Intent.ACTION_VIEW,
-                Uri.parse(PIXIV_ARTWORK_URL + token)
+                Uri.parse(WALLHAVEN_ARTWORK_URL + token)
             )
         }?.let { intent ->
             PendingIntent.getActivity(

@@ -1,6 +1,6 @@
 package com.brewaco3.muzei.wallhaven.provider
 
-import com.brewaco3.muzei.wallhaven.provider.network.PixivRankingFeedJsonService
+import com.brewaco3.muzei.wallhaven.provider.network.WallhavenRankingFeedJsonService
 import com.brewaco3.muzei.wallhaven.provider.network.RestClient
 import com.brewaco3.muzei.wallhaven.provider.network.moshi.Contents
 
@@ -11,7 +11,7 @@ class ContentsHelper(
 ) {
     private lateinit var contents: Contents
     private val service = RestClient.getRetrofitRankingInstance().create(
-        PixivRankingFeedJsonService::class.java
+        WallhavenRankingFeedJsonService::class.java
     )
     private var pageNumber = 1
     private var lastPage = 1

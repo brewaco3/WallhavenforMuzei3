@@ -1,6 +1,6 @@
 package com.brewaco3.muzei.wallhaven.provider.network.interceptor
 
-import com.brewaco3.muzei.wallhaven.PixivProviderConst.APP_USER_AGENT
+import com.brewaco3.muzei.wallhaven.WallhavenProviderConst.APP_USER_AGENT
 import okhttp3.Interceptor
 import okhttp3.Response
 

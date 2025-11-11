@@ -29,7 +29,7 @@ import androidx.preference.*
 import androidx.work.*
 import com.brewaco3.muzei.wallhaven.R
 import com.brewaco3.muzei.wallhaven.provider.ClearCacheWorker
-import com.brewaco3.muzei.wallhaven.provider.PixivArtWorker
+import com.brewaco3.muzei.wallhaven.provider.WallhavenArtWorker
 import com.brewaco3.muzei.wallhaven.provider.network.OkHttpSingleton
 import java.text.SimpleDateFormat
 import java.util.*
@@ -203,7 +203,7 @@ class AdvOptionsPreferenceFragment : PreferenceFragmentCompat() {
         findPreference<SwitchPreference>("pref_enableNetworkBypass")?.let {
             it.setOnPreferenceChangeListener { _, _ ->
                 OkHttpSingleton.refreshInstance() // Renew a instance with sslSocketFactory by this
-                PixivArtWorker.enqueueLoad(false, requireContext())
+                WallhavenArtWorker.enqueueLoad(false, requireContext())
                 true
             }
         }
