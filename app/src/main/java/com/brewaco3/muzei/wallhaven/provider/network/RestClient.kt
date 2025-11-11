@@ -16,14 +16,13 @@
  */
 package com.brewaco3.muzei.wallhaven.provider.network
 
-import com.brewaco3.muzei.wallhaven.PixivMuzeiSupervisor
 import com.brewaco3.muzei.wallhaven.PixivProviderConst.OAUTH_URL
 import com.brewaco3.muzei.wallhaven.PixivProviderConst.PIXIV_API_HOST_URL
 import com.brewaco3.muzei.wallhaven.PixivProviderConst.PIXIV_IMAGE_URL
 import com.brewaco3.muzei.wallhaven.PixivProviderConst.PIXIV_RANKING_URL
-import com.brewaco3.muzei.wallhaven.provider.network.interceptor.PixivAuthHeaderInterceptor
 import com.brewaco3.muzei.wallhaven.provider.network.interceptor.StandardAuthHttpHeaderInterceptor
 import com.brewaco3.muzei.wallhaven.provider.network.interceptor.StandardImageHttpHeaderInterceptor
+import com.brewaco3.muzei.wallhaven.provider.network.interceptor.WallhavenApiKeyInterceptor
 import okhttp3.Interceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -32,7 +31,7 @@ object RestClient {
     private val okHttpClientAuthBuilder
         get() = OkHttpSingleton.getInstance().newBuilder()
             .apply {
-                addInterceptor(PixivAuthHeaderInterceptor())
+                addInterceptor(WallhavenApiKeyInterceptor())
                 addInterceptor(StandardAuthHttpHeaderInterceptor())
             }
 
@@ -42,12 +41,9 @@ object RestClient {
             .addInterceptor(Interceptor { chain ->
                 val requestBuilder = chain.request().newBuilder()
                     .header("Accept", "application/json")
-                val cookie = PixivMuzeiSupervisor.getSessionCookie()
-                if (cookie.isNotEmpty()) {
-                    requestBuilder.header("Cookie", cookie)
-                }
                 chain.proceed(requestBuilder.build())
             })
+            .addInterceptor(WallhavenApiKeyInterceptor())
             .build()
         return Retrofit.Builder()
             .client(okHttpClientRanking)
@@ -68,7 +64,9 @@ object RestClient {
     // Used to add artworks to your list of bookmarks
     fun getRetrofitBookmarkInstance(): Retrofit {
         return Retrofit.Builder()
-            .client(OkHttpSingleton.getInstance())
+            .client(OkHttpSingleton.getInstance().newBuilder()
+                .addInterceptor(WallhavenApiKeyInterceptor())
+                .build())
             .baseUrl(PIXIV_API_HOST_URL)
             .build()
     }
@@ -76,6 +74,7 @@ object RestClient {
     // Downloads images from any source
     fun getRetrofitImageInstance(): Retrofit {
         val imageHttpClient = OkHttpSingleton.getInstance().newBuilder()
+            .addInterceptor(WallhavenApiKeyInterceptor())
             .addInterceptor(StandardImageHttpHeaderInterceptor())
             .build()
         return Retrofit.Builder()

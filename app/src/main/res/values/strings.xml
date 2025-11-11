@@ -11,6 +11,7 @@
     <string name="attr_hot">Hot</string>
 
     <string name="button_clearCache">Immediately clear image cache</string>
+    <string name="button_forceRefresh">Force refresh wallpapers</string>
 
     <string name="command_addToBookmark">Add to bookmarks</string>
     <string name="command_addToPrivateBookmark">Bookmark privately</string>
@@ -33,18 +34,20 @@
 
     <string name="prefCat_about">About</string>
     <string name="prefCat_advFiltering">Advanced filtering</string>
-    <string name="prefCat_authSettings">Pixiv Login</string>
+    <string name="prefCat_authSettings">Wallhaven API access</string>
     <string name="prefCat_fileOptions">File Options</string>
     <string name="prefCat_networkingOptions">Networking options</string>
     <string name="prefCat_pullFeedSettings">Picture feed settings</string>
     <string name="prefCat_postProcess">Postprocessing Options</string>
 
-    <string name="prefSummary_LoggedIn">Logged in as </string>
-    <string name="prefSummary_currentlyLoggedInAs">"Currently logged in as "</string>
+    <string name="prefTitle_apiKey">Wallhaven API key</string>
+    <string name="prefSummary_apiKey_notSet">API key not set</string>
+    <string name="prefSummary_apiKey_set">API key saved</string>
+    <string name="prefDialog_apiKey">Enter your Wallhaven API key</string>
     <string name="prefSummary_noFileSizeLimit">No limit</string>
-    <string name="prefSummary_notLoggedIn">Not logged in</string>
     <string name="prefSummary_storeInExtStorage">Pictures saved here will not be automatically cleared</string>
     <string name="prefSummary_stuckApp">If the app is not working, press here</string>
+    <string name="prefSummary_forceRefresh">Download a fresh wallpaper immediately</string>
     <string name="prefSummary_autoCrop">Crops blank spaces around artworks. Increased battery drain when downloading.</string>
 
     <string name="prefTitle_MaximumFileSize">Maximum artwork size</string>
@@ -53,8 +56,6 @@
     <string name="prefTitle_authFilterSelect">Feed NSFW filter level</string>
     <string name="prefTitle_autoClearMode">Automatically clear cache at 1AM daily</string>
     <string name="prefTitle_keyContributor">Key contributor</string>
-    <string name="prefTitle_loginButton">Login</string>
-    <string name="prefTitle_logoutButton">Manage login</string>
     <string name="prefTitle_mainDeveloper">Main developer</string>
     <string name="prefTitle_minimumViews">Artwork minimum views</string>
     <string name="prefTitle_numToDownload">Number of artwork to download at a time</string>
@@ -96,7 +97,12 @@
     <string name="toast_authFailedRetry">Wallhaven for Muzei: Login failed, will try again</string>
     <string name="toast_authFailedSwitch">Wallhaven for Muzei: Login failed, switching to toplist</string>
     <string name="toast_clearingCache">Clearing image cache</string>
-    <string name="toast_loginFirst">Please login first</string>
+    <string name="toast_forceRefreshQueued">Refreshing wallpapers…</string>
+    <string name="toast_forceRefreshComplete">Wallpapers refreshed</string>
+    <string name="toast_forceRefreshFailed">Refresh failed: %1$s</string>
+    <string name="toast_forceRefreshFailed_generic">Refresh failed</string>
+    <string name="toast_forceRefreshCancelled">Refresh cancelled</string>
+    <string name="toast_loginFirst">Please enter your API key first</string>
     <string name="toast_newArtist">New Artist, clearing image cache</string>
     <string name="toast_newFilterMode">New filtering mode, clearing image cache</string>
     <string name="toast_newFilterSelect">New filter selection, clearing image cache</string>
