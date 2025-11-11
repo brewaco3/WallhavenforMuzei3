@@ -6,22 +6,21 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.brewaco3.muzei.wallhaven.PixivInstrumentation;
-import com.brewaco3.muzei.wallhaven.util.HostManager;
+import com.brewaco3.muzei.wallhaven.WallhavenInstrumentation;
 
-public class PixivMuzeiActivity extends AppCompatActivity {
+public class WallhavenMuzeiActivity extends AppCompatActivity {
 
-    private PixivInstrumentation mPixivInstrumentation;
+    private WallhavenInstrumentation mWallhavenInstrumentation;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        mPixivInstrumentation = new PixivInstrumentation();
+        mWallhavenInstrumentation = new WallhavenInstrumentation();
         super.onCreate(savedInstanceState);
     }
 
     @NonNull
-    protected PixivInstrumentation requireInstrumentation() {
-        PixivInstrumentation instrumentation = getInstrumentation();
+    protected WallhavenInstrumentation requireInstrumentation() {
+        WallhavenInstrumentation instrumentation = getInstrumentation();
         if (instrumentation == null) {
             throw new IllegalStateException("Activity " + this + "not prepared.");
         }
@@ -29,8 +28,8 @@ public class PixivMuzeiActivity extends AppCompatActivity {
     }
 
     @Nullable
-    protected PixivInstrumentation getInstrumentation() {
-        return mPixivInstrumentation;
+    protected WallhavenInstrumentation getInstrumentation() {
+        return mWallhavenInstrumentation;
     }
 
 }

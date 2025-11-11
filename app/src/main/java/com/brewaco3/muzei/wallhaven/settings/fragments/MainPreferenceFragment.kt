@@ -24,11 +24,11 @@ import androidx.preference.*
 import androidx.work.ExistingWorkPolicy
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import com.brewaco3.muzei.wallhaven.PixivMuzeiSupervisor
-import com.brewaco3.muzei.wallhaven.PixivProviderConst
-import com.brewaco3.muzei.wallhaven.PixivProviderConst.AUTH_MODES
+import com.brewaco3.muzei.wallhaven.WallhavenMuzeiSupervisor
+import com.brewaco3.muzei.wallhaven.WallhavenProviderConst
+import com.brewaco3.muzei.wallhaven.WallhavenProviderConst.AUTH_MODES
 import com.brewaco3.muzei.wallhaven.R
-import com.brewaco3.muzei.wallhaven.provider.PixivArtWorker.Companion.enqueueLoad
+import com.brewaco3.muzei.wallhaven.provider.WallhavenArtWorker.Companion.enqueueLoad
 import com.google.android.material.snackbar.Snackbar
 class MainPreferenceFragment : PreferenceFragmentCompat() {
     private lateinit var oldUpdateMode: String
@@ -43,7 +43,7 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.main_preference_layout, rootKey)
 
-        PixivMuzeiSupervisor.start(requireContext().applicationContext)
+        WallhavenMuzeiSupervisor.start(requireContext().applicationContext)
 
         val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
 
@@ -66,7 +66,7 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
             Preference.OnPreferenceChangeListener setOnPreferenceChangeListener@{ _: Preference?, newValue: Any ->
                 // User has selected an authenticated feed mode, but has not yet provided
                 // the API key required for those requests
-                if (AUTH_MODES.contains(newValue) && !PixivMuzeiSupervisor.hasApiKey()) {
+                if (AUTH_MODES.contains(newValue) && !WallhavenMuzeiSupervisor.hasApiKey()) {
                     Snackbar.make(
                         requireView(), R.string.toast_loginFirst,
                         Snackbar.LENGTH_SHORT
@@ -249,7 +249,7 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
 
                         WorkInfo.State.FAILED -> {
                             val errorMessage = info.outputData
-                                .getString(PixivProviderConst.WORK_ERROR_MESSAGE_KEY)
+                                .getString(WallhavenProviderConst.WORK_ERROR_MESSAGE_KEY)
                                 .orEmpty()
                             val message = if (errorMessage.isBlank()) {
                                 getString(R.string.toast_forceRefreshFailed_generic)
@@ -293,16 +293,16 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
                     InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD or
                         InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
             }
-            val storedApiKey = PixivMuzeiSupervisor.getApiKey()
+            val storedApiKey = WallhavenMuzeiSupervisor.getApiKey()
             if (pref.text.isNullOrBlank() && storedApiKey.isNotBlank()) {
                 pref.text = storedApiKey
             }
             pref.setOnPreferenceChangeListener { preference, newValue ->
                 val sanitized = (newValue as? String).orEmpty().trim()
                 if (sanitized.isEmpty()) {
-                    PixivMuzeiSupervisor.clearApiKey()
+                    WallhavenMuzeiSupervisor.clearApiKey()
                 } else {
-                    PixivMuzeiSupervisor.setApiKey(sanitized)
+                    WallhavenMuzeiSupervisor.setApiKey(sanitized)
                 }
                 if (sanitized != newValue) {
                     (preference as EditTextPreference).text = sanitized
@@ -343,7 +343,7 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
     // Returns a comma delimited string of user selections. There is no trailing comma
     // newValue is a HashSet that can contain 2, 4, 6, or 8, and corresponds to
     // SFW, Slightly Ecchi, Fairly Ecchi, and R18 respectively
-    // 2, 4, 6, 8 was selected to match with the values used in Pixiv JSON
+    // 2, 4, 6, 8 was selected to match with the values used in Wallhaven JSON
     private fun authSummaryStringGenerator(selection: Set<String>): String {
         val authFilterEntriesPossible =
             resources.getStringArray(R.array.pref_authFilterLevel_entries)

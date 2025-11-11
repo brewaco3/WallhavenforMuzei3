@@ -20,7 +20,7 @@ import android.content.Context
 import android.os.Environment
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.brewaco3.muzei.wallhaven.provider.PixivArtWorker.Companion.enqueueLoad
+import com.brewaco3.muzei.wallhaven.provider.WallhavenArtWorker.Companion.enqueueLoad
 
 class ClearCacheWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
     override fun doWork(): Result {

@@ -1,4 +1,4 @@
-Plugin for the new Muzei 3, to display Pixiv artworks as your wallpaper
+Plugin for the new Muzei 3, to display Wallhaven wallpapers on your device
 
 Features:
 

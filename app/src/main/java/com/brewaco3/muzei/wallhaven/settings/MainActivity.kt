@@ -27,14 +27,14 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.viewpager2.widget.ViewPager2
 import com.brewaco3.muzei.wallhaven.BuildConfig
 import com.brewaco3.muzei.wallhaven.R
-import com.brewaco3.muzei.wallhaven.common.PixivMuzeiActivity
+import com.brewaco3.muzei.wallhaven.common.WallhavenMuzeiActivity
 import com.brewaco3.muzei.wallhaven.settings.fragments.AdvOptionsPreferenceFragment
 import com.brewaco3.muzei.wallhaven.util.IntentUtils
 import com.google.android.apps.muzei.api.MuzeiContract.Sources.createChooseProviderIntent
 import com.google.android.apps.muzei.api.MuzeiContract.Sources.isProviderSelected
 import com.google.android.material.tabs.TabLayoutMediator
 
-class MainActivity : PixivMuzeiActivity(), AdvOptionsPreferenceFragment.NightModePreferenceListener {
+class MainActivity : WallhavenMuzeiActivity(), AdvOptionsPreferenceFragment.NightModePreferenceListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -83,7 +83,7 @@ class MainActivity : PixivMuzeiActivity(), AdvOptionsPreferenceFragment.NightMod
                 }
                 .show()
         } else if (!isProviderSelected(this, BuildConfig.APPLICATION_ID + ".provider")) {
-            // If Pixiv for Muzei 3 is not the selected provider
+        // If Wallhaven for Muzei 3 is not the selected provider
             AlertDialog.Builder(this)
                 .setTitle(applicationContext.getString(R.string.dialogTitle_muzeiNotActiveSource))
                 .setMessage(applicationContext.getString(R.string.dialog_selectSource))

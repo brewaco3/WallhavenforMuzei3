@@ -1,6 +1,6 @@
 package com.brewaco3.muzei.wallhaven.provider
 
-import com.brewaco3.muzei.wallhaven.provider.network.PixivAuthFeedJsonService
+import com.brewaco3.muzei.wallhaven.provider.network.WallhavenAuthFeedJsonService
 import com.brewaco3.muzei.wallhaven.provider.network.RestClient
 import com.brewaco3.muzei.wallhaven.provider.network.moshi.Illusts
 import retrofit2.Call
@@ -12,8 +12,8 @@ class IllustsHelper(
     private val tag: String = ""
 ) {
     private lateinit var illusts: Illusts
-    private val service: PixivAuthFeedJsonService = RestClient.getRetrofitAuthInstance()
-        .create(PixivAuthFeedJsonService::class.java)
+    private val service: WallhavenAuthFeedJsonService = RestClient.getRetrofitAuthInstance()
+        .create(WallhavenAuthFeedJsonService::class.java)
     
     fun getNewIllusts(): Illusts {
         val call: Call<Illusts?> = when (updateMode) {

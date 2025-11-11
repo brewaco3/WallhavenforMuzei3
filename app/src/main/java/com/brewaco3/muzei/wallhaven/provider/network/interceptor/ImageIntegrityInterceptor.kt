@@ -5,7 +5,7 @@ import com.brewaco3.muzei.wallhaven.provider.exceptions.CorruptFileException
 import okhttp3.Interceptor
 import okhttp3.Response
 
-// This interceptor makes sure the artworks we are downloading from Pixiv are nto corrupt due to network issues
+// This interceptor makes sure the artworks we are downloading from Wallhaven are not corrupt due to network issues
 // It does this by checking the declared length from the HTTP response header ("content-length")
 // Then comparing it to the actual length of the response body.
 // If a mismatch is found then the request is retried up to three times after a short delay.

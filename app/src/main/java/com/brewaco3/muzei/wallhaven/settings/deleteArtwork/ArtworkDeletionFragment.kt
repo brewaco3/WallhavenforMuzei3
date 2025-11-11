@@ -31,7 +31,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.brewaco3.muzei.wallhaven.AppDatabase
 import com.brewaco3.muzei.wallhaven.BuildConfig
 import com.brewaco3.muzei.wallhaven.R
-import com.brewaco3.muzei.wallhaven.provider.PixivArtProvider
+import com.brewaco3.muzei.wallhaven.provider.WallhavenArtProvider
 import com.google.android.apps.muzei.api.provider.ProviderContract
 import com.google.android.apps.muzei.api.provider.ProviderContract.Artwork.TOKEN
 import com.google.android.apps.muzei.api.provider.ProviderContract.getProviderClient
@@ -90,7 +90,7 @@ class ArtworkDeletionFragment : Fragment() {
             // Builds a new delete operation for every selected artwork
             for (artworkItem in SELECTED_ITEMS) {
                 val operation = ContentProviderOperation
-                    .newDelete(getProviderClient(context, PixivArtProvider::class.java).contentUri)
+                    .newDelete(getProviderClient(context, WallhavenArtProvider::class.java).contentUri)
                     .withSelection(selection, arrayOf(artworkItem.token))
                     .build()
                 operations.add(operation)
@@ -126,7 +126,7 @@ class ArtworkDeletionFragment : Fragment() {
     private fun getInitialArtworkItemList(context: Context): MutableList<ArtworkItem> {
         val listOfArtworkItem = mutableListOf<ArtworkItem>()
         val projection = arrayOf("token", "title", "persistent_uri")
-        val conResUri = getProviderClient(context, PixivArtProvider::class.java).contentUri
+        val conResUri = getProviderClient(context, WallhavenArtProvider::class.java).contentUri
         val cursor = context.contentResolver.query(conResUri, projection, null, null, null)
         if (cursor != null) {
             while (cursor.moveToNext()) {

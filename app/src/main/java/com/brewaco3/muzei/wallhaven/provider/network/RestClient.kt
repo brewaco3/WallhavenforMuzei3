@@ -16,10 +16,10 @@
  */
 package com.brewaco3.muzei.wallhaven.provider.network
 
-import com.brewaco3.muzei.wallhaven.PixivProviderConst.OAUTH_URL
-import com.brewaco3.muzei.wallhaven.PixivProviderConst.PIXIV_API_HOST_URL
-import com.brewaco3.muzei.wallhaven.PixivProviderConst.PIXIV_IMAGE_URL
-import com.brewaco3.muzei.wallhaven.PixivProviderConst.PIXIV_RANKING_URL
+import com.brewaco3.muzei.wallhaven.WallhavenProviderConst.OAUTH_URL
+import com.brewaco3.muzei.wallhaven.WallhavenProviderConst.WALLHAVEN_API_BASE_URL
+import com.brewaco3.muzei.wallhaven.WallhavenProviderConst.WALLHAVEN_API_HOST_URL
+import com.brewaco3.muzei.wallhaven.WallhavenProviderConst.WALLHAVEN_IMAGE_URL
 import com.brewaco3.muzei.wallhaven.provider.network.interceptor.StandardAuthHttpHeaderInterceptor
 import com.brewaco3.muzei.wallhaven.provider.network.interceptor.StandardImageHttpHeaderInterceptor
 import com.brewaco3.muzei.wallhaven.provider.network.interceptor.WallhavenApiKeyInterceptor
@@ -47,7 +47,7 @@ object RestClient {
             .build()
         return Retrofit.Builder()
             .client(okHttpClientRanking)
-            .baseUrl(PIXIV_RANKING_URL)
+            .baseUrl(WALLHAVEN_API_BASE_URL)
             .addConverterFactory(MoshiConverterFactory.create())
             .build()
     }
@@ -56,7 +56,7 @@ object RestClient {
     fun getRetrofitAuthInstance(): Retrofit {
         return Retrofit.Builder()
             .client(okHttpClientAuthBuilder.build())
-            .baseUrl(PIXIV_API_HOST_URL)
+            .baseUrl(WALLHAVEN_API_HOST_URL)
             .addConverterFactory(MoshiConverterFactory.create())
             .build()
     }
@@ -67,7 +67,7 @@ object RestClient {
             .client(OkHttpSingleton.getInstance().newBuilder()
                 .addInterceptor(WallhavenApiKeyInterceptor())
                 .build())
-            .baseUrl(PIXIV_API_HOST_URL)
+            .baseUrl(WALLHAVEN_API_HOST_URL)
             .build()
     }
 
@@ -79,7 +79,7 @@ object RestClient {
             .build()
         return Retrofit.Builder()
             .client(imageHttpClient)
-            .baseUrl(PIXIV_IMAGE_URL)
+            .baseUrl(WALLHAVEN_IMAGE_URL)
             .addConverterFactory(MoshiConverterFactory.create())
             .build()
     }

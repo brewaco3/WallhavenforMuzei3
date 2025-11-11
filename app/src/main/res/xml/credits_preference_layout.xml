@@ -54,7 +54,7 @@
             android:data="https://github.com/FluffyDiscord" />
     </Preference>
     <Preference
-        android:summary="Pixiv login"
+        android:summary="Wallhaven login"
         android:title="James58899">
         <intent
             android:action="android.intent.action.VIEW"

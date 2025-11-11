@@ -15,7 +15,7 @@ class BlockArtistReceiver : BroadcastReceiver(), CoroutineScope by CoroutineScop
     override fun onReceive(context: Context, intent: Intent) {
         intent.getStringExtra("artistId")?.let { artistId ->
             context.contentResolver.delete(
-                ProviderContract.getProviderClient(context, PixivArtProvider::class.java).contentUri,
+                ProviderContract.getProviderClient(context, WallhavenArtProvider::class.java).contentUri,
                 "${ProviderContract.Artwork.TOKEN} = ?",
                 arrayOf(artistId)
             )

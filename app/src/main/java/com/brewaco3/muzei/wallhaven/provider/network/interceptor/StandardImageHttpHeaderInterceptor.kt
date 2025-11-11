@@ -1,11 +1,11 @@
 package com.brewaco3.muzei.wallhaven.provider.network.interceptor
 
-import com.brewaco3.muzei.wallhaven.PixivProviderConst.APP_USER_AGENT
-import com.brewaco3.muzei.wallhaven.PixivProviderConst.WALLHAVEN_BASE_URL
+import com.brewaco3.muzei.wallhaven.WallhavenProviderConst.APP_USER_AGENT
+import com.brewaco3.muzei.wallhaven.WallhavenProviderConst.WALLHAVEN_BASE_URL
 import okhttp3.Interceptor
 import okhttp3.Response
 
-// This interceptor makes all outgoing requests to download images look just like the ones made with the official Pixiv app
+// This interceptor makes all outgoing requests to download images look just like the ones made with the official Wallhaven site
 class StandardImageHttpHeaderInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val originRequest = chain.request()

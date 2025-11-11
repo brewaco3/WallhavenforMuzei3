@@ -18,23 +18,23 @@
 package com.brewaco3.muzei.wallhaven.provider.network.interceptor
 
 import android.text.TextUtils
-import com.brewaco3.muzei.wallhaven.PixivMuzeiSupervisor
+import com.brewaco3.muzei.wallhaven.WallhavenMuzeiSupervisor
 import okhttp3.Interceptor
 import okhttp3.Response
 
 /**
- * Pixiv auth request [Interceptor] that automatic append access token to headers
+ * Wallhaven auth request [Interceptor] that automatically appends the access token to headers
  *
  * Created by alvince on 2020/6/13
  *
  * @author alvince.zy@gmail.com
  */
-class PixivAuthHeaderInterceptor : Interceptor {
+class WallhavenAuthHeaderInterceptor : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val originRequest = chain.request()
 
-        val cookie = PixivMuzeiSupervisor.getSessionCookie()
+        val cookie = WallhavenMuzeiSupervisor.getSessionCookie()
         if (TextUtils.isEmpty(cookie)) {
             return chain.proceed(originRequest)
         }

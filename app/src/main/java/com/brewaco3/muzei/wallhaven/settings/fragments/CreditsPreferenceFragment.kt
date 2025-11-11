@@ -32,7 +32,7 @@ class CreditsPreferenceFragment : PreferenceFragmentCompat() {
             val intent = Intent(Intent.ACTION_SENDTO)
             intent.data = Uri.parse("mailto:") // only email apps should handle this
             intent.putExtra(Intent.EXTRA_EMAIL, arrayOf("antonyhupro@gmail.com"))
-            intent.putExtra(Intent.EXTRA_SUBJECT, "Pixiv for Muzei 3 Feedback and Suggestions")
+            intent.putExtra(Intent.EXTRA_SUBJECT, "Wallhaven for Muzei 3 Feedback and Suggestions")
             IntentUtils.launchActivity(this, intent)
         }
     }

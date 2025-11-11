@@ -3,7 +3,7 @@ package com.brewaco3.muzei.wallhaven
 import android.app.Application
 import android.content.Context
 
-class PixivMuzei : Application() {
+class WallhavenMuzei : Application() {
     override fun onCreate() {
         super.onCreate()
         context = this

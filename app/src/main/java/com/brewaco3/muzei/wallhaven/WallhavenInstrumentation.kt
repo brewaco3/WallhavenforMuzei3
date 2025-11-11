@@ -3,12 +3,12 @@ package com.brewaco3.muzei.wallhaven
 import android.content.Context
 import androidx.preference.PreferenceManager
 import com.brewaco3.muzei.wallhaven.BuildConfig
-import com.brewaco3.muzei.wallhaven.PixivProviderConst.PREFERENCE_API_KEY
-import com.brewaco3.muzei.wallhaven.PixivProviderConst.PREFERENCE_SESSION_COOKIE
-import com.brewaco3.muzei.wallhaven.PixivProviderConst.PREFERENCE_SESSION_TIMESTAMP
-import com.brewaco3.muzei.wallhaven.PixivProviderConst.PREFERENCE_SESSION_USERNAME
+import com.brewaco3.muzei.wallhaven.WallhavenProviderConst.PREFERENCE_API_KEY
+import com.brewaco3.muzei.wallhaven.WallhavenProviderConst.PREFERENCE_SESSION_COOKIE
+import com.brewaco3.muzei.wallhaven.WallhavenProviderConst.PREFERENCE_SESSION_TIMESTAMP
+import com.brewaco3.muzei.wallhaven.WallhavenProviderConst.PREFERENCE_SESSION_USERNAME
 
-class PixivInstrumentation {
+class WallhavenInstrumentation {
 
     companion object {
         const val INTENT_ACTION_ACCESS_TOKEN_MISSING =
