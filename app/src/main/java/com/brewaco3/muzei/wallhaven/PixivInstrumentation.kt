@@ -3,6 +3,7 @@ package com.brewaco3.muzei.wallhaven
 import android.content.Context
 import androidx.preference.PreferenceManager
 import com.brewaco3.muzei.wallhaven.BuildConfig
+import com.brewaco3.muzei.wallhaven.PixivProviderConst.PREFERENCE_API_KEY
 import com.brewaco3.muzei.wallhaven.PixivProviderConst.PREFERENCE_SESSION_COOKIE
 import com.brewaco3.muzei.wallhaven.PixivProviderConst.PREFERENCE_SESSION_TIMESTAMP
 import com.brewaco3.muzei.wallhaven.PixivProviderConst.PREFERENCE_SESSION_USERNAME
@@ -19,6 +20,7 @@ class PixivInstrumentation {
                 .remove(PREFERENCE_SESSION_COOKIE)
                 .remove(PREFERENCE_SESSION_TIMESTAMP)
                 .remove(PREFERENCE_SESSION_USERNAME)
+                .remove(PREFERENCE_API_KEY)
                 .apply()
         }
     }
@@ -48,4 +50,33 @@ class PixivInstrumentation {
 
     fun hasSession(context: Context): Boolean =
         getSessionCookie(context).isNotEmpty()
+
+    fun storeApiKey(context: Context, apiKey: String?) {
+        val sanitized = apiKey?.trim().orEmpty()
+        PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
+            .edit()
+            .apply {
+                if (sanitized.isEmpty()) {
+                    remove(PREFERENCE_API_KEY)
+                } else {
+                    putString(PREFERENCE_API_KEY, sanitized)
+                }
+            }
+            .apply()
+    }
+
+    fun clearApiKey(context: Context) {
+        PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
+            .edit()
+            .remove(PREFERENCE_API_KEY)
+            .apply()
+    }
+
+    fun getApiKey(context: Context): String =
+        PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
+            .getString(PREFERENCE_API_KEY, "")
+            .orEmpty()
+
+    fun hasApiKey(context: Context): Boolean =
+        getApiKey(context).isNotEmpty()
 }

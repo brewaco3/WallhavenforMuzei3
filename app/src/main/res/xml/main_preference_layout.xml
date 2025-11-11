@@ -56,6 +56,10 @@
             android:key="@string/button_clearCache"
             android:summary="@string/prefSummary_stuckApp"
             android:title="@string/button_clearCache" />
+        <Preference
+            android:key="pref_forceRefresh"
+            android:summary="@string/prefSummary_forceRefresh"
+            android:title="@string/button_forceRefresh" />
         <EditTextPreference
             android:dialogTitle="@string/prefTitle_tagSearch"
             android:inputType="text"
@@ -84,7 +88,12 @@
     <PreferenceCategory
         android:key="prefCat_loginSettings"
         android:title="@string/prefCat_authSettings">
-        <Preference android:key="pref_login" />
+        <EditTextPreference
+            android:dialogTitle="@string/prefDialog_apiKey"
+            android:inputType="textPassword"
+            android:key="pref_api_key"
+            android:persistent="true"
+            android:title="@string/prefTitle_apiKey" />
         <DropDownPreference
             android:entries="@array/array_authFailActions_entries"
             android:entryValues="@array/array_authFailActions_entryvalues"
