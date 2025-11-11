@@ -26,7 +26,7 @@ import retrofit2.http.Header;
 import retrofit2.http.Query;
 import retrofit2.http.Url;
 
-public interface PixivAuthFeedJsonService {
+public interface WallhavenAuthFeedJsonService {
 
     @GET("/v2/illust/follow?restrict=public")
     Call<Illusts> getFollowJson();

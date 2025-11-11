@@ -3,7 +3,7 @@ Wallhaven for Muzei
 
 Wallhaven.cc plugin for the Muzei 3 API.
 
-Forked from [Pixiv for Muzei](https://github.com/dahlia/muzei-pixiv) with the goal of sourcing wallpapers from Wallhaven's public feeds.
+Forked from [Pixiv for Muzei 3](https://github.com/yellowbluesky/PixivforMuzei3) with the goal of sourcing wallpapers from Wallhaven's public feeds.
 
 [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
      alt="Get it on F-Droid"
@@ -34,17 +34,17 @@ Features
 How the wallpaper pipeline works
 ---
 
-1. **Work scheduling** – Muzei asks the provider for a new image, which triggers `PixivArtWorker` via `WorkManager`. The worker coordinates cache maintenance, purity filtering, and download orchestration.
+1. **Work scheduling** – Muzei asks the provider for a new image, which triggers `WallhavenArtWorker` via `WorkManager`. The worker coordinates cache maintenance, purity filtering, and download orchestration.
 2. **Feed selection** – Depending on the chosen mode, the worker creates a `ContentsHelper` (for toplist/hot) or other helper classes to hit Wallhaven's REST API through `RestClient`. Each request includes the Firefox user agent and, when present, the stored Wallhaven session cookie so that NSFW pages return data.
 3. **Artwork harvesting** – Helper classes deserialize the JSON into `RankingArtwork` models. The worker loops through the feed, discarding images that violate user filters (resolution, purity, blocked IDs) until enough items are ready for Muzei.
-4. **Download and storage** – `PixivImageDownloadService` streams the selected wallpaper into the app's cache or shared storage, updating the Muzei content provider once the file is written.
+4. **Download and storage** – `WallhavenImageDownloadService` streams the selected wallpaper into the app's cache or shared storage, updating the Muzei content provider once the file is written.
 
 Wallhaven login for NSFW content
 ---
 
 1. Open **Settings → Login**. If you are already logged in, pressing the preference will clear the saved Wallhaven session.
 2. The in-app browser loads `https://wallhaven.cc/login` with the Firefox desktop user agent. After you authenticate, the app captures the resulting cookies and stores them locally (visible under the login preference).
-3. Future feed calls automatically attach this cookie via `PixivMuzeiSupervisor`, unlocking the NSFW purity option for both toplist and hot feeds.
+3. Future feed calls automatically attach this cookie via `WallhavenMuzeiSupervisor`, unlocking the NSFW purity option for both toplist and hot feeds.
 
 ## [Contribute Guide](./CONTRIBUTE.md)
 

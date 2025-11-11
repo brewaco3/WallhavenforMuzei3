@@ -133,17 +133,17 @@
         android:summary="@string/prefSummary_enableNetworkBypass"
         android:title="@string/prefTitle_enableNetworkBypass" />
     <SwitchPreference
-        android:key="pref_usePixivCat"
+        android:key="pref_useWallhavenProxy"
         android:persistent="true"
-        android:summary="@string/prefSummary_usePixivCat"
-        android:title="@string/prefTitle_usePixivCat" />
+        android:summary="@string/prefSummary_useWallhavenProxy"
+        android:title="@string/prefTitle_useWallhavenProxy" />
     <EditTextPreference
-        android:defaultValue="i.pixiv.cat"
-        android:key="pref_pixivProxyHost"
+        android:defaultValue="w.wallhaven.cc"
+        android:key="pref_wallhavenProxyHost"
         android:singleLine="true"
-        android:title="Pixiv proxy host"
+        android:title="Wallhaven proxy host"
         android:inputType="text"
-        app:dependency="pref_usePixivCat"
+        app:dependency="pref_useWallhavenProxy"
         app:persistent="true"
         app:useSimpleSummaryProvider="true"/>
     <!--    </PreferenceCategory>-->

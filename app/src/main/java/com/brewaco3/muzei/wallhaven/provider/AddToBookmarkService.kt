@@ -25,10 +25,10 @@ import android.os.Build
 import android.os.IBinder
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
-import com.brewaco3.muzei.wallhaven.PixivMuzeiSupervisor
+import com.brewaco3.muzei.wallhaven.WallhavenMuzeiSupervisor
 import com.brewaco3.muzei.wallhaven.R
 import com.brewaco3.muzei.wallhaven.provider.network.OkHttpSingleton
-import com.brewaco3.muzei.wallhaven.provider.network.interceptor.PixivAuthHeaderInterceptor
+import com.brewaco3.muzei.wallhaven.provider.network.interceptor.WallhavenAuthHeaderInterceptor
 import com.brewaco3.muzei.wallhaven.provider.network.interceptor.StandardAuthHttpHeaderInterceptor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -64,7 +64,7 @@ class AddToBookmarkService : Service() {
                 // in here execute a post request
                 // no need to use the service really
                 val imageHttpClient = OkHttpSingleton.getInstance().newBuilder()
-                    .addInterceptor(PixivAuthHeaderInterceptor())
+                    .addInterceptor(WallhavenAuthHeaderInterceptor())
                     .addInterceptor(StandardAuthHttpHeaderInterceptor())
                     .build()
 
@@ -80,7 +80,7 @@ class AddToBookmarkService : Service() {
 
                 imageHttpClient.newCall(request).execute().use { response ->
                     if (response.isSuccessful) {
-                        PixivMuzeiSupervisor.post(Runnable {
+                        WallhavenMuzeiSupervisor.post(Runnable {
                             Toast.makeText(
                                 applicationContext,
                                 if (intent.getBooleanExtra("isPrivate", false))
@@ -91,7 +91,7 @@ class AddToBookmarkService : Service() {
                             ).show()
                         })
                     } else {
-                        PixivMuzeiSupervisor.post(Runnable {
+                        WallhavenMuzeiSupervisor.post(Runnable {
                             Toast.makeText(
                                 applicationContext,
                                 R.string.toast_bookmark_failure,
@@ -113,7 +113,7 @@ class AddToBookmarkService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val serviceChannel = NotificationChannel(
                 CHANNEL_ID,
-                "Pixiv for Muzei 3 Foreground Service Channel",
+                "Wallhaven for Muzei 3 Foreground Service Channel",
                 NotificationManager.IMPORTANCE_DEFAULT
             )
             getSystemService(NotificationManager::class.java).createNotificationChannel(serviceChannel)
@@ -125,6 +125,6 @@ class AddToBookmarkService : Service() {
     }
 
     companion object {
-        const val CHANNEL_ID = "PixivForMuzei3NotificationChannel"
+        const val CHANNEL_ID = "WallhavenForMuzei3NotificationChannel"
     }
 }

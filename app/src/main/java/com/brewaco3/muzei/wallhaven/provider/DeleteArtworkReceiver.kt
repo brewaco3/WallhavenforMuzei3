@@ -17,7 +17,7 @@ class DeleteArtworkReceiver : BroadcastReceiver(),
     override fun onReceive(context: Context, intent: Intent) {
         intent.getStringExtra("artworkId")?.let { artworkId ->
             context.contentResolver.delete(
-                ProviderContract.getProviderClient(context, PixivArtProvider::class.java).contentUri,
+                ProviderContract.getProviderClient(context, WallhavenArtProvider::class.java).contentUri,
                 "${ProviderContract.Artwork.TOKEN} = ?",
                 arrayOf(artworkId)
             )

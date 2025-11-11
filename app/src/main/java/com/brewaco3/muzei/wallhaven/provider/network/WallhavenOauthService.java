@@ -17,13 +17,17 @@
 
 package com.brewaco3.muzei.wallhaven.provider.network;
 
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.http.GET;
-import retrofit2.http.Url;
+import com.brewaco3.muzei.wallhaven.provider.network.moshi.OAuth;
 
-public interface PixivImageDownloadService
-{
-    @GET
-    Call<ResponseBody> downloadImage(@Url String url);
+import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.http.FieldMap;
+import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.POST;
+
+public interface WallhavenOauthService {
+    @FormUrlEncoded
+    @POST("/auth/token")
+    Call<OAuth> postRefreshToken(@FieldMap Map<String, String> params);
 }

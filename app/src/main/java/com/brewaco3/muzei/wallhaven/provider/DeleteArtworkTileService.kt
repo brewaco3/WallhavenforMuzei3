@@ -12,7 +12,7 @@ class DeleteArtworkTileService : TileService() {
         super.onClick()
         MuzeiContract.Artwork.getCurrentArtwork(applicationContext)?.title?.let {
             applicationContext.contentResolver.delete(
-                ProviderContract.getProviderClient(applicationContext, PixivArtProvider::class.java).contentUri,
+                ProviderContract.getProviderClient(applicationContext, WallhavenArtProvider::class.java).contentUri,
                 "${ProviderContract.Artwork.TITLE} = ?",
                 arrayOf(it)
             )

@@ -66,7 +66,7 @@ public class RubyHttpDns implements Dns {
     Mashiro
     链接：https://2heng.xin/2017/09/19/pixiv/
     来源：樱花庄的白猫
-    #Pixiv Start
+    #Wallhaven Start
     210.129.120.49  pixiv.net
     210.129.120.49  www.pixiv.net
     210.140.92.134  i.pximg.net
@@ -93,7 +93,7 @@ public class RubyHttpDns implements Dns {
     210.140.92.141  s.pximg.net
     210.140.92.135  pixiv.pximg.net
     210.129.120.56  fanbox.pixiv.net
-    #Pixiv End*/
+    #Wallhaven End*/
 
     public List<InetAddress> lookup(String paramString)
             throws UnknownHostException {

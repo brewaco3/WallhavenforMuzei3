@@ -33,7 +33,8 @@ import androidx.core.app.RemoteActionCompat
 import androidx.core.content.FileProvider
 import androidx.preference.PreferenceManager
 import com.brewaco3.muzei.wallhaven.BuildConfig
-import com.brewaco3.muzei.wallhaven.PixivMuzeiSupervisor.start
+import com.brewaco3.muzei.wallhaven.WallhavenMuzeiSupervisor.start
+import com.brewaco3.muzei.wallhaven.WallhavenProviderConst.WALLHAVEN_ARTWORK_URL
 import com.brewaco3.muzei.wallhaven.util.IntentUtils
 import com.google.android.apps.muzei.api.UserCommand
 import com.google.android.apps.muzei.api.provider.Artwork
@@ -43,10 +44,10 @@ import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.InputStream
 
-class PixivArtProvider : MuzeiArtProvider() {
+class WallhavenArtProvider : MuzeiArtProvider() {
 
     companion object {
-        const val TAG = "PixivArtProviderKt"
+        const val TAG = "WallhavenArtProvider"
     }
 
     private val commandManager by lazy { MuzeiCommandManager() }
@@ -68,7 +69,7 @@ class PixivArtProvider : MuzeiArtProvider() {
             Log.i("ANTONY_PROVIDER", "Data saver mode, stopping new artwork download")
             return
         }
-        PixivArtWorker.enqueueLoad(false, context)
+        WallhavenArtWorker.enqueueLoad(false, context)
     }
 
     override fun getCommandActions(artwork: Artwork): List<RemoteActionCompat> {
@@ -137,7 +138,7 @@ class PixivArtProvider : MuzeiArtProvider() {
                     ?.let { token ->
                         Intent(
                             Intent.ACTION_VIEW,
-                            Uri.parse("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=$token")
+                            Uri.parse(WALLHAVEN_ARTWORK_URL + token)
                         )
                     }
                     ?.also { intent ->

@@ -24,15 +24,15 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.brewaco3.muzei.wallhaven.AppDatabase
-import com.brewaco3.muzei.wallhaven.PixivMuzeiSupervisor
-import com.brewaco3.muzei.wallhaven.PixivMuzeiSupervisor.getAccessToken
-import com.brewaco3.muzei.wallhaven.PixivProviderConst
-import com.brewaco3.muzei.wallhaven.PixivProviderConst.AUTH_MODES
+import com.brewaco3.muzei.wallhaven.WallhavenMuzeiSupervisor
+import com.brewaco3.muzei.wallhaven.WallhavenMuzeiSupervisor.getAccessToken
+import com.brewaco3.muzei.wallhaven.WallhavenProviderConst
+import com.brewaco3.muzei.wallhaven.WallhavenProviderConst.AUTH_MODES
 import com.brewaco3.muzei.wallhaven.R
 import com.brewaco3.muzei.wallhaven.provider.exceptions.CorruptFileException
 import com.brewaco3.muzei.wallhaven.provider.exceptions.FilterMatchNotFoundException
 import com.brewaco3.muzei.wallhaven.provider.network.OkHttpSingleton
-import com.brewaco3.muzei.wallhaven.provider.network.PixivImageDownloadService
+import com.brewaco3.muzei.wallhaven.provider.network.WallhavenImageDownloadService
 import com.brewaco3.muzei.wallhaven.provider.network.RestClient
 import com.brewaco3.muzei.wallhaven.provider.network.interceptor.ImageIntegrityInterceptor
 import com.brewaco3.muzei.wallhaven.provider.network.interceptor.StandardImageHttpHeaderInterceptor
@@ -53,7 +53,7 @@ import java.io.OutputStream
 import java.util.concurrent.TimeUnit
 import java.util.UUID
 
-class PixivArtWorker(context: Context, workerParams: WorkerParameters) :
+class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
     Worker(context, workerParams) {
     companion object {
         const val LOG_TAG = "ANTONY_WORKER"
@@ -74,7 +74,7 @@ class PixivArtWorker(context: Context, workerParams: WorkerParameters) :
                 Constraints.Builder().apply {
                     setRequiredNetworkType(NetworkType.CONNECTED)
                 }.let { builder ->
-                    OneTimeWorkRequest.Builder(PixivArtWorker::class.java)
+                    OneTimeWorkRequest.Builder(WallhavenArtWorker::class.java)
                         .setConstraints(builder.build())
                         .addTag(WORKER_TAG)
                         .setBackoffCriteria(BackoffPolicy.LINEAR, 5, TimeUnit.MINUTES)
@@ -98,7 +98,7 @@ class PixivArtWorker(context: Context, workerParams: WorkerParameters) :
     * Performs binary search to find when the oldest bookmark artwork was made.
     * Buckle up for a fairly convoluted explanation
     * Context: Imagine a user account with 1000 bookmarked artworks made over the past one year
-    * The Pixiv API has no way to arbitrarily navigate to any single bookmarked artwork.
+    * The Wallhaven API has no way to arbitrarily navigate to any single bookmarked artwork.
     * Instead, when making an API call we may specify a "max_bookmark_id" parameter
     * This parameter is a timestamp of some sort. From my investigations, it appears to be a counting
     * in centiseconds from an epoch sometime in early 2016. This doesn't seem entirely correct, but exact understanding
@@ -402,9 +402,9 @@ class PixivArtWorker(context: Context, workerParams: WorkerParameters) :
     // Returns true if the image currently exists in the app's ContentProvider, e.g. it can be selected by Muzei at any time as the wallpaper
     private fun isDuplicateArtwork(illustId: String): Boolean {
         // SQL pseudocode
-        // FROM PixivArtProvider.providerClient SELECT _id WHERE token = illustId
+        // FROM WallhavenArtProvider.providerClient SELECT _id WHERE token = illustId
         applicationContext.contentResolver.query(
-            getProviderClient(applicationContext, PixivArtProvider::class.java).contentUri,
+            getProviderClient(applicationContext, WallhavenArtProvider::class.java).contentUri,
             arrayOf(ProviderContract.Artwork._ID),
             "${ProviderContract.Artwork.TOKEN} = ?",
             arrayOf(illustId),
@@ -497,7 +497,7 @@ class PixivArtWorker(context: Context, workerParams: WorkerParameters) :
         settingMinimumHeight: Int
     ): RankingArtwork {
         val normalizedPurity = puritySelection.map { it.lowercase() }
-            .filterNot { it == "nsfw" && !PixivMuzeiSupervisor.hasApiKey() }
+            .filterNot { it == "nsfw" && !WallhavenMuzeiSupervisor.hasApiKey() }
             .toSet()
             .ifEmpty { setOf("sfw") }
 
@@ -587,7 +587,7 @@ class PixivArtWorker(context: Context, workerParams: WorkerParameters) :
         } else {
             // its your original code
             val service =
-                RestClient.getRetrofitImageInstance().create(PixivImageDownloadService::class.java)
+                RestClient.getRetrofitImageInstance().create(WallhavenImageDownloadService::class.java)
             val call = service.downloadImage(imageUrl)
             call.execute().body()
         }
@@ -604,7 +604,7 @@ class PixivArtWorker(context: Context, workerParams: WorkerParameters) :
             .byline(selectedArtwork.user.name)
             .persistentUri(localUri)
             .token(token)
-            .webUri(Uri.parse(PixivProviderConst.PIXIV_ARTWORK_URL + token))
+            .webUri(Uri.parse(WallhavenProviderConst.WALLHAVEN_ARTWORK_URL + token))
             .metadata(selectedArtwork.user.id.toString()) // Allows blocking of artist
             .build()
     }
@@ -698,7 +698,7 @@ class PixivArtWorker(context: Context, workerParams: WorkerParameters) :
     }
 
     // Bookmarks artworks are handled in a separate function
-    // Part of the reason is that Pixiv itself has different API surface for bookmarks
+    // Part of the reason is that Wallhaven itself has different API surface for bookmarks
     // And must be handled accordingly
     private fun getArtworksAuth(updateMode: String): List<Artwork> {
         val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
@@ -747,7 +747,7 @@ class PixivArtWorker(context: Context, workerParams: WorkerParameters) :
             purityFlags[1] = '1'
         }
         if ("nsfw" in normalized) {
-            if (PixivMuzeiSupervisor.hasApiKey()) {
+            if (WallhavenMuzeiSupervisor.hasApiKey()) {
                 purityFlags[2] = '1'
             } else {
                 Log.i(LOG_TAG, "NSFW selection requires an API key, ignoring for now")
@@ -794,7 +794,7 @@ class PixivArtWorker(context: Context, workerParams: WorkerParameters) :
         )
         var contents = contentsHelper.getNewContents()
         val sanitizedPurity = puritySelection.map { it.lowercase() }.filterNot {
-            it == "nsfw" && !PixivMuzeiSupervisor.hasApiKey()
+            it == "nsfw" && !WallhavenMuzeiSupervisor.hasApiKey()
         }.toSet()
         return mutableListOf<Artwork>().also {
             while (it.size < numArtworksToDownload) {
@@ -844,7 +844,7 @@ class PixivArtWorker(context: Context, workerParams: WorkerParameters) :
             "changeDaily" -> {
                 Log.i(LOG_TAG, "Changing mode to toplist")
                 sharedPrefs.edit().putString("pref_updateMode", "toplist").apply()
-                PixivMuzeiSupervisor.post(Runnable {
+                WallhavenMuzeiSupervisor.post(Runnable {
                     Toast.makeText(
                         applicationContext,
                         R.string.toast_authFailedSwitch,
@@ -856,7 +856,7 @@ class PixivArtWorker(context: Context, workerParams: WorkerParameters) :
 
             "doNotChange_downDaily" -> {
                 Log.i(LOG_TAG, "Downloading a single toplist entry")
-                PixivMuzeiSupervisor.post(Runnable {
+                WallhavenMuzeiSupervisor.post(Runnable {
                     Toast.makeText(
                         applicationContext,
                         R.string.toast_authFailedDown,
@@ -868,7 +868,7 @@ class PixivArtWorker(context: Context, workerParams: WorkerParameters) :
 
             "doNotChange_doNotDown" -> {
                 Log.i(LOG_TAG, "Retrying with no changes")
-                PixivMuzeiSupervisor.post(Runnable {
+                WallhavenMuzeiSupervisor.post(Runnable {
                     Toast.makeText(
                         applicationContext,
                         R.string.toast_authFailedRetry,
@@ -887,7 +887,7 @@ class PixivArtWorker(context: Context, workerParams: WorkerParameters) :
     override fun doWork(): Result {
         Log.i(LOG_TAG, "Starting work")
         return try {
-            with(getProviderClient(applicationContext, PixivArtProvider::class.java)) {
+            with(getProviderClient(applicationContext, WallhavenArtProvider::class.java)) {
                 val artworks = getArtworks() ?: return Result.retry()
                 if (clearArtwork) {
                     clearArtwork = false
@@ -902,7 +902,7 @@ class PixivArtWorker(context: Context, workerParams: WorkerParameters) :
             Log.e(LOG_TAG, "Failed to update artwork", throwable)
             Result.failure(
                 workDataOf(
-                    PixivProviderConst.WORK_ERROR_MESSAGE_KEY to
+                    WallhavenProviderConst.WORK_ERROR_MESSAGE_KEY to
                         (throwable.message ?: throwable.javaClass.simpleName)
                 )
             )

@@ -9,13 +9,13 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.enableEdgeToEdge
-import com.brewaco3.muzei.wallhaven.PixivMuzeiSupervisor
-import com.brewaco3.muzei.wallhaven.PixivProviderConst
+import com.brewaco3.muzei.wallhaven.WallhavenMuzeiSupervisor
+import com.brewaco3.muzei.wallhaven.WallhavenProviderConst
 import com.brewaco3.muzei.wallhaven.R
-import com.brewaco3.muzei.wallhaven.common.PixivMuzeiActivity
+import com.brewaco3.muzei.wallhaven.common.WallhavenMuzeiActivity
 import com.brewaco3.muzei.wallhaven.databinding.ActivityLoginWebviewBinding
 
-class LoginActivityWebview : PixivMuzeiActivity() {
+class LoginActivityWebview : WallhavenMuzeiActivity() {
 
     private lateinit var binding: ActivityLoginWebviewBinding
     private val cookieManager = CookieManager.getInstance()
@@ -37,7 +37,7 @@ class LoginActivityWebview : PixivMuzeiActivity() {
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView(webView: WebView) {
         webView.settings.javaScriptEnabled = true
-        webView.settings.userAgentString = PixivProviderConst.BROWSER_USER_AGENT
+        webView.settings.userAgentString = WallhavenProviderConst.BROWSER_USER_AGENT
 
         webView.webViewClient = object : WebViewClient() {
             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
@@ -84,7 +84,7 @@ class LoginActivityWebview : PixivMuzeiActivity() {
 
     private fun persistSession(cookieHeader: String, username: String?) {
         sessionPersisted = true
-        PixivMuzeiSupervisor.storeSession(applicationContext, cookieHeader, username)
+        WallhavenMuzeiSupervisor.storeSession(applicationContext, cookieHeader, username)
         cookieManager.flush()
 
         val resultIntent = Intent().putExtra("username", username.orEmpty())

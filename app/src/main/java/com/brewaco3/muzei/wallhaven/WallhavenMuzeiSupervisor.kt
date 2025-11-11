@@ -30,14 +30,14 @@ import com.brewaco3.muzei.wallhaven.util.Predicates
  *
  * @author alvince.zy@gmail.com
  */
-object PixivMuzeiSupervisor {
+object WallhavenMuzeiSupervisor {
 
     const val INTENT_CAT_LOCAL = BuildConfig.APPLICATION_ID + ".intent.category.LOCAL_BROADCAST"
 
     private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
 
     private lateinit var appContext: Context
-    private lateinit var appInstrumentation: PixivInstrumentation
+    private lateinit var appInstrumentation: WallhavenInstrumentation
 
     private var start: Boolean = false
 
@@ -45,10 +45,10 @@ object PixivMuzeiSupervisor {
         if (start) {
             return true
         }
-        val resolvedContext = (context ?: PixivMuzei.context)?.applicationContext
+        val resolvedContext = (context ?: WallhavenMuzei.context)?.applicationContext
         if (resolvedContext != null) {
             appContext = resolvedContext
-            appInstrumentation = PixivInstrumentation()
+            appInstrumentation = WallhavenInstrumentation()
             start = true
         }
         return start
@@ -72,7 +72,7 @@ object PixivMuzeiSupervisor {
         if (!ensureInitialized()) {
             return
         }
-        PixivInstrumentation.clearSession(appContext)
+        WallhavenInstrumentation.clearSession(appContext)
     }
 
     fun setApiKey(apiKey: String) {
