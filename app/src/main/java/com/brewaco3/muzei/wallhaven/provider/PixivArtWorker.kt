@@ -497,7 +497,7 @@ class PixivArtWorker(context: Context, workerParams: WorkerParameters) :
         settingMinimumHeight: Int
     ): RankingArtwork {
         val normalizedPurity = puritySelection.map { it.lowercase() }
-            .filterNot { it == "nsfw" }
+            .filterNot { it == "nsfw" && !PixivMuzeiSupervisor.hasApiKey() }
             .toSet()
             .ifEmpty { setOf("sfw") }
 
