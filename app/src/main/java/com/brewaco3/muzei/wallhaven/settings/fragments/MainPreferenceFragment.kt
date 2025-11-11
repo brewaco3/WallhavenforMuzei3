@@ -21,8 +21,11 @@ import android.os.Environment
 import android.text.InputType
 import android.widget.Toast
 import androidx.preference.*
+import androidx.work.ExistingWorkPolicy
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.brewaco3.muzei.wallhaven.PixivMuzeiSupervisor
+import com.brewaco3.muzei.wallhaven.PixivProviderConst
 import com.brewaco3.muzei.wallhaven.PixivProviderConst.AUTH_MODES
 import com.brewaco3.muzei.wallhaven.R
 import com.brewaco3.muzei.wallhaven.provider.PixivArtWorker.Companion.enqueueLoad
@@ -201,13 +204,79 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
                 WorkManager.getInstance(requireContext()).cancelUniqueWork("ANTONY")
                 requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
                     ?.deleteRecursively()
-                enqueueLoad(true, context)
+                enqueueLoad(true, requireContext())
                 Snackbar.make(
                     requireView(), R.string.toast_clearingCache,
                     Snackbar.LENGTH_SHORT
                 )
                     .show()
                 newUpdateMode = oldUpdateMode
+                true
+            }
+
+        findPreference<Preference>("pref_forceRefresh")?.onPreferenceClickListener =
+            Preference.OnPreferenceClickListener {
+                val workId = enqueueLoad(true, requireContext(), ExistingWorkPolicy.REPLACE)
+                if (workId == null) {
+                    Snackbar.make(
+                        requireView(),
+                        R.string.toast_forceRefreshFailed_generic,
+                        Snackbar.LENGTH_LONG
+                    ).show()
+                    return@OnPreferenceClickListener true
+                }
+
+                Snackbar.make(
+                    requireView(),
+                    R.string.toast_forceRefreshQueued,
+                    Snackbar.LENGTH_SHORT
+                ).show()
+
+                val workManager = WorkManager.getInstance(requireContext())
+                val liveData = workManager.getWorkInfoByIdLiveData(workId)
+                liveData.observe(viewLifecycleOwner) { info ->
+                    if (info == null) {
+                        return@observe
+                    }
+                    when (info.state) {
+                        WorkInfo.State.SUCCEEDED -> {
+                            Snackbar.make(
+                                requireView(),
+                                R.string.toast_forceRefreshComplete,
+                                Snackbar.LENGTH_SHORT
+                            ).show()
+                        }
+
+                        WorkInfo.State.FAILED -> {
+                            val errorMessage = info.outputData
+                                .getString(PixivProviderConst.WORK_ERROR_MESSAGE_KEY)
+                                .orEmpty()
+                            val message = if (errorMessage.isBlank()) {
+                                getString(R.string.toast_forceRefreshFailed_generic)
+                            } else {
+                                getString(R.string.toast_forceRefreshFailed, errorMessage)
+                            }
+                            Snackbar.make(requireView(), message, Snackbar.LENGTH_LONG)
+                                .show()
+                        }
+
+                        WorkInfo.State.CANCELLED -> {
+                            Snackbar.make(
+                                requireView(),
+                                R.string.toast_forceRefreshCancelled,
+                                Snackbar.LENGTH_LONG
+                            ).show()
+                        }
+
+                        else -> {
+                            // Ignore other states
+                        }
+                    }
+
+                    if (info.state.isFinished) {
+                        liveData.removeObservers(viewLifecycleOwner)
+                    }
+                }
                 true
             }
 
@@ -312,7 +381,7 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
             WorkManager.getInstance(requireContext()).cancelUniqueWork("ANTONY")
             requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
                 ?.deleteRecursively()
-            enqueueLoad(true, context)
+            enqueueLoad(true, requireContext())
             when {
                 oldUpdateMode != newUpdateMode -> Toast.makeText(
                     context,

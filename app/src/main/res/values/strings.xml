@@ -11,6 +11,7 @@
     <string name="attr_hot">Hot</string>
 
     <string name="button_clearCache">Immediately clear image cache</string>
+    <string name="button_forceRefresh">Force refresh wallpapers</string>
 
     <string name="command_addToBookmark">Add to bookmarks</string>
     <string name="command_addToPrivateBookmark">Bookmark privately</string>
@@ -46,6 +47,7 @@
     <string name="prefSummary_noFileSizeLimit">No limit</string>
     <string name="prefSummary_storeInExtStorage">Pictures saved here will not be automatically cleared</string>
     <string name="prefSummary_stuckApp">If the app is not working, press here</string>
+    <string name="prefSummary_forceRefresh">Download a fresh wallpaper immediately</string>
     <string name="prefSummary_autoCrop">Crops blank spaces around artworks. Increased battery drain when downloading.</string>
 
     <string name="prefTitle_MaximumFileSize">Maximum artwork size</string>
@@ -95,6 +97,11 @@
     <string name="toast_authFailedRetry">Wallhaven for Muzei: Login failed, will try again</string>
     <string name="toast_authFailedSwitch">Wallhaven for Muzei: Login failed, switching to toplist</string>
     <string name="toast_clearingCache">Clearing image cache</string>
+    <string name="toast_forceRefreshQueued">Refreshing wallpapers…</string>
+    <string name="toast_forceRefreshComplete">Wallpapers refreshed</string>
+    <string name="toast_forceRefreshFailed">Refresh failed: %1$s</string>
+    <string name="toast_forceRefreshFailed_generic">Refresh failed</string>
+    <string name="toast_forceRefreshCancelled">Refresh cancelled</string>
     <string name="toast_loginFirst">Please enter your API key first</string>
     <string name="toast_newArtist">New Artist, clearing image cache</string>
     <string name="toast_newFilterMode">New filtering mode, clearing image cache</string>

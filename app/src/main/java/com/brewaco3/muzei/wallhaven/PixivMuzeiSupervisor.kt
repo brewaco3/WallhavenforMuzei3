@@ -41,69 +41,78 @@ object PixivMuzeiSupervisor {
 
     private var start: Boolean = false
 
+    private fun ensureInitialized(context: Context? = null): Boolean {
+        if (start) {
+            return true
+        }
+        val resolvedContext = (context ?: PixivMuzei.context)?.applicationContext
+        if (resolvedContext != null) {
+            appContext = resolvedContext
+            appInstrumentation = PixivInstrumentation()
+            start = true
+        }
+        return start
+    }
+
     @MainThread
     fun start(context: Context) {
         Predicates.requireMainThread()
 
-        appContext = context.applicationContext
-        appInstrumentation = PixivInstrumentation()
-        start = true
+        ensureInitialized(context)
     }
 
     fun storeSession(context: Context, cookieHeader: String, username: String?) {
-        if (!start) {
-            start(context.applicationContext)
+        if (!ensureInitialized(context)) {
+            return
         }
         appInstrumentation.storeSession(appContext, cookieHeader, username)
     }
 
     fun clearSession() {
-        if (!start) {
+        if (!ensureInitialized()) {
             return
         }
         PixivInstrumentation.clearSession(appContext)
     }
 
     fun setApiKey(apiKey: String) {
-        if (!start) {
+        if (!ensureInitialized()) {
             return
         }
         appInstrumentation.storeApiKey(appContext, apiKey)
     }
 
     fun clearApiKey() {
-        if (!start) {
+        if (!ensureInitialized()) {
             return
         }
         appInstrumentation.clearApiKey(appContext)
     }
 
     fun getApiKey(): String {
-        if (!start) {
-            return ""
+        if (!ensureInitialized()) {
+            return System.getenv("WALLHAVEN_API_KEY").orEmpty().trim()
         }
-        return appInstrumentation.getApiKey(appContext)
+        val storedKey = appInstrumentation.getApiKey(appContext)
+        if (storedKey.isNotEmpty()) {
+            return storedKey
+        }
+        return System.getenv("WALLHAVEN_API_KEY").orEmpty().trim()
     }
 
     fun hasApiKey(): Boolean {
-        if (!start) {
-            return false
-        }
-        return appInstrumentation.hasApiKey(appContext)
+        return getApiKey().isNotEmpty()
     }
 
     fun getSessionCookie(): String {
-        if (!start) {
+        if (!ensureInitialized()) {
             return ""
         }
         return appInstrumentation.getSessionCookie(appContext)
     }
 
     fun hasSession(): Boolean {
-        if (!start) {
-            return false
-        }
-        return appInstrumentation.hasSession(appContext)
+        return ensureInitialized() && appInstrumentation.hasSession(appContext)
     }
 
     fun getAccessToken(): String = getApiKey()

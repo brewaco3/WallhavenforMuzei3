@@ -56,6 +56,10 @@
             android:key="@string/button_clearCache"
             android:summary="@string/prefSummary_stuckApp"
             android:title="@string/button_clearCache" />
+        <Preference
+            android:key="pref_forceRefresh"
+            android:summary="@string/prefSummary_forceRefresh"
+            android:title="@string/button_forceRefresh" />
         <EditTextPreference
             android:dialogTitle="@string/prefTitle_tagSearch"
             android:inputType="text"

@@ -11,6 +11,7 @@
     <string name="attr_hot">热门</string>
 
     <string name="button_clearCache">清除图像缓存</string>
+    <string name="button_forceRefresh">强制刷新壁纸</string>
 
     <string name="command_addToBookmark">收藏</string>
     <string name="command_addToPrivateBookmark">非公开收藏</string>
@@ -46,6 +47,7 @@
     <string name="prefSummary_noFileSizeLimit">无限制</string>
     <string name="prefSummary_storeInExtStorage">保存在此处的图片不会自动清除</string>
     <string name="prefSummary_stuckApp">如果该应用未工作，请按此处</string>
+    <string name="prefSummary_forceRefresh">立即下载新的壁纸</string>
     <string name="prefSummary_autoCrop">下载时裁剪作品四周空白，会增加电量消耗</string>
 
     <string name="prefTitle_MaximumFileSize">作品最大尺寸</string>
@@ -92,6 +94,11 @@
     <string name="toast_authFailedRetry">Wallhaven for Muzei: 登录失败，再次尝试</string>
     <string name="toast_authFailedSwitch">Wallhaven for Muzei: 登录失败，更改为排行榜</string>
     <string name="toast_clearingCache">清除图像缓存</string>
+    <string name="toast_forceRefreshQueued">正在刷新壁纸…</string>
+    <string name="toast_forceRefreshComplete">壁纸已刷新</string>
+    <string name="toast_forceRefreshFailed">刷新失败：%1$s</string>
+    <string name="toast_forceRefreshFailed_generic">刷新失败</string>
+    <string name="toast_forceRefreshCancelled">刷新已取消</string>
     <string name="toast_loginFirst">请先输入 API 密钥</string>
     <string name="toast_newArtist">艺术家更新，清除图像缓存</string>
     <string name="toast_newFilterMode">过滤模式更新，清除图像缓存</string>

@@ -39,6 +39,7 @@ public final class PixivProviderConst {
     public static final String PREFERENCE_SESSION_TIMESTAMP = "wallhavenSessionTimestamp";
     public static final String PREFERENCE_API_KEY = "wallhavenApiKey";
     public static final String PREFERENCE_OLDEST_MAX_BOOKMARK_ID = "oldestMaxBookmarkId";
+    public static final String WORK_ERROR_MESSAGE_KEY = "workErrorMessage";
 
 
     public static final String[] AUTH_MODES = {};

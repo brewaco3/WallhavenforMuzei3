@@ -22,6 +22,7 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 import com.brewaco3.muzei.wallhaven.AppDatabase
 import com.brewaco3.muzei.wallhaven.PixivMuzeiSupervisor
 import com.brewaco3.muzei.wallhaven.PixivMuzeiSupervisor.getAccessToken
@@ -50,6 +51,7 @@ import okio.sink
 import java.io.File
 import java.io.OutputStream
 import java.util.concurrent.TimeUnit
+import java.util.UUID
 
 class PixivArtWorker(context: Context, workerParams: WorkerParameters) :
     Worker(context, workerParams) {
@@ -59,12 +61,16 @@ class PixivArtWorker(context: Context, workerParams: WorkerParameters) :
         // Variable that tracks if the artwork cache needs to be cleared
         private var clearArtwork = false
 
-        internal fun enqueueLoad(clearArtworkRequested: Boolean, context: Context?) {
+        internal fun enqueueLoad(
+            clearArtworkRequested: Boolean,
+            context: Context?,
+            existingWorkPolicy: ExistingWorkPolicy = ExistingWorkPolicy.KEEP,
+        ): UUID? {
             if (clearArtworkRequested) {
                 clearArtwork = true
             }
 
-            context?.also {
+            return context?.let {
                 Constraints.Builder().apply {
                     setRequiredNetworkType(NetworkType.CONNECTED)
                 }.let { builder ->
@@ -75,7 +81,8 @@ class PixivArtWorker(context: Context, workerParams: WorkerParameters) :
                         .build()
                 }.let { request ->
                     WorkManager.getInstance(it)
-                        .enqueueUniqueWork(WORKER_TAG, ExistingWorkPolicy.KEEP, request)
+                        .enqueueUniqueWork(WORKER_TAG, existingWorkPolicy, request)
+                    request.id
                 }
             }
 
@@ -83,6 +90,7 @@ class PixivArtWorker(context: Context, workerParams: WorkerParameters) :
             // If not unique work, multiple works can be submitted at the processed at the same time
             // This can lead to race conditions if a new access token is needed
             // Additionally, we definitely do not want to spam the API
+            return null
         }
     }
 
@@ -878,16 +886,26 @@ class PixivArtWorker(context: Context, workerParams: WorkerParameters) :
     // Any critical errors bubble up as a null result, resulting in Muzei calling this function again later
     override fun doWork(): Result {
         Log.i(LOG_TAG, "Starting work")
-        with(getProviderClient(applicationContext, PixivArtProvider::class.java)) {
-            val artworks = getArtworks() ?: return Result.retry()
-            if (clearArtwork) {
-                clearArtwork = false
-                setArtwork(artworks)
-            } else {
-                addArtwork(artworks)
+        return try {
+            with(getProviderClient(applicationContext, PixivArtProvider::class.java)) {
+                val artworks = getArtworks() ?: return Result.retry()
+                if (clearArtwork) {
+                    clearArtwork = false
+                    setArtwork(artworks)
+                } else {
+                    addArtwork(artworks)
+                }
             }
+            Log.i(LOG_TAG, "Work completed")
+            Result.success()
+        } catch (throwable: Throwable) {
+            Log.e(LOG_TAG, "Failed to update artwork", throwable)
+            Result.failure(
+                workDataOf(
+                    PixivProviderConst.WORK_ERROR_MESSAGE_KEY to
+                        (throwable.message ?: throwable.javaClass.simpleName)
+                )
+            )
         }
-        Log.i(LOG_TAG, "Work completed")
-        return Result.success()
     }
 }
