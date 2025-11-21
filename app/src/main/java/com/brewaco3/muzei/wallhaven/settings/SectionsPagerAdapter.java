@@ -24,9 +24,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.brewaco3.muzei.wallhaven.settings.deleteArtwork.ArtworkDeletionFragment;
 import com.brewaco3.muzei.wallhaven.settings.fragments.AdvOptionsPreferenceFragment;
-import com.brewaco3.muzei.wallhaven.settings.fragments.CreditsPreferenceFragment;
 import com.brewaco3.muzei.wallhaven.settings.fragments.MainPreferenceFragment;
-import com.brewaco3.muzei.wallhaven.settings.fragments.RoadmapPreferenceFragment;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -46,16 +44,14 @@ public class SectionsPagerAdapter extends FragmentStateAdapter {
                 return new AdvOptionsPreferenceFragment();
             case 2:
                 return new ArtworkDeletionFragment();
-            case 3:
             default:
-                return new CreditsPreferenceFragment();
-            case 4:
-                return new RoadmapPreferenceFragment();
+                // This case should ideally not be reached if getItemCount is correct
+                return new MainPreferenceFragment(); // Fallback
         }
     }
 
     @Override
     public int getItemCount() {
-        return 5;
+        return 3;
     }
 }

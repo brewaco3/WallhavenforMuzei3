@@ -57,15 +57,49 @@
     </string-array>
 
     <string-array name="pref_aspectRatio_entries">
-        <item>Portrait and Landscape</item>
-        <item>Portrait</item>
-        <item>Landscape</item>
+        <item>Any</item>
+        <item>Landscape (16x9, 16x10)</item>
+        <item>Portrait (9x16, 10x16)</item>
+        <item>Ultrawide (21x9)</item>
+        <item>Square (1x1)</item>
     </string-array>
 
     <string-array name="pref_aspectRatio_entryValues">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
+        <item></item>
+        <item>landscape</item>
+        <item>portrait</item>
+        <item>21x9</item>
+        <item>1x1</item>
+    </string-array>
+
+    <string-array name="pref_topRange_entries">
+        <item>1 Day</item>
+        <item>3 Days</item>
+        <item>1 Week</item>
+        <item>1 Month</item>
+        <item>3 Months</item>
+        <item>6 Months</item>
+        <item>1 Year</item>
+    </string-array>
+
+    <string-array name="pref_topRange_entryValues">
+        <item>1d</item>
+        <item>3d</item>
+        <item>1w</item>
+        <item>1M</item>
+        <item>3M</item>
+        <item>6M</item>
+        <item>1y</item>
+    </string-array>
+
+    <string-array name="pref_order_entries">
+        <item>Descending</item>
+        <item>Ascending</item>
+    </string-array>
+
+    <string-array name="pref_order_entryValues">
+        <item>desc</item>
+        <item>asc</item>
     </string-array>
 
     <string-array name="pref_tagFilterLanguage_entries">

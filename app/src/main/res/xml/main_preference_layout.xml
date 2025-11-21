@@ -28,6 +28,14 @@
             android:persistent="true"
             android:title="@string/pref_updateMode"
             app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            android:dialogTitle="@string/prefDialog_tagFilter"
+            android:inputType="text"
+            android:key="pref_tagFilter"
+            android:persistent="true"
+            android:title="@string/prefTitle_tagFilter"
+            app:isPreferenceVisible="true"
+            app:useSimpleSummaryProvider="true" />
         <MultiSelectListPreference
             android:defaultValue="@array/pref_rankingFilterDefault_entryvalues"
             android:entries="@array/pref_rankingFilterLevel_entries"

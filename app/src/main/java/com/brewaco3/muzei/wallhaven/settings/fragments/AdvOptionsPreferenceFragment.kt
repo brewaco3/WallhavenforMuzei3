@@ -52,18 +52,7 @@ class AdvOptionsPreferenceFragment : PreferenceFragmentCompat() {
         setPreferencesFromResource(R.xml.adv_setting_preference_layout, rootKey)
         val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
 
-        // Artwork minimum views slider
-        // Updates the summary in real time as the user drags the thumb
-        // Increments of 500, hence the scalar =
-        findPreference<SeekBarPreference>("prefSlider_minViews")?.let { slider ->
-            slider.updatesContinuously = true
-            slider.summary = (sharedPrefs.getInt("prefSlider_minViews", 0) * 500).toString()
-            slider.onPreferenceChangeListener =
-                Preference.OnPreferenceChangeListener { _: Preference?, newValue: Any ->
-                    slider.summary = (newValue as Int * 500).toString()
-                    true
-                }
-        }
+        // Artwork minimum views slider - REMOVED
 
         findPreference<SeekBarPreference>("prefSlider_minimumWidth")?.let {
             it.updatesContinuously = true
@@ -224,6 +213,97 @@ class AdvOptionsPreferenceFragment : PreferenceFragmentCompat() {
                 nightModePreferenceListener.nightModeOptionSelected((newValue as String).toInt())
                 true
             }
+        }
+
+        updateDebugUrl()
+    }
+
+    override fun onPreferenceTreeClick(preference: Preference): Boolean {
+        updateDebugUrl()
+        return super.onPreferenceTreeClick(preference)
+    }
+
+    private fun updateDebugUrl() {
+        val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        val context = requireContext()
+        
+        // Base URL
+        var url = "https://wallhaven.cc/api/v1/search?"
+
+        // Parameters
+        val params = mutableListOf<String>()
+
+        // q (Tag Filter)
+        val tagFilter = sharedPrefs.getString("pref_tagFilter", "") ?: ""
+        if (tagFilter.isNotEmpty()) {
+            params.add("q=${android.net.Uri.encode(tagFilter)}")
+        }
+
+        // categories
+        val categorySelection = sharedPrefs.getStringSet("pref_rankingCategorySelect", setOf("general", "anime", "people")) ?: setOf("general", "anime", "people")
+        val categoryFlags = charArrayOf('0', '0', '0')
+        if (categorySelection.contains("general")) categoryFlags[0] = '1'
+        if (categorySelection.contains("anime")) categoryFlags[1] = '1'
+        if (categorySelection.contains("people")) categoryFlags[2] = '1'
+        params.add("categories=${String(categoryFlags)}")
+
+        // purity
+        val puritySelection = sharedPrefs.getStringSet("pref_rankingFilterSelect", setOf("sfw")) ?: setOf("sfw")
+        val purityFlags = charArrayOf('0', '0', '0')
+        if (puritySelection.contains("sfw")) purityFlags[0] = '1'
+        if (puritySelection.contains("sketchy")) purityFlags[1] = '1'
+        if (puritySelection.contains("nsfw")) purityFlags[2] = '1'
+        params.add("purity=${String(purityFlags)}")
+
+        // sorting (update mode)
+        val updateMode = sharedPrefs.getString("pref_updateMode", "toplist") ?: "toplist"
+        params.add("sorting=$updateMode")
+
+        // atleast
+        val atleast = sharedPrefs.getString("pref_atleast", "") ?: ""
+        if (atleast.isNotEmpty()) {
+            params.add("atleast=$atleast")
+        }
+
+        // ratios
+        val ratios = sharedPrefs.getString("pref_aspectRatioSelect", "") ?: ""
+        if (ratios.isNotEmpty()) {
+            params.add("ratios=$ratios")
+        }
+
+        // topRange
+        val topRange = sharedPrefs.getString("pref_topRange", "1M") ?: "1M"
+        if (updateMode == "toplist") {
+            params.add("topRange=$topRange")
+        }
+
+        // order
+        val order = sharedPrefs.getString("pref_order", "desc") ?: "desc"
+        params.add("order=$order")
+
+        // seed
+        val seed = sharedPrefs.getString("pref_seed", "") ?: ""
+        if (seed.isNotEmpty()) {
+            params.add("seed=$seed")
+        }
+
+        // colors
+        val colors = sharedPrefs.getString("pref_colors", "") ?: ""
+        if (colors.isNotEmpty()) {
+            params.add("colors=$colors")
+        }
+        
+        // API Key (masked)
+        val apiKey = sharedPrefs.getString("apikey", "") ?: ""
+        if (apiKey.isNotEmpty()) {
+            params.add("apikey=********")
+        }
+
+        url += params.joinToString("&")
+
+        findPreference<EditTextPreference>("pref_debugUrl")?.let {
+            it.text = url
+            it.summary = url
         }
     }
 
