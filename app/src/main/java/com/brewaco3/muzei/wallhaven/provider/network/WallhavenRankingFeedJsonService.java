@@ -23,14 +23,18 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
-public interface WallhavenRankingFeedJsonService
-{
+public interface WallhavenRankingFeedJsonService {
     @GET("search")
     Call<Contents> getSearchResults(
             @Query("sorting") String sorting,
             @Query("purity") String purity,
             @Query("categories") String categories,
             @Query("page") int page,
-            @Query("order") String order
-    );
+            @Query("order") String order,
+            @Query("q") String query,
+            @Query("atleast") String atleast,
+            @Query("ratios") String ratios,
+            @Query("topRange") String topRange,
+            @Query("seed") String seed,
+            @Query("colors") String colors);
 }

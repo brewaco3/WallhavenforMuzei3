@@ -787,10 +787,25 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
             "pref_rankingCategorySelect",
             setOf("general", "anime", "people")
         ) ?: setOf("general", "anime", "people")
+        val tagFilter = sharedPrefs.getString("pref_tagFilter", "") ?: ""
+        val atleast = sharedPrefs.getString("pref_atleast", "") ?: ""
+        val ratios = sharedPrefs.getString("pref_aspectRatioSelect", "") ?: ""
+        val topRange = sharedPrefs.getString("pref_topRange", "1M") ?: "1M"
+        val order = sharedPrefs.getString("pref_order", "desc") ?: "desc"
+        val seed = sharedPrefs.getString("pref_seed", "") ?: ""
+        val colors = sharedPrefs.getString("pref_colors", "") ?: ""
+
         val contentsHelper = ContentsHelper(
             updateMode,
             buildPurityQuery(puritySelection),
-            buildCategoryQuery(categorySelection)
+            buildCategoryQuery(categorySelection),
+            tagFilter,
+            atleast,
+            ratios,
+            topRange,
+            order,
+            seed,
+            colors
         )
         var contents = contentsHelper.getNewContents()
         val sanitizedPurity = puritySelection.map { it.lowercase() }.filterNot {

@@ -24,32 +24,50 @@
         android:key="prefCat_advFiltering"
         android:title="@string/prefCat_advFiltering">
         <DropDownPreference
-            android:defaultValue="@string/pref_aspectRatioDefault_entryValues"
+            android:defaultValue=""
             android:entries="@array/pref_aspectRatio_entries"
             android:entryValues="@array/pref_aspectRatio_entryValues"
             android:key="pref_aspectRatioSelect"
             android:persistent="true"
             android:title="@string/prefTitle_aspectRatio"
             app:useSimpleSummaryProvider="true" />
-        <SwitchPreference
-            android:key="pref_showManga"
+        <EditTextPreference
+            android:dialogTitle="@string/prefDialog_atleast"
+            android:inputType="text"
+            android:key="pref_atleast"
             android:persistent="true"
-            android:title="@string/prefTitle_showManga"
-            app:summaryOff="Hiding manga"
-            app:summaryOn="Showing manga" />
-        <!--    <DropDownPreference-->
-        <!--        android:entries="@array/pref_tagFilterLanguage_entries"-->
-        <!--        android:entryValues="@array/pref_tagFilterLanguage_entryValues"-->
-        <!--        android:key="pref_tagFilterLanguage"-->
-        <!--        android:persistent="true"-->
-        <!--        android:summary="%s"-->
-        <!--        android:title="Filter by tag language" />-->
-        <SeekBarPreference
-            android:defaultValue="0"
-            android:key="prefSlider_minViews"
-            android:max="100"
+            android:title="@string/prefTitle_atleast"
+            app:useSimpleSummaryProvider="true" />
+        <ListPreference
+            android:defaultValue="1M"
+            android:entries="@array/pref_topRange_entries"
+            android:entryValues="@array/pref_topRange_entryValues"
+            android:key="pref_topRange"
             android:persistent="true"
-            android:title="@string/prefTitle_minimumViews" />
+            android:title="@string/prefTitle_topRange"
+            app:useSimpleSummaryProvider="true" />
+        <ListPreference
+            android:defaultValue="desc"
+            android:entries="@array/pref_order_entries"
+            android:entryValues="@array/pref_order_entryValues"
+            android:key="pref_order"
+            android:persistent="true"
+            android:title="@string/prefTitle_order"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            android:dialogTitle="@string/prefDialog_seed"
+            android:inputType="text"
+            android:key="pref_seed"
+            android:persistent="true"
+            android:title="@string/prefTitle_seed"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            android:dialogTitle="@string/prefDialog_colors"
+            android:inputType="text"
+            android:key="pref_colors"
+            android:persistent="true"
+            android:title="@string/prefTitle_colors"
+            app:useSimpleSummaryProvider="true" />
         <SeekBarPreference
             android:defaultValue="0"
             android:key="prefSlider_minimumWidth"
@@ -147,4 +165,15 @@
         app:persistent="true"
         app:useSimpleSummaryProvider="true"/>
     <!--    </PreferenceCategory>-->
+    <PreferenceCategory
+        android:key="prefCat_debug"
+        android:title="@string/prefCat_debug">
+        <EditTextPreference
+            android:key="pref_debugUrl"
+            android:title="@string/prefTitle_debugUrl"
+            android:persistent="false"
+            android:selectable="true"
+            android:editable="false"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
 </PreferenceScreen>
