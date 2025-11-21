@@ -70,6 +70,26 @@
     <string name="prefTitle_minimumWidth">Minimum picture width</string>
     <string name="prefTitle_minimumHeight">Minimum picture height</string>
     <string name="prefTitle_autoCrop">Auto crop</string>
+    <string name="prefTitle_tagFilter">Tag filter</string>
+    <string name="prefDialog_tagFilter">Enter tags to include (e.g. pantyhose) or exclude (e.g. -nsfw)</string>
+
+    <string name="prefTitle_atleast">Minimum Resolution</string>
+    <string name="prefDialog_atleast">Enter minimum resolution (e.g. 1920x1080)</string>
+
+    <string name="prefTitle_ratios">Aspect Ratios</string>
+
+    <string name="prefTitle_topRange">Toplist Range</string>
+
+    <string name="prefTitle_order">Order</string>
+
+    <string name="prefTitle_seed">Random Seed</string>
+    <string name="prefDialog_seed">Enter a seed for random sorting (optional)</string>
+
+    <string name="prefTitle_colors">Colors</string>
+    <string name="prefDialog_colors">Enter a hex color code (e.g. 663399)</string>
+
+    <string name="prefCat_debug">Debug Info</string>
+    <string name="prefTitle_debugUrl">API Query URL</string>
 
     <string name="pref_aspectRatioDefault_entryValues">0</string>
     <string name="pref_authFailActionDropDown">Authentication failure action</string>

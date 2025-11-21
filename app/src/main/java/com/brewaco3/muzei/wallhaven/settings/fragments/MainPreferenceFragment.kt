@@ -39,6 +39,7 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
     private lateinit var newArtist: String
     private lateinit var oldRankingFilters: Set<String>
     private lateinit var oldRankingCategories: Set<String>
+    private lateinit var oldTagFilter: String
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.main_preference_layout, rootKey)
@@ -58,6 +59,7 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
             "pref_rankingCategorySelect",
             setOf("general", "anime", "people")
         )?.toSet() ?: setOf("general", "anime", "people")
+        oldTagFilter = sharedPrefs.getString("pref_tagFilter", "") ?: ""
 
         // Ensures that the user has provided an API key before selecting any update mode requiring authentication
         // Reveals UI elements as needed depending on Update Mode selection
@@ -81,6 +83,8 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
                 findPreference<Preference>("pref_rankingFilterSelect")?.isVisible =
                     !authFeedModeSelected
                 findPreference<Preference>("pref_rankingCategorySelect")?.isVisible =
+                    !authFeedModeSelected
+                findPreference<Preference>("pref_tagFilter")?.isVisible =
                     !authFeedModeSelected
                 findPreference<Preference>("pref_tagSearch")?.isVisible = newValue == "tag_search"
                 findPreference<Preference>("pref_tagLanguage")?.isVisible = newValue == "tag_search"
@@ -196,6 +200,7 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
         } else {
             findPreference<Preference>("pref_rankingFilterSelect")?.isVisible = true
             findPreference<Preference>("pref_rankingCategorySelect")?.isVisible = true
+            findPreference<Preference>("pref_tagFilter")?.isVisible = true
         }
 
         // Preference that immediately clears Muzei's image cache when pressed
@@ -371,12 +376,13 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
             "pref_rankingCategorySelect",
             setOf("general", "anime", "people")
         )?.toSet() ?: setOf("general", "anime", "people")
+        val newTagFilter = sharedPrefs.getString("pref_tagFilter", "") ?: ""
 
         // If user has changed update, filter mode, or search tag:
         // Immediately stop any pending work, clear the Provider of any Artwork, and then toast
         if (oldUpdateMode != newUpdateMode || oldTag != newTag
             || oldArtist != newArtist || oldRankingFilters != newRankingFilters
-            || oldRankingCategories != newRankingCategories
+            || oldRankingCategories != newRankingCategories || oldTagFilter != newTagFilter
         ) {
             WorkManager.getInstance(requireContext()).cancelUniqueWork("ANTONY")
             requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
@@ -404,6 +410,11 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
                         getString(R.string.toast_newFilterSelect),
                         Toast.LENGTH_SHORT
                     ).show()
+                oldTagFilter != newTagFilter -> Toast.makeText(
+                    context,
+                    getString(R.string.toast_newFilterSelect),
+                    Toast.LENGTH_SHORT
+                ).show()
                 else -> {
                     Toast.makeText(
                         context,
