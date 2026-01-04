@@ -113,4 +113,20 @@
     <string name="prefSummary_mobileDataSaver">停止下载新作品</string>
     <string name="prefCat_appSettings">应用设置</string>
     <string name="prefSummary_useWallhavenProxy">加速某些地区的图片下载</string>
+
+    <!-- About Settings -->
+    <string name="tab_heading_about">关于</string>
+    <string name="prefCat_appInfo">应用信息</string>
+    <string name="prefCat_update">更新</string>
+    <string name="prefTitle_version">版本</string>
+    <string name="prefTitle_author">作者</string>
+    <string name="prefTitle_sourceCode">源代码</string>
+    <string name="prefSummary_sourceCode">在 GitHub 上查看</string>
+    <string name="prefTitle_checkUpdate">检查更新</string>
+    <string name="prefSummary_checkUpdate">检查 GitHub 上的最新版本</string>
+    <string name="toast_checking_update">正在检查更新…</string>
+    <string name="toast_no_update">您正在使用最新版本</string>
+    <string name="toast_update_check_failed">检查更新失败</string>
+    <string name="dialog_new_version_title">新版本可用：%s</string>
+    <string name="dialog_download">下载</string>
 </resources>

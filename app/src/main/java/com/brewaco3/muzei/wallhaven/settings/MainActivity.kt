@@ -46,7 +46,8 @@ class MainActivity : WallhavenMuzeiActivity(), AdvOptionsPreferenceFragment.Nigh
         val tabTitles = intArrayOf(
             R.string.tab_heading_main,
             R.string.tab_heading_adv_options,
-            R.string.tab_heading_artwork_delete
+            R.string.tab_heading_artwork_delete,
+            R.string.tab_heading_about
         )
 
         setContentView(R.layout.activity_main)
