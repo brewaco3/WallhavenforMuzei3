@@ -438,14 +438,6 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
             .toSet()
     }
 
-    // Batch load all blocked artist IDs from Room database
-    private fun loadBlockedArtists(): Set<String> {
-        return AppDatabase.getInstance(applicationContext)
-            .blockedArtistDao()
-            .getAllIds()
-            .toSet()
-    }
-
     // Compute a hash of all query-affecting settings for cache invalidation
     private fun computeQueryHash(sharedPrefs: SharedPreferences): String {
         val params = listOf(
@@ -575,8 +567,7 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
         updateMode: String,
         puritySelection: Set<String>,
         existingTokens: Set<String>,
-        deletedIds: Set<String>,
-        blockedArtists: Set<String>
+        deletedIds: Set<String>
     ): Artwork {
         Log.i(LOG_TAG, "Getting ranking artwork")
         val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
@@ -589,8 +580,7 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
             sharedPrefs.getInt("prefSlider_minimumWidth", 0),
             sharedPrefs.getInt("prefSlider_minimumHeight", 0),
             existingTokens,
-            deletedIds,
-            blockedArtists
+            deletedIds
         )
         Log.i(LOG_TAG, "Filtering ranking artwork completed")
 
@@ -653,12 +643,11 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
         settingMinimumWidth: Int,
         settingMinimumHeight: Int,
         existingTokens: Set<String>,
-        deletedIds: Set<String>,
-        blockedArtists: Set<String>
+        deletedIds: Set<String>
     ): RankingArtwork {
         val filtered = filterArtworkRankingList(
             artworkList, puritySelection, settingAspectRatios, settingMinimumViewCount,
-            settingMinimumWidth, settingMinimumHeight, existingTokens, deletedIds, blockedArtists
+            settingMinimumWidth, settingMinimumHeight, existingTokens, deletedIds
         )
         if (filtered.isEmpty()) {
             throw FilterMatchNotFoundException("All Wallhaven wallpapers iterated over, fetching a new Contents")
@@ -675,8 +664,7 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
         settingMinimumWidth: Int,
         settingMinimumHeight: Int,
         existingTokens: Set<String>,
-        deletedIds: Set<String>,
-        blockedArtists: Set<String>
+        deletedIds: Set<String>
     ): List<RankingArtwork> {
         val normalizedPurity = puritySelection.map { it.lowercase() }
             .filterNot { it == "nsfw" && !WallhavenMuzeiSupervisor.hasApiKey() }
@@ -698,11 +686,7 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
                 )
             },
             { !deletedIds.contains(it.id) },
-            { normalizedPurity.contains(it.purity.lowercase()) },
-            {
-                val uploader = it.uploader?.username
-                uploader.isNullOrEmpty() || !blockedArtists.contains(uploader)
-            }
+            { normalizedPurity.contains(it.purity.lowercase()) }
         )
 
         return artworkList.filter { candidate ->
@@ -716,8 +700,7 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
         artworkList: List<AuthArtwork>,
         isRecommended: Boolean,
         existingTokens: Set<String>,
-        deletedIds: Set<String>,
-        blockedArtists: Set<String>
+        deletedIds: Set<String>
     ): Artwork {
         Log.i(LOG_TAG, "Getting auth artwork")
         val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
@@ -733,8 +716,7 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
             sharedPrefs.getInt("prefSlider_minimumWidth", 0),
             sharedPrefs.getInt("prefSlider_minimumHeight", 0),
             existingTokens,
-            deletedIds,
-            blockedArtists
+            deletedIds
         )
         Log.i(LOG_TAG, "Filtering auth artwork completed")
 
@@ -788,7 +770,6 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
             .persistentUri(localUri)
             .token(token)
             .webUri(Uri.parse(WallhavenProviderConst.WALLHAVEN_ARTWORK_URL + token))
-            .metadata(selectedArtwork.user.id.toString()) // Allows blocking of artist
             .build()
     }
 
@@ -802,8 +783,7 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
         settingMinimumWidth: Int,
         settingMinimumHeight: Int,
         existingTokens: Set<String>,
-        deletedIds: Set<String>,
-        blockedArtists: Set<String>
+        deletedIds: Set<String>
     ): AuthArtwork {
         val predicates: List<(AuthArtwork) -> Boolean> = listOfNotNull(
             { !existingTokens.contains(it.id.toString()) },
@@ -824,8 +804,7 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
                 settingIsRecommended || settingNsfwSelection.size == 4 ||
                         settingNsfwSelection.contains(it.sanity_level.toString()) ||
                         (settingNsfwSelection.contains("8") && it.x_restrict == 1)
-            },
-            { !blockedArtists.contains(it.user.id.toString()) }
+            }
             // If feed mode is recommended or user has selected all possible NSFW levels, then don't bother filtering NSFW
             // Recommended only provides SFW artwork
         )
@@ -843,8 +822,7 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
 
     private fun getArtworksBookmark(
         existingTokens: Set<String>,
-        deletedIds: Set<String>,
-        blockedArtists: Set<String>
+        deletedIds: Set<String>
     ): List<Artwork> {
         val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
 
@@ -872,7 +850,7 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
         while (artworkList.size < sharedPrefs.getInt("prefSlider_numToDownload", 2)) {
             val artwork: Artwork
             try {
-                artwork = buildArtworkAuth(bookmarkArtworks, false, existingTokens, deletedIds, blockedArtists)
+                artwork = buildArtworkAuth(bookmarkArtworks, false, existingTokens, deletedIds)
             } catch (e: FilterMatchNotFoundException) {
                 Log.i(LOG_TAG, "Fetching new bookmarks")
                 bookmarkArtworks = bookmarksHelper.getNextBookmarks().artworks
@@ -893,8 +871,7 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
     private fun getArtworksAuth(
         updateMode: String,
         existingTokens: Set<String>,
-        deletedIds: Set<String>,
-        blockedArtists: Set<String>
+        deletedIds: Set<String>
     ): List<Artwork> {
         val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         // Determines if any extra information is needed, and passes it along
@@ -918,7 +895,7 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
         while (artworkList.size < sharedPrefs.getInt("prefSlider_numToDownload", 2)) {
             val artwork: Artwork
             try {
-                artwork = buildArtworkAuth(authArtworkList, updateMode == "recommended", existingTokens, deletedIds, blockedArtists)
+                artwork = buildArtworkAuth(authArtworkList, updateMode == "recommended", existingTokens, deletedIds)
             } catch (e: FilterMatchNotFoundException) {
                 Log.i(LOG_TAG, "Fetching new bookmarks")
                 authArtworkList = illustsHelper.getNextIllusts().artworks
@@ -977,8 +954,7 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
     private fun getArtworksRanking(
         updateMode: String,
         existingTokens: Set<String>,
-        deletedIds: Set<String>,
-        blockedArtists: Set<String>
+        deletedIds: Set<String>
     ): List<Artwork> {
         val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         val numArtworksToDownload = sharedPrefs.getInt("prefSlider_numToDownload", 2)
@@ -1037,8 +1013,7 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
             minWidth,
             minHeight,
             existingTokens,
-            deletedIds,
-            blockedArtists
+            deletedIds
         )
 
         // If not enough filtered candidates, fetch fresh from API
@@ -1065,7 +1040,7 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
                 while (it.size < numArtworksToDownload) {
                     val artwork: Artwork
                     try {
-                        artwork = buildArtworkRanking(contents, updateMode, sanitizedPurity, existingTokens, deletedIds, blockedArtists)
+                        artwork = buildArtworkRanking(contents, updateMode, sanitizedPurity, existingTokens, deletedIds)
                     } catch (e: FilterMatchNotFoundException) {
                         Log.i(LOG_TAG, "Fetching new contents")
                         contents = contentsHelper.getNextContents()
@@ -1118,19 +1093,18 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
             getAccessToken()
         }
 
-        // Load lookup sets once for efficient duplicate/deleted/blocked checks
+        // Load lookup sets once for efficient duplicate/deleted checks
         val existingTokens = loadExistingArtworkTokens()
         val deletedIds = loadDeletedArtworkIds()
-        val blockedArtists = loadBlockedArtists()
 
         // App has functionality to temporarily or permanently change the update mode if authentication fails
         // i.e. update mode can change between the previous if block and this if block
         // Thus two identical if statements are required
         Log.i(LOG_TAG, "Feed mode: $updateMode")
         val artworkList: List<Artwork> = when (updateMode) {
-            "bookmark" -> getArtworksBookmark(existingTokens, deletedIds, blockedArtists)
-            in AUTH_MODES -> getArtworksAuth(updateMode, existingTokens, deletedIds, blockedArtists)
-            else -> getArtworksRanking(updateMode, existingTokens, deletedIds, blockedArtists)
+            "bookmark" -> getArtworksBookmark(existingTokens, deletedIds)
+            in AUTH_MODES -> getArtworksAuth(updateMode, existingTokens, deletedIds)
+            else -> getArtworksRanking(updateMode, existingTokens, deletedIds)
         }
         Log.i(LOG_TAG, "Submitting ${artworkList.size} artworks")
         return artworkList
