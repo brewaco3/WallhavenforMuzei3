@@ -7,6 +7,9 @@ on:
     paths:
       - 'gradle.properties'  # Only trigger when this file changes
 
+permissions:
+  contents: write  # Required for creating releases
+
 jobs:
   check-version:
     runs-on: ubuntu-latest
