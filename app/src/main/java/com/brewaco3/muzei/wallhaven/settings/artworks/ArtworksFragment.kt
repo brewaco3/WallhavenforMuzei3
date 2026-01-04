@@ -26,6 +26,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.RemoteException
 import android.provider.MediaStore
+import android.view.ScaleGestureDetector
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -86,8 +87,12 @@ class ArtworksFragment : Fragment() {
         // The ceiling gives a minimum of 2 columns, and scales well up to a Nexus 10 tablet (1280dp width)
         val displayMetrics = context.resources.displayMetrics
         val dpWidth = displayMetrics.widthPixels / displayMetrics.density
-        val spanCount = ceil(dpWidth.toDouble() / 200).toInt()
-        val layoutManager = GridLayoutManager(context, spanCount)
+
+        val minSpanCount = 2
+        val maxSpanCount = (dpWidth / 100).toInt().coerceAtLeast(minSpanCount)
+        val initialSpanCount = ceil(dpWidth.toDouble() / 200).toInt().coerceIn(minSpanCount, maxSpanCount)
+
+        val layoutManager = GridLayoutManager(context, initialSpanCount)
         recyclerView.layoutManager = layoutManager
         adapter = ArtworksAdapter(getInitialArtworkItemList(context))
 
@@ -95,12 +100,42 @@ class ArtworksFragment : Fragment() {
         layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
                 return when (adapter.getItemViewType(position)) {
-                    0 -> spanCount // TYPE_HEADER (hardcoded 0 to match adapter companion object)
+                    0 -> layoutManager.spanCount // TYPE_HEADER (dynamic lookup)
                     else -> 1
                 }
             }
         }
-        
+
+        // Pinch-to-zoom to change column count
+        val scaleGestureDetector = ScaleGestureDetector(context, object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+            var scaleFactor = 1f
+
+            override fun onScale(detector: ScaleGestureDetector): Boolean {
+                scaleFactor *= detector.scaleFactor
+                val currentSpan = layoutManager.spanCount
+
+                if (scaleFactor > 1.2f) { // Pinch out -> Decrease columns (images get larger)
+                    if (currentSpan > minSpanCount) {
+                        layoutManager.spanCount = currentSpan - 1
+                        adapter.notifyItemRangeChanged(0, adapter.itemCount)
+                        scaleFactor = 1f
+                    }
+                } else if (scaleFactor < 0.8f) { // Pinch in -> Increase columns (images get smaller)
+                    if (currentSpan < maxSpanCount) {
+                        layoutManager.spanCount = currentSpan + 1
+                        adapter.notifyItemRangeChanged(0, adapter.itemCount)
+                        scaleFactor = 1f
+                    }
+                }
+                return true
+            }
+        })
+
+        recyclerView.setOnTouchListener { _, event ->
+            scaleGestureDetector.onTouchEvent(event)
+            false // Return false to allow normal touch events (scrolling, clicking)
+        }
+
         recyclerView.adapter = adapter
 
         return linearLayoutView

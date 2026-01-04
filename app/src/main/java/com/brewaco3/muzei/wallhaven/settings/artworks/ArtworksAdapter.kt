@@ -146,7 +146,6 @@ class ArtworksAdapter(private val artworkItems: MutableList<ArtworkItem>) :
     inner class ItemViewHolder(private val mView: View) : RecyclerView.ViewHolder(mView), View.OnClickListener {
         private val mImageView: ImageView = mView.findViewById(R.id.image)
         private lateinit var mArtworkItem: ArtworkItem
-        private val color = Color.BLUE // Fallback color to avoid potential theme issues
 
         fun bind(artworkItem: ArtworkItem) {
             mArtworkItem = artworkItem
@@ -160,7 +159,8 @@ class ArtworksAdapter(private val artworkItems: MutableList<ArtworkItem>) :
 
         private fun updateSelectionState() {
             if (mArtworkItem.selected) {
-                mImageView.setColorFilter(Color.argb(130, Color.red(color), Color.green(color), Color.blue(color)))
+                // Subtle white overlay for selection
+                mImageView.setColorFilter(Color.argb(80, 255, 255, 255))
             } else {
                 mImageView.clearColorFilter()
             }
