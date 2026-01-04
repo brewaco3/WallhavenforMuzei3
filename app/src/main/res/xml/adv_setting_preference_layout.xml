@@ -23,11 +23,11 @@
     <PreferenceCategory
         android:key="prefCat_advFiltering"
         android:title="@string/prefCat_advFiltering">
-        <DropDownPreference
-            android:defaultValue=""
+        <MultiSelectListPreference
+            android:defaultValue="@array/pref_aspectRatioDefault_entryValues_v2"
             android:entries="@array/pref_aspectRatio_entries"
             android:entryValues="@array/pref_aspectRatio_entryValues"
-            android:key="pref_aspectRatioSelect"
+            android:key="pref_aspectRatioSelect_v2"
             android:persistent="true"
             android:title="@string/prefTitle_aspectRatio"
             app:useSimpleSummaryProvider="true" />
@@ -168,12 +168,11 @@
     <PreferenceCategory
         android:key="prefCat_debug"
         android:title="@string/prefCat_debug">
-        <EditTextPreference
+        <Preference
             android:key="pref_debugUrl"
             android:title="@string/prefTitle_debugUrl"
             android:persistent="false"
             android:selectable="true"
-            android:editable="false"
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 </PreferenceScreen>

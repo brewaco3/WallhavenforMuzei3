@@ -10,7 +10,7 @@
     <string name="attr_toplist">Toplist</string>
     <string name="attr_hot">Hot</string>
 
-    <string name="button_clearCache">Immediately clear image cache</string>
+    <string name="button_clearCache">Clear all cached artwork</string>
     <string name="button_forceRefresh">Force refresh wallpapers</string>
 
     <string name="command_addToBookmark">Add to bookmarks</string>
@@ -70,8 +70,8 @@
     <string name="prefTitle_minimumWidth">Minimum picture width</string>
     <string name="prefTitle_minimumHeight">Minimum picture height</string>
     <string name="prefTitle_autoCrop">Auto crop</string>
-    <string name="prefTitle_tagFilter">Tag filter</string>
-    <string name="prefDialog_tagFilter">Enter tags to include (e.g. pantyhose) or exclude (e.g. -nsfw)</string>
+    <string name="prefTitle_tagFilter">Search Query</string>
+    <string name="prefDialog_tagFilter">Enter search query (e.g. \'landscape\', \'type:png\'). Supports all Wallhaven API \'q\' parameter options.</string>
 
     <string name="prefTitle_atleast">Minimum Resolution</string>
     <string name="prefDialog_atleast">Enter minimum resolution (e.g. 1920x1080)</string>
@@ -136,6 +136,8 @@
     <string name="login_wallhaven_refresh_hint">Refresh Token</string>
     <string name="action_sign_in_refresh">Login using refresh token</string>
     <string name="dialog_logoutConfirm">Are you sure you want to logout?</string>
+    <string name="dialog_clearCache_title">Clear image cache?</string>
+    <string name="dialog_clearCache_message">This will delete all cached images and artwork entries, then download fresh wallpapers. Continue?</string>
     <string name="prefTitle_nightModePreference">Night mode preference</string>
     <string name="prefTitle_mobileDataSaver">Mobile data saver</string>
     <string name="prefSummary_mobileDataSaver">Stops new artworks from being downloaded</string>

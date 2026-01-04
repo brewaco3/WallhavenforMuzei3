@@ -20,6 +20,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.text.InputType
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.preference.*
 import androidx.work.ExistingWorkPolicy
 import androidx.work.WorkInfo
@@ -28,7 +29,9 @@ import com.brewaco3.muzei.wallhaven.WallhavenMuzeiSupervisor
 import com.brewaco3.muzei.wallhaven.WallhavenProviderConst
 import com.brewaco3.muzei.wallhaven.WallhavenProviderConst.AUTH_MODES
 import com.brewaco3.muzei.wallhaven.R
+import com.brewaco3.muzei.wallhaven.provider.WallhavenArtProvider
 import com.brewaco3.muzei.wallhaven.provider.WallhavenArtWorker.Companion.enqueueLoad
+import com.google.android.apps.muzei.api.provider.ProviderContract.getProviderClient
 import com.google.android.material.snackbar.Snackbar
 class MainPreferenceFragment : PreferenceFragmentCompat() {
     private lateinit var oldUpdateMode: String
@@ -206,16 +209,28 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
         // Preference that immediately clears Muzei's image cache when pressed
         findPreference<Preference>(getString(R.string.button_clearCache))?.onPreferenceClickListener =
             Preference.OnPreferenceClickListener {
-                WorkManager.getInstance(requireContext()).cancelUniqueWork("ANTONY")
-                requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-                    ?.deleteRecursively()
-                enqueueLoad(true, requireContext())
-                Snackbar.make(
-                    requireView(), R.string.toast_clearingCache,
-                    Snackbar.LENGTH_SHORT
-                )
+                AlertDialog.Builder(requireContext())
+                    .setTitle(R.string.dialog_clearCache_title)
+                    .setMessage(R.string.dialog_clearCache_message)
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                        // Cancel any ongoing work
+                        WorkManager.getInstance(requireContext()).cancelUniqueWork("ANTONY")
+                        // Delete cached image files
+                        requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+                            ?.deleteRecursively()
+                        // Clear the Muzei provider database
+                        getProviderClient(requireContext(), WallhavenArtProvider::class.java)
+                            .setArtwork(emptyList())
+                        // Download fresh wallpapers
+                        enqueueLoad(false, requireContext())
+                        Snackbar.make(
+                            requireView(), R.string.toast_clearingCache,
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                        newUpdateMode = oldUpdateMode
+                    }
+                    .setNegativeButton(android.R.string.cancel, null)
                     .show()
-                newUpdateMode = oldUpdateMode
                 true
             }
 

@@ -58,10 +58,14 @@
 
     <string-array name="pref_aspectRatio_entries">
         <item>Any</item>
-        <item>Landscape (16x9, 16x10)</item>
-        <item>Portrait (9x16, 10x16)</item>
+        <item>All Wide</item>
+        <item>All Portrait</item>
         <item>Ultrawide (21x9)</item>
         <item>Square (1x1)</item>
+    </string-array>
+
+    <string-array name="pref_aspectRatioDefault_entryValues_v2">
+        <item></item>
     </string-array>
 
     <string-array name="pref_aspectRatio_entryValues">
