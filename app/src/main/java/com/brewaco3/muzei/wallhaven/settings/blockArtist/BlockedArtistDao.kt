@@ -7,6 +7,9 @@ import androidx.room.Query
 
 @Dao
 interface BlockedArtistDao {
+    @Query("SELECT artistId FROM BlockArtistEntity")
+    fun getAllIds(): List<String>
+
     @Query("SELECT EXISTS(SELECT * FROM BlockArtistEntity WHERE artistId = (:artistId))")
     fun isRowIsExist(artistId: String): Boolean
 
