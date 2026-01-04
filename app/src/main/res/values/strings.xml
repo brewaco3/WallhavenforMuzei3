@@ -148,5 +148,4 @@
     <string name="prefSummary_enableNetworkBypass">Disable if you are having problems on VPN</string>
     <string name="prefSummary_useWallhavenProxy">May speed up image downloads in some areas</string>
     <string name="prefTitle_tagLanguage">Tag language</string>
-    <string name="wallhaven_unknown_uploader">Unknown uploader</string>
 </resources>

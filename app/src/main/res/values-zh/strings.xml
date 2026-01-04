@@ -118,5 +118,4 @@
     <string name="prefSummary_mobileDataSaver">停止下载新作品</string>
     <string name="prefCat_appSettings">应用设置</string>
     <string name="prefSummary_useWallhavenProxy">加速某些地区的图片下载</string>
-    <string name="wallhaven_unknown_uploader">未知上传者</string>
 </resources>
