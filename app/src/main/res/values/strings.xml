@@ -101,6 +101,7 @@
 
     <string name="snackbar_deletedArtworks">artworks deleted</string>
     <string name="snackbar_savedArtworks">artworks saved</string>
+    <string name="snackbar_savedArtworksWithSkipped">artworks saved, %d already existed</string>
     <string name="snackbar_selectArtworkFirst">Select at least one artwork first</string>
 
     <string name="tab_heading_adv_options">Advanced settings</string>
