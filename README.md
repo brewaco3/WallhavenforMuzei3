@@ -1,24 +1,20 @@
 Wallhaven for Muzei
 ===
 
-Wallhaven.cc plugin for the Muzei 3 API.
+[![Scc Count Badge](https://sloc.xyz/github/brewaco3/WallhavenforMuzei3)](https://github.com/brewaco3/WallhavenforMuzei3/)
 
-Forked from [Pixiv for Muzei 3](https://github.com/yellowbluesky/PixivforMuzei3) with the goal of sourcing wallpapers from Wallhaven's public feeds.
+Wallhaven.cc plugin for the Muzei 3 API. Available for download on [GitHub Releases](https://github.com/brewaco3/WallhavenforMuzei3/releases).
 
-**[Download from GitHub Releases](https://github.com/brewaco3/WallhavenforMuzei3/releases)**
 
 Features
   - Pulls wallpapers from Wallhaven's public toplist and hot feeds
   - Supports SFW, Sketchy, and NSFW purity filters (NSFW requires [API token from Wallhaven Settings](https://wallhaven.cc/settings/account))
-  - Filter against multiple criteria:
-    - Aspect ratio
-    - View count
-  - Minimum resolution
+  - Filter by multiple criteria: aspect ratio, minimum resolution, view count
   - Option to automatically clear cache on a daily basis
   - Option to save artwork to external user storage
-  - No tracking or collection of user details
+  - No tracking or collection of user data
 
-  [![Scc Count Badge](https://sloc.xyz/github/yellowbluesky/PixivforMuzei3/)](https://github.com/yellowbluesky/PixivforMuzei3/)
+This project started as a fork of [Pixiv for Muzei 3](https://github.com/yellowbluesky/PixivforMuzei3), adapted to source wallpapers from Wallhaven's public feeds.
 
 <img src="https://github.com/brewaco3/WallhavenforMuzei3/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="250">
 <img src="https://github.com/brewaco3/WallhavenforMuzei3/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="250">
@@ -27,16 +23,6 @@ Features
 <img src="https://github.com/brewaco3/WallhavenforMuzei3/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/5.png" width="250">
 <img src="https://github.com/brewaco3/WallhavenforMuzei3/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/6.png" width="250">
 
-## [Contribute Guide](./CONTRIBUTE.md)
-
-Contributors
----
-
-- [alvince](https://github.com/alvince): Significant contributions to code and improvements in application safety
-- [Notsfsssf](https://github.com/Notsfsssf): SNI Bypass
-  - His Android Pixiv client [Pix-EzViewer](https://github.com/Notsfsssf/Pix-EzViewer) is excellent, try it out
-- [SettingDust](https://github.com/SettingDust): Localisation
-- [Linsui](https://github.com/linsui): F-Droid RFP and localisation
 
 Build instructions
 ---
@@ -47,8 +33,8 @@ Build instructions
    - `adb` from the Android Platform Tools for deploying to a device.
 2. **Clone the project and prepare the SDK path**
    ```bash
-   git clone https://github.com/yellowbluesky/PixivforMuzei3.git
-   cd PixivforMuzei3
+   git clone https://github.com/brewaco3/WallhavenforMuzei3.git
+   cd WallhavenforMuzei3
    ```
    Ensure that `local.properties` contains a valid `sdk.dir=/absolute/path/to/Android/Sdk`. Android Studio populates this automatically when you open the project; for command-line builds you can create the file manually.
 3. **Build a debug APK**
