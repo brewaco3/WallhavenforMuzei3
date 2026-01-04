@@ -1,4 +1,4 @@
-package com.brewaco3.muzei.wallhaven.settings.deleteArtwork
+package com.brewaco3.muzei.wallhaven.settings.artworks
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
