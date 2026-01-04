@@ -32,6 +32,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.brewaco3.muzei.wallhaven.AppDatabase
@@ -53,6 +54,7 @@ class ArtworksFragment : Fragment() {
 
     companion object {
         val SELECTED_ITEMS = mutableListOf<ArtworkItem>()
+        private const val PREF_ARTWORK_COLUMNS = "pref_artwork_columns"
     }
 
     override fun onResume() {
@@ -92,7 +94,12 @@ class ArtworksFragment : Fragment() {
         val maxSpanCount = (dpWidth / 100).toInt().coerceAtLeast(minSpanCount)
         val initialSpanCount = ceil(dpWidth.toDouble() / 200).toInt().coerceIn(minSpanCount, maxSpanCount)
 
-        val layoutManager = GridLayoutManager(context, initialSpanCount)
+        // Load saved column count, falling back to calculated default
+        val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
+        val savedSpanCount = sharedPrefs.getInt(PREF_ARTWORK_COLUMNS, initialSpanCount)
+        val startingSpanCount = savedSpanCount.coerceIn(minSpanCount, maxSpanCount)
+
+        val layoutManager = GridLayoutManager(context, startingSpanCount)
         recyclerView.layoutManager = layoutManager
         adapter = ArtworksAdapter(getInitialArtworkItemList(context))
 
@@ -118,12 +125,14 @@ class ArtworksFragment : Fragment() {
                     if (currentSpan > minSpanCount) {
                         layoutManager.spanCount = currentSpan - 1
                         adapter.notifyItemRangeChanged(0, adapter.itemCount)
+                        sharedPrefs.edit().putInt(PREF_ARTWORK_COLUMNS, layoutManager.spanCount).apply()
                         scaleFactor = 1f
                     }
                 } else if (scaleFactor < 0.8f) { // Pinch in -> Increase columns (images get smaller)
                     if (currentSpan < maxSpanCount) {
                         layoutManager.spanCount = currentSpan + 1
                         adapter.notifyItemRangeChanged(0, adapter.itemCount)
+                        sharedPrefs.edit().putInt(PREF_ARTWORK_COLUMNS, layoutManager.spanCount).apply()
                         scaleFactor = 1f
                     }
                 }
