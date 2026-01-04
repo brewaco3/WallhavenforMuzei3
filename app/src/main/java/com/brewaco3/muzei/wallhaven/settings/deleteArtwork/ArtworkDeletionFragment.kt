@@ -50,6 +50,12 @@ class ArtworkDeletionFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        // Refresh data when tab becomes visible (e.g., after Force Refresh or Clear Cache)
+        if (::adapter.isInitialized) {
+            SELECTED_ITEMS.clear()
+            val freshData = getInitialArtworkItemList(requireContext())
+            adapter.updateData(freshData)
+        }
         activity?.findViewById<FloatingActionButton>(R.id.fab_delete)?.let { fab ->
             fab.show()
             fab.setOnClickListener { deleteSelectedItems() }

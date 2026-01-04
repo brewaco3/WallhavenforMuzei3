@@ -98,6 +98,13 @@ class ArtworkDeletionAdapter(private val artworkItems: MutableList<ArtworkItem>)
         notifyDataSetChanged()
     }
 
+    fun updateData(newItems: MutableList<ArtworkItem>) {
+        artworkItems.clear()
+        artworkItems.addAll(newItems)
+        updateDisplayItems()
+        notifyDataSetChanged()
+    }
+
     // Helper for GridLayoutManager span size
     val spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
         override fun getSpanSize(position: Int): Int {
