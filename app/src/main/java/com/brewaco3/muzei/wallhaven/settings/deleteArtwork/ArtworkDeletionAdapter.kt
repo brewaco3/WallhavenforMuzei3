@@ -20,58 +20,139 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
 import android.widget.ImageView
+import android.widget.TextView
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.brewaco3.muzei.wallhaven.R
 import com.bumptech.glide.Glide
 import com.google.android.material.color.MaterialColors
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ArtworkDeletionAdapter(private val artworkItems: MutableList<ArtworkItem>) :
-    RecyclerView.Adapter<ArtworkDeletionAdapter.ViewHolder>() {
-    // Call to inflate the view. In our case, this is fragment_artwork, which is only an ImageView
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.fragment_artwork, parent, false)
-        return ViewHolder(view)
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    sealed class DeletionItem {
+        data class Header(val date: String, val items: List<ArtworkItem>) : DeletionItem()
+        data class Item(val artworkItem: ArtworkItem) : DeletionItem()
     }
 
-    // Called to populate or "bind" an ArtworkItem with an ImageView
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(artworkItems[position])
+    private var displayItems: MutableList<DeletionItem> = mutableListOf()
+
+    init {
+        updateDisplayItems()
     }
 
-    override fun getItemCount(): Int {
-        return artworkItems.size
-    }
-
-    fun removeItems(artworkItemsToDelete: List<ArtworkItem>) {
-        val positionsToDelete = artworkItemsToDelete.mapNotNull { item ->
-            artworkItems.indexOf(item).takeIf { it != -1 }
-        }.sortedDescending()
-        artworkItems.removeAll(artworkItemsToDelete)
-        for (position in positionsToDelete) {
-            notifyItemRemoved(position)
+    private fun updateDisplayItems() {
+        displayItems.clear()
+        val grouped = artworkItems.groupBy {
+            SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date(it.dateAdded))
+        }
+        
+        // Sort groups by date descending (keys are yyyy-MM-dd strings)
+        grouped.toSortedMap(compareByDescending { it }).forEach { (date, items) ->
+            displayItems.add(DeletionItem.Header(date, items))
+            items.forEach { displayItems.add(DeletionItem.Item(it)) }
         }
     }
 
-    class ViewHolder(private val mView: View) : RecyclerView.ViewHolder(mView), View.OnClickListener {
+    override fun getItemViewType(position: Int): Int {
+        return when (displayItems[position]) {
+            is DeletionItem.Header -> TYPE_HEADER
+            is DeletionItem.Item -> TYPE_ITEM
+        }
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return when (viewType) {
+            TYPE_HEADER -> {
+                val view = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.item_artwork_header, parent, false)
+                HeaderViewHolder(view)
+            }
+            TYPE_ITEM -> {
+                val view = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.fragment_artwork, parent, false)
+                ItemViewHolder(view)
+            }
+            else -> throw IllegalArgumentException("Invalid view type")
+        }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when (val item = displayItems[position]) {
+            is DeletionItem.Header -> (holder as HeaderViewHolder).bind(item)
+            is DeletionItem.Item -> (holder as ItemViewHolder).bind(item.artworkItem)
+        }
+    }
+
+    override fun getItemCount(): Int {
+        return displayItems.size
+    }
+
+    fun removeItems(artworkItemsToDelete: List<ArtworkItem>) {
+        artworkItems.removeAll(artworkItemsToDelete)
+        updateDisplayItems()
+        notifyDataSetChanged()
+    }
+
+    // Helper for GridLayoutManager span size
+    val spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+        override fun getSpanSize(position: Int): Int {
+            return when (getItemViewType(position)) {
+                TYPE_HEADER -> 3 // Span full width (assuming 3 columns, will adjust in Fragment)
+                else -> 1
+            }
+        }
+    }
+
+    inner class HeaderViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        private val title: TextView = view.findViewById(R.id.header_title)
+        private val checkBox: CheckBox = view.findViewById(R.id.header_checkbox)
+
+        fun bind(header: DeletionItem.Header) {
+            title.text = header.date
+            
+            // Check state: if all items in this group are selected
+            val allSelected = header.items.all { it.selected }
+            checkBox.isChecked = allSelected
+
+            checkBox.setOnClickListener {
+                val isChecked = checkBox.isChecked
+                header.items.forEach { item ->
+                    if (item.selected != isChecked) {
+                        item.selected = isChecked
+                        if (isChecked) {
+                            ArtworkDeletionFragment.SELECTED_ITEMS.add(item)
+                        } else {
+                            ArtworkDeletionFragment.SELECTED_ITEMS.remove(item)
+                        }
+                    }
+                }
+                notifyDataSetChanged()
+            }
+        }
+    }
+
+    inner class ItemViewHolder(private val mView: View) : RecyclerView.ViewHolder(mView), View.OnClickListener {
         private val mImageView: ImageView = mView.findViewById(R.id.image)
         private lateinit var mArtworkItem: ArtworkItem
-
-        private val color = MaterialColors.getColor(mView, com.google.android.material.R.attr.colorTertiaryContainer, Color.BLUE)
+        private val color = Color.BLUE // Fallback color to avoid potential theme issues
 
         fun bind(artworkItem: ArtworkItem) {
             mArtworkItem = artworkItem
-            // Glide is used instead of simply setting the ImageView Uri directly
-            //  Without Glide, performance was unacceptable because the ImageView was directly pulling
-            //  the full size image and resizing it to fit the View every time it was asked to
-            //  Glide caches the resized image, much more performant
             Glide.with(mView)
                 .load(artworkItem.persistent_uri)
                 .centerCrop()
                 .into(mImageView)
 
-            if (artworkItem.selected) {
+            updateSelectionState()
+        }
+
+        private fun updateSelectionState() {
+            if (mArtworkItem.selected) {
                 mImageView.setColorFilter(Color.argb(130, Color.red(color), Color.green(color), Color.blue(color)))
             } else {
                 mImageView.clearColorFilter()
@@ -79,25 +160,28 @@ class ArtworkDeletionAdapter(private val artworkItems: MutableList<ArtworkItem>)
         }
 
         override fun onClick(view: View) {
-            val position = absoluteAdapterPosition
-
-            if (position != RecyclerView.NO_POSITION) {
-                // Check if an item was deleted, but the user clicked it before the UI removed it
-                // We can access the data within the views
-                if (!mArtworkItem.selected) {
+            if (absoluteAdapterPosition != RecyclerView.NO_POSITION) {
+                mArtworkItem.selected = !mArtworkItem.selected
+                if (mArtworkItem.selected) {
                     ArtworkDeletionFragment.SELECTED_ITEMS.add(mArtworkItem)
-                    mImageView.setColorFilter(Color.argb(130, Color.red(color), Color.green(color), Color.blue(color)))
-                    mArtworkItem.selected = true
                 } else {
                     ArtworkDeletionFragment.SELECTED_ITEMS.remove(mArtworkItem)
-                    mImageView.clearColorFilter()
-                    mArtworkItem.selected = false
                 }
+                updateSelectionState()
+                // Notify header to update checkbox
+                // Ideally we should find the header position and notifyItemChanged, 
+                // but notifyDataSetChanged is safer/easier for now given the structure
+                notifyDataSetChanged() 
             }
         }
 
         init {
             mView.setOnClickListener(this)
         }
+    }
+
+    companion object {
+        private const val TYPE_HEADER = 0
+        private const val TYPE_ITEM = 1
     }
 }

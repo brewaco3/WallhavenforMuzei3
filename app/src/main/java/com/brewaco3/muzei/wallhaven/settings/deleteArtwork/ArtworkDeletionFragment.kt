@@ -42,8 +42,26 @@ import java.util.*
 import kotlin.math.ceil
 
 class ArtworkDeletionFragment : Fragment() {
+    private lateinit var adapter: ArtworkDeletionAdapter
+
     companion object {
         val SELECTED_ITEMS = mutableListOf<ArtworkItem>()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        activity?.findViewById<FloatingActionButton>(R.id.fab_delete)?.let { fab ->
+            fab.show()
+            fab.setOnClickListener { deleteSelectedItems() }
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        activity?.findViewById<FloatingActionButton>(R.id.fab_delete)?.let { fab ->
+            fab.setOnClickListener(null)
+            fab.visibility = View.GONE
+        }
     }
 
     override fun onCreateView(
@@ -58,74 +76,82 @@ class ArtworkDeletionFragment : Fragment() {
         // The ceiling gives a minimum of 2 columns, and scales well up to a Nexus 10 tablet (1280dp width)
         val displayMetrics = context.resources.displayMetrics
         val dpWidth = displayMetrics.widthPixels / displayMetrics.density
-        recyclerView.layoutManager = GridLayoutManager(context, ceil(dpWidth.toDouble() / 200).toInt())
-        val adapter = ArtworkDeletionAdapter(getInitialArtworkItemList(context))
+        val spanCount = ceil(dpWidth.toDouble() / 200).toInt()
+        val layoutManager = GridLayoutManager(context, spanCount)
+        recyclerView.layoutManager = layoutManager
+        adapter = ArtworkDeletionAdapter(getInitialArtworkItemList(context))
+
+        // Set span size lookup for headers
+        layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return when (adapter.getItemViewType(position)) {
+                    0 -> spanCount // TYPE_HEADER (hardcoded 0 to match adapter companion object)
+                    else -> 1
+                }
+            }
+        }
+        
         recyclerView.adapter = adapter
 
-        // This FAB actions the delete operation from both the RecyclerView, and the
-        //  ContentProvider storing the Artwork details.
-        // All changes appear instantaneously
-        val fab: FloatingActionButton = linearLayoutView.findViewById(R.id.fab)
-        fab.setOnClickListener {
-            // Early exit when no artworks are selected for deletion
-            if (SELECTED_ITEMS.isEmpty()) {
-                Snackbar.make(
-                    requireView(), R.string.snackbar_selectArtworkFirst,
-                    Snackbar.LENGTH_LONG
-                )
-                    .show()
-                return@setOnClickListener
-            }
-            val numberDeleted = SELECTED_ITEMS.size
+        return linearLayoutView
+    }
 
-            // Deletes the artwork items from the ArrayList used as backing for the RecyclerView
-            adapter.removeItems(SELECTED_ITEMS)
-
-            // We insert the deleted artwork ID's
-            val listOfDeletedIds: MutableList<DeletedArtworkIdEntity> = mutableListOf()
-
-            // Now to delete the Artwork's themselves from the ContentProvider
-            val operations = ArrayList<ContentProviderOperation>()
-            val selection = "$TOKEN = ?"
-            // Builds a new delete operation for every selected artwork
-            for (artworkItem in SELECTED_ITEMS) {
-                val operation = ContentProviderOperation
-                    .newDelete(getProviderClient(context, WallhavenArtProvider::class.java).contentUri)
-                    .withSelection(selection, arrayOf(artworkItem.token))
-                    .build()
-                operations.add(operation)
-
-                // Used to remember which artworks have been deleted, so we don't download them again
-                listOfDeletedIds.add(DeletedArtworkIdEntity(artworkItem.token))
-            }
-            SELECTED_ITEMS.clear()
-
-            try {
-                context.contentResolver.applyBatch(BuildConfig.APPLICATION_ID + ".provider", operations)
-            } catch (e: RemoteException) {
-                e.printStackTrace()
-            } catch (e: OperationApplicationException) {
-                e.printStackTrace()
-            }
-
-            val appDatabase = AppDatabase.getInstance(context)
-            CoroutineScope(Dispatchers.Main + SupervisorJob()).launch(Dispatchers.IO) {
-                appDatabase.deletedArtworkIdDao().insertDeletedArtworkId(listOfDeletedIds.toList())
-            }
-
-            // TODO also delete the files from the disk?
-
+    private fun deleteSelectedItems() {
+        val context = requireContext()
+        // Early exit when no artworks are selected for deletion
+        if (SELECTED_ITEMS.isEmpty()) {
             Snackbar.make(
-                requireView(), numberDeleted.toString() + " " + getString(R.string.snackbar_deletedArtworks),
+                requireView(), R.string.snackbar_selectArtworkFirst,
                 Snackbar.LENGTH_LONG
             ).show()
+            return
         }
-        return linearLayoutView
+        val numberDeleted = SELECTED_ITEMS.size
+
+        // Deletes the artwork items from the ArrayList used as backing for the RecyclerView
+        adapter.removeItems(SELECTED_ITEMS)
+
+        // We insert the deleted artwork ID's
+        val listOfDeletedIds: MutableList<DeletedArtworkIdEntity> = mutableListOf()
+
+        // Now to delete the Artwork's themselves from the ContentProvider
+        val operations = ArrayList<ContentProviderOperation>()
+        val selection = "$TOKEN = ?"
+        // Builds a new delete operation for every selected artwork
+        for (artworkItem in SELECTED_ITEMS) {
+            val operation = ContentProviderOperation
+                .newDelete(getProviderClient(context, WallhavenArtProvider::class.java).contentUri)
+                .withSelection(selection, arrayOf(artworkItem.token))
+                .build()
+            operations.add(operation)
+
+            // Used to remember which artworks have been deleted, so we don't download them again
+            listOfDeletedIds.add(DeletedArtworkIdEntity(artworkItem.token))
+        }
+        SELECTED_ITEMS.clear()
+
+        try {
+            context.contentResolver.applyBatch(BuildConfig.APPLICATION_ID + ".provider", operations)
+        } catch (e: RemoteException) {
+            e.printStackTrace()
+        } catch (e: OperationApplicationException) {
+            e.printStackTrace()
+        }
+
+        val appDatabase = AppDatabase.getInstance(context)
+        CoroutineScope(Dispatchers.Main + SupervisorJob()).launch(Dispatchers.IO) {
+            appDatabase.deletedArtworkIdDao().insertDeletedArtworkId(listOfDeletedIds.toList())
+        }
+
+        Snackbar.make(
+            requireView(), numberDeleted.toString() + " " + getString(R.string.snackbar_deletedArtworks),
+            Snackbar.LENGTH_LONG
+        ).show()
     }
 
     private fun getInitialArtworkItemList(context: Context): MutableList<ArtworkItem> {
         val listOfArtworkItem = mutableListOf<ArtworkItem>()
-        val projection = arrayOf("token", "title", "persistent_uri")
+        val projection = arrayOf("token", "title", "persistent_uri", "date_added")
         val conResUri = getProviderClient(context, WallhavenArtProvider::class.java).contentUri
         val cursor = context.contentResolver.query(conResUri, projection, null, null, null)
         if (cursor != null) {
@@ -134,10 +160,17 @@ class ArtworkDeletionFragment : Fragment() {
                 //val title = cursor.getString(cursor.getColumnIndexOrThrow(ProviderContract.Artwork.TITLE))
                 val persistentUri =
                     Uri.parse(cursor.getString(cursor.getColumnIndexOrThrow(ProviderContract.Artwork.PERSISTENT_URI)))
-                listOfArtworkItem.add(ArtworkItem(token, persistentUri))
+                val dateAdded = try {
+                    cursor.getLong(cursor.getColumnIndexOrThrow(ProviderContract.Artwork.DATE_ADDED))
+                } catch (e: IllegalArgumentException) {
+                    0L
+                }
+                listOfArtworkItem.add(ArtworkItem(token, persistentUri, dateAdded))
             }
             cursor.close()
         }
+        // Sort by date descending
+        listOfArtworkItem.sortByDescending { it.dateAdded }
         return listOfArtworkItem
     }
 }
