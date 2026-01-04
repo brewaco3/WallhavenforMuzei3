@@ -23,6 +23,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.brewaco3.muzei.wallhaven.settings.artworks.ArtworksFragment;
+import com.brewaco3.muzei.wallhaven.settings.fragments.AboutPreferenceFragment;
 import com.brewaco3.muzei.wallhaven.settings.fragments.AdvOptionsPreferenceFragment;
 import com.brewaco3.muzei.wallhaven.settings.fragments.MainPreferenceFragment;
 
@@ -44,6 +45,8 @@ public class SectionsPagerAdapter extends FragmentStateAdapter {
                 return new AdvOptionsPreferenceFragment();
             case 2:
                 return new ArtworksFragment();
+            case 3:
+                return new AboutPreferenceFragment();
             default:
                 // This case should ideally not be reached if getItemCount is correct
                 return new MainPreferenceFragment(); // Fallback
@@ -52,6 +55,6 @@ public class SectionsPagerAdapter extends FragmentStateAdapter {
 
     @Override
     public int getItemCount() {
-        return 3;
+        return 4;
     }
 }

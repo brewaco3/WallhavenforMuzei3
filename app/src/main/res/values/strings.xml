@@ -143,4 +143,22 @@
     <string name="prefSummary_enableNetworkBypass">Disable if you are having problems on VPN</string>
     <string name="prefSummary_useWallhavenProxy">May speed up image downloads in some areas</string>
     <string name="prefTitle_tagLanguage">Tag language</string>
+
+    <!-- About Settings -->
+    <string name="tab_heading_about">About</string>
+    <string name="prefCat_appInfo">App Info</string>
+    <string name="prefCat_update">Update</string>
+    <string name="prefTitle_version">Version</string>
+    <string name="prefTitle_author">Author</string>
+    <string name="app_author_name">brewaco3</string>
+    <string name="prefTitle_sourceCode">Source Code</string>
+    <string name="prefSummary_sourceCode">View on GitHub</string>
+    <string name="url_source_code" translatable="false">https://github.com/brewaco3/WallhavenforMuzei3</string>
+    <string name="prefTitle_checkUpdate">Check for Update</string>
+    <string name="prefSummary_checkUpdate">Check GitHub for the latest release</string>
+    <string name="toast_checking_update">Checking for updates…</string>
+    <string name="toast_no_update">You are using the latest version</string>
+    <string name="toast_update_check_failed">Failed to check for updates</string>
+    <string name="dialog_new_version_title">New Version Available: %s</string>
+    <string name="dialog_download">Download</string>
 </resources>
