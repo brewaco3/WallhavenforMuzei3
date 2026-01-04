@@ -4,17 +4,36 @@ plugins {
     id("com.google.devtools.ksp")
 }
 
+// Load keystore properties
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 android {
     compileSdkVersion 35
+
+    signingConfigs {
+        release {
+            if (keystorePropertiesFile.exists()) {
+                def storeFilePath = keystoreProperties['storeFile']
+                if (storeFilePath != null) {
+                    storeFile file(storeFilePath)
+                    storePassword keystoreProperties['storePassword']
+                    keyAlias keystoreProperties['keyAlias']
+                    keyPassword keystoreProperties['keyPassword']
+                }
+            }
+        }
+    }
+
     defaultConfig {
         applicationId "com.brewaco3.muzei.wallhaven"
         minSdkVersion 21
         targetSdkVersion 35
         versionCode getProperty('app.version.code') as int
         versionName getProperty('app.version.name')
-
-        buildConfigField "String", "PIXIV_CLIENT_ID", "\"${getProperty('pixiv.client.id')}\""
-        buildConfigField "String", "PIXIV_CLIENT_SEC", "\"${getProperty('pixiv.client.sec')}\""
 
         manifestPlaceholders = [
                 PACKAGE: "com.brewaco3.muzei.wallhaven"
@@ -32,6 +51,7 @@ android {
 
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
