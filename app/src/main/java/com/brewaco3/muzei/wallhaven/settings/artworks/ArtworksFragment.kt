@@ -170,7 +170,6 @@ class ArtworksFragment : Fragment() {
 
         val context = requireContext()
         val itemsToSave = SELECTED_ITEMS.toList()
-        val numberToSave = itemsToSave.size
 
         CoroutineScope(Dispatchers.Main + SupervisorJob()).launch {
             var savedCount = 0
@@ -187,25 +186,40 @@ class ArtworksFragment : Fragment() {
             SELECTED_ITEMS.clear()
             adapter.notifyDataSetChanged()
 
-            Snackbar.make(
-                requireView(),
-                "$savedCount ${getString(R.string.snackbar_savedArtworks)}",
-                Snackbar.LENGTH_LONG
-            ).show()
+            val skippedCount = itemsToSave.size - savedCount
+            val message = if (skippedCount > 0) {
+                "$savedCount ${getString(R.string.snackbar_savedArtworksWithSkipped, skippedCount)}"
+            } else {
+                "$savedCount ${getString(R.string.snackbar_savedArtworks)}"
+            }
+            Snackbar.make(requireView(), message, Snackbar.LENGTH_LONG).show()
         }
     }
 
     private fun copyToExternalStorage(context: Context, item: ArtworkItem): Boolean {
         return try {
-            val inputStream = context.contentResolver.openInputStream(item.persistent_uri)
-                ?: return false
+            val fileName = "${item.token}.jpg"
+            val relativePath = Environment.DIRECTORY_PICTURES + "/WallhavenForMuzei3/Saved"
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                // Use MediaStore for Android 10+
+                // Check if file already exists in MediaStore
+                val existsQuery = context.contentResolver.query(
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    arrayOf(MediaStore.Images.Media._ID),
+                    "${MediaStore.Images.Media.DISPLAY_NAME} = ? AND ${MediaStore.Images.Media.RELATIVE_PATH} = ?",
+                    arrayOf(fileName, "$relativePath/"),
+                    null
+                )
+                val alreadyExists = existsQuery?.use { it.count > 0 } ?: false
+                if (alreadyExists) return false
+
+                val inputStream = context.contentResolver.openInputStream(item.persistent_uri)
+                    ?: return false
+
                 val contentValues = ContentValues().apply {
-                    put(MediaStore.Images.Media.DISPLAY_NAME, "${item.token}.jpg")
+                    put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
                     put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-                    put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/WallhavenForMuzei3/Saved")
+                    put(MediaStore.Images.Media.RELATIVE_PATH, relativePath)
                 }
 
                 val uri = context.contentResolver.insert(
@@ -225,7 +239,11 @@ class ArtworksFragment : Fragment() {
                     directory.mkdirs()
                 }
 
-                val outputFile = File(directory, "${item.token}.jpg")
+                val outputFile = File(directory, fileName)
+                if (outputFile.exists()) return false
+
+                val inputStream = context.contentResolver.openInputStream(item.persistent_uri)
+                    ?: return false
                 outputFile.outputStream().use { outputStream ->
                     inputStream.copyTo(outputStream)
                 }
