@@ -6,8 +6,8 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.brewaco3.muzei.wallhaven.settings.blockArtist.BlockedArtistDao
 import com.brewaco3.muzei.wallhaven.settings.blockArtist.BlockArtistEntity
-import com.brewaco3.muzei.wallhaven.settings.deleteArtwork.DeletedArtworkIdDao
-import com.brewaco3.muzei.wallhaven.settings.deleteArtwork.DeletedArtworkIdEntity
+import com.brewaco3.muzei.wallhaven.settings.artworks.DeletedArtworkIdDao
+import com.brewaco3.muzei.wallhaven.settings.artworks.DeletedArtworkIdEntity
 
 @Database(
     entities = [DeletedArtworkIdEntity::class, BlockArtistEntity::class], version = 1, exportSchema = false

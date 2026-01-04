@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.brewaco3.muzei.wallhaven.AppDatabase
-import com.brewaco3.muzei.wallhaven.settings.deleteArtwork.DeletedArtworkIdEntity
+import com.brewaco3.muzei.wallhaven.settings.artworks.DeletedArtworkIdEntity
 import com.google.android.apps.muzei.api.provider.ProviderContract
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

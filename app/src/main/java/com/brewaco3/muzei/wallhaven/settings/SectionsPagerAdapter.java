@@ -22,7 +22,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import com.brewaco3.muzei.wallhaven.settings.deleteArtwork.ArtworkDeletionFragment;
+import com.brewaco3.muzei.wallhaven.settings.artworks.ArtworksFragment;
 import com.brewaco3.muzei.wallhaven.settings.fragments.AdvOptionsPreferenceFragment;
 import com.brewaco3.muzei.wallhaven.settings.fragments.MainPreferenceFragment;
 
@@ -43,7 +43,7 @@ public class SectionsPagerAdapter extends FragmentStateAdapter {
             case 1:
                 return new AdvOptionsPreferenceFragment();
             case 2:
-                return new ArtworkDeletionFragment();
+                return new ArtworksFragment();
             default:
                 // This case should ideally not be reached if getItemCount is correct
                 return new MainPreferenceFragment(); // Fallback
