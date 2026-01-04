@@ -19,7 +19,6 @@ package com.brewaco3.muzei.wallhaven.settings.fragments
 import android.os.Bundle
 import android.os.Environment
 import android.text.InputType
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.preference.*
 import androidx.work.ExistingWorkPolicy
@@ -34,35 +33,12 @@ import com.brewaco3.muzei.wallhaven.provider.WallhavenArtWorker.Companion.enqueu
 import com.google.android.apps.muzei.api.provider.ProviderContract.getProviderClient
 import com.google.android.material.snackbar.Snackbar
 class MainPreferenceFragment : PreferenceFragmentCompat() {
-    private lateinit var oldUpdateMode: String
-    private lateinit var newUpdateMode: String
-    private lateinit var oldTag: String
-    private lateinit var newTag: String
-    private lateinit var oldArtist: String
-    private lateinit var newArtist: String
-    private lateinit var oldRankingFilters: Set<String>
-    private lateinit var oldRankingCategories: Set<String>
-    private lateinit var oldTagFilter: String
-
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.main_preference_layout, rootKey)
 
         WallhavenMuzeiSupervisor.start(requireContext().applicationContext)
 
         val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
-
-        // Stores user toggleable variables into a temporary store for later comparison in onStop()
-        // If the value of the preference on Activity creation is different to Activity stop, then take certain action
-        oldUpdateMode = sharedPrefs.getString("pref_updateMode", "toplist") ?: "toplist"
-        oldTag = sharedPrefs.getString("pref_tagSearch", "") ?: ""
-        oldArtist = sharedPrefs.getString("pref_artistId", "") ?: ""
-        oldRankingFilters = sharedPrefs.getStringSet("pref_rankingFilterSelect", setOf("sfw"))
-            ?.toSet() ?: setOf("sfw")
-        oldRankingCategories = sharedPrefs.getStringSet(
-            "pref_rankingCategorySelect",
-            setOf("general", "anime", "people")
-        )?.toSet() ?: setOf("general", "anime", "people")
-        oldTagFilter = sharedPrefs.getString("pref_tagFilter", "") ?: ""
 
         // Ensures that the user has provided an API key before selecting any update mode requiring authentication
         // Reveals UI elements as needed depending on Update Mode selection
@@ -227,7 +203,6 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
                             requireView(), R.string.toast_clearingCache,
                             Snackbar.LENGTH_SHORT
                         ).show()
-                        newUpdateMode = oldUpdateMode
                     }
                     .setNegativeButton(android.R.string.cancel, null)
                     .show()
@@ -375,69 +350,6 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
             }
             it.setLength(it.length - 2)
             it.toString()
-        }
-    }
-
-    // Functions in here action only on app exit
-    override fun onStop() {
-        super.onStop()
-        val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        newUpdateMode = sharedPrefs.getString("pref_updateMode", "") ?: ""
-        newTag = sharedPrefs.getString("pref_tagSearch", "") ?: ""
-        newArtist = sharedPrefs.getString("pref_artistId", "") ?: ""
-        val newRankingFilters = sharedPrefs.getStringSet("pref_rankingFilterSelect", setOf("sfw"))
-            ?.toSet() ?: setOf("sfw")
-        val newRankingCategories = sharedPrefs.getStringSet(
-            "pref_rankingCategorySelect",
-            setOf("general", "anime", "people")
-        )?.toSet() ?: setOf("general", "anime", "people")
-        val newTagFilter = sharedPrefs.getString("pref_tagFilter", "") ?: ""
-
-        // If user has changed update, filter mode, or search tag:
-        // Immediately stop any pending work, clear the Provider of any Artwork, and then toast
-        if (oldUpdateMode != newUpdateMode || oldTag != newTag
-            || oldArtist != newArtist || oldRankingFilters != newRankingFilters
-            || oldRankingCategories != newRankingCategories || oldTagFilter != newTagFilter
-        ) {
-            WorkManager.getInstance(requireContext()).cancelUniqueWork("ANTONY")
-            requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-                ?.deleteRecursively()
-            enqueueLoad(true, requireContext())
-            when {
-                oldUpdateMode != newUpdateMode -> Toast.makeText(
-                    context,
-                    getString(R.string.toast_newUpdateMode),
-                    Toast.LENGTH_SHORT
-                ).show()
-                oldArtist != newArtist -> Toast.makeText(
-                    context,
-                    getString(R.string.toast_newArtist),
-                    Toast.LENGTH_SHORT
-                ).show()
-                oldTag != newTag -> Toast.makeText(
-                    context,
-                    getString(R.string.toast_newTag),
-                    Toast.LENGTH_SHORT
-                ).show()
-                oldRankingFilters != newRankingFilters || oldRankingCategories != newRankingCategories ->
-                    Toast.makeText(
-                        context,
-                        getString(R.string.toast_newFilterSelect),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                oldTagFilter != newTagFilter -> Toast.makeText(
-                    context,
-                    getString(R.string.toast_newFilterSelect),
-                    Toast.LENGTH_SHORT
-                ).show()
-                else -> {
-                    Toast.makeText(
-                        context,
-                        getString(R.string.toast_newFilterSelect),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
         }
     }
 }

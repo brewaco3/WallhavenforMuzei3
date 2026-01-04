@@ -100,11 +100,6 @@
     <string name="toast_forceRefreshFailed_generic">刷新失败</string>
     <string name="toast_forceRefreshCancelled">刷新已取消</string>
     <string name="toast_loginFirst">请先输入 API 密钥</string>
-    <string name="toast_newArtist">艺术家更新，清除图像缓存</string>
-    <string name="toast_newFilterMode">过滤模式更新，清除图像缓存</string>
-    <string name="toast_newFilterSelect">过滤选择更新，清除图像缓存</string>
-    <string name="toast_newTag">搜索标签更新，清除图像缓存</string>
-    <string name="toast_newUpdateMode">模式更新，清除图像缓存</string>
     <string name="toast_bookmark_success">收藏成功</string>
     <string name="toast_bookmark_private_success">非公开收藏成功</string>
     <string name="toast_bookmark_failure">收藏失败</string>
