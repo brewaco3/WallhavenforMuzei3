@@ -407,6 +407,14 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
         return viewCount >= settingMinimumViewCount * 500
     }
 
+    private fun formatNumber(num: Int): String {
+        return when {
+            num >= 1_000_000 -> String.format("%.1fM", num / 1_000_000.0)
+            num >= 1_000 -> String.format("%.1fK", num / 1_000.0)
+            else -> num.toString()
+        }
+    }
+
     // Batch load all existing artwork tokens from Muzei provider
     private fun loadExistingArtworkTokens(): Set<String> {
         val tokens = mutableSetOf<String>()
@@ -524,6 +532,10 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
             )
             append(" • ")
             append(rankingArtwork.purity.uppercase())
+            rankingArtwork.category?.takeIf { it.isNotBlank() }?.let { category ->
+                append(" • ")
+                append(category.replaceFirstChar { it.uppercase() })
+            }
         }
 
         val token = rankingArtwork.id
@@ -546,16 +558,14 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
         imageResponse.close()
 
         Log.i(LOG_TAG, "Download completed: ${rankingArtwork.id}")
-        val uploader = rankingArtwork.uploader?.username
-            ?: applicationContext.getString(R.string.wallhaven_unknown_uploader)
+        val byline = "👁 ${formatNumber(rankingArtwork.views)} • ❤️ ${formatNumber(rankingArtwork.favorites)}"
         return Artwork.Builder()
             .title(rankingArtwork.id)
-            .byline(uploader)
+            .byline(byline)
             .attribution(attribution)
             .persistentUri(localUri)
             .token(token)
             .webUri(Uri.parse(rankingArtwork.url))
-            .metadata(rankingArtwork.uploader?.username ?: "")
             .build()
     }
 
@@ -598,6 +608,10 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
             )
             append(" • ")
             append(rankingArtwork.purity.uppercase())
+            rankingArtwork.category?.takeIf { it.isNotBlank() }?.let { category ->
+                append(" • ")
+                append(category.replaceFirstChar { it.uppercase() })
+            }
         }
 
         val token = rankingArtwork.id
@@ -620,16 +634,14 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
         imageResponse.close()
 
         Log.i(LOG_TAG, "Getting ranking artwork completed")
-        val uploader = rankingArtwork.uploader?.username
-            ?: applicationContext.getString(R.string.wallhaven_unknown_uploader)
+        val byline = "👁 ${formatNumber(rankingArtwork.views)} • ❤️ ${formatNumber(rankingArtwork.favorites)}"
         return Artwork.Builder()
             .title(rankingArtwork.id)
-            .byline(uploader)
+            .byline(byline)
             .attribution(attribution)
             .persistentUri(localUri)
             .token(token)
             .webUri(Uri.parse(rankingArtwork.url))
-            .metadata(rankingArtwork.uploader?.username ?: "")
             .build()
     }
 

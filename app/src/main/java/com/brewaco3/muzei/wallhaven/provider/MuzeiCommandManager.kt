@@ -56,7 +56,6 @@ class MuzeiCommandManager {
         private const val ACTION_ADD_TO_BOOKMARK = "${BuildConfig.APPLICATION_ID}.action.ADD_TO_BOOKMARK"
         private const val ACTION_ADD_TO_PRIVATE_BOOKMARK = "${BuildConfig.APPLICATION_ID}.action.ADD_TO_PRIVATE_BOOKMARK"
         private const val ACTION_DELETE_ARTWORK = "${BuildConfig.APPLICATION_ID}.action.DELETE_ARTWORK"
-        private const val ACTION_BLOCK_ARTIST = "${BuildConfig.APPLICATION_ID}.action.BLOCK_ARTIST"
     }
 
     fun provideActions(context: Context, artwork: Artwork): List<RemoteActionCompat> {
@@ -64,7 +63,6 @@ class MuzeiCommandManager {
             add(obtainActionShareImage(context, artwork))
             add(obtainActionViewArtworkDetails(context, artwork))
             add(obtainActionDeleteArtwork(context, artwork))
-            add(obtainActionBlockArtist(context, artwork))
             // Logged in user required to add artwork to bookmarks
             if (PreferenceManager.getDefaultSharedPreferences(context).getString("accessToken", "")
                     ?.isNotEmpty() == true
@@ -244,29 +242,6 @@ class MuzeiCommandManager {
             val title = context.getString(R.string.command_delete_artwork)
             RemoteActionCompat(
                 IconCompat.createWithResource(context, R.drawable.ic_delete_white_24dp),
-                title,
-                title,
-                pendingIntent
-            ).apply {
-                setShouldShowIcon(false)
-            }
-        }
-
-    private fun obtainActionBlockArtist(context: Context, artwork: Artwork): RemoteActionCompat =
-        Intent(context, BlockArtistReceiver::class.java).apply {
-            action = ACTION_BLOCK_ARTIST
-            putExtra("artistId", artwork.metadata)
-        }.let { intent ->
-            PendingIntent.getBroadcast(
-                context,
-                artwork.id.toInt(),
-                intent,
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-            )
-        }.let { pendingIntent ->
-            val title = "Block this artist" // TODO
-            RemoteActionCompat(
-                IconCompat.createWithResource(context, R.drawable.baseline_block_24),
                 title,
                 title,
                 pendingIntent
