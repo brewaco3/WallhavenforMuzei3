@@ -19,6 +19,7 @@ package com.brewaco3.muzei.wallhaven.settings.fragments
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -35,7 +36,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class AdvOptionsPreferenceFragment : PreferenceFragmentCompat() {
+class AdvOptionsPreferenceFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
     interface NightModePreferenceListener {
         fun nightModeOptionSelected(option: Int)
     }
@@ -45,6 +46,23 @@ class AdvOptionsPreferenceFragment : PreferenceFragmentCompat() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         nightModePreferenceListener = context as NightModePreferenceListener
+    }
+
+    override fun onResume() {
+        super.onResume()
+        PreferenceManager.getDefaultSharedPreferences(requireContext())
+            .registerOnSharedPreferenceChangeListener(this)
+        updateDebugUrl()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        PreferenceManager.getDefaultSharedPreferences(requireContext())
+            .unregisterOnSharedPreferenceChangeListener(this)
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        updateDebugUrl()
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -215,11 +233,44 @@ class AdvOptionsPreferenceFragment : PreferenceFragmentCompat() {
             }
         }
 
-        updateDebugUrl()
+        findPreference<MultiSelectListPreference>("pref_aspectRatioSelect_v2")?.let {
+            it.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { preference, newValue ->
+                val newValues = (newValue as Set<String>).toMutableSet()
+                val oldValues = (preference as MultiSelectListPreference).values
+
+                if (newValues.contains("") && !oldValues.contains("")) {
+                    // User selected "Any", clear others
+                    newValues.clear()
+                    newValues.add("")
+                    preference.values = newValues
+                    return@OnPreferenceChangeListener false // We handled the update
+                } else if (newValues.contains("") && newValues.size > 1) {
+                    // User selected something else while "Any" was selected, clear "Any"
+                    newValues.remove("")
+                    preference.values = newValues
+                    return@OnPreferenceChangeListener false // We handled the update
+                }
+                
+                // If nothing is selected, default to "Any"
+                if (newValues.isEmpty()) {
+                    newValues.add("")
+                    preference.values = newValues
+                    return@OnPreferenceChangeListener false
+                }
+
+                true
+            }
+        }
     }
 
     override fun onPreferenceTreeClick(preference: Preference): Boolean {
-        updateDebugUrl()
+        if (preference.key == "pref_debugUrl") {
+            val clipboard = requireContext().getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+            val clip = android.content.ClipData.newPlainText("API Query URL", preference.summary)
+            clipboard.setPrimaryClip(clip)
+            android.widget.Toast.makeText(requireContext(), "URL copied to clipboard", android.widget.Toast.LENGTH_SHORT).show()
+            return true
+        }
         return super.onPreferenceTreeClick(preference)
     }
 
@@ -266,9 +317,10 @@ class AdvOptionsPreferenceFragment : PreferenceFragmentCompat() {
         }
 
         // ratios
-        val ratios = sharedPrefs.getString("pref_aspectRatioSelect", "") ?: ""
+        val ratiosSet = sharedPrefs.getStringSet("pref_aspectRatioSelect_v2", setOf("")) ?: setOf("")
+        val ratios = ratiosSet.filter { it.isNotEmpty() }.joinToString(",")
         if (ratios.isNotEmpty()) {
-            params.add("ratios=$ratios")
+            params.add("ratios=${android.net.Uri.encode(ratios)}")
         }
 
         // topRange
@@ -301,8 +353,7 @@ class AdvOptionsPreferenceFragment : PreferenceFragmentCompat() {
 
         url += params.joinToString("&")
 
-        findPreference<EditTextPreference>("pref_debugUrl")?.let {
-            it.text = url
+        findPreference<Preference>("pref_debugUrl")?.let {
             it.summary = url
         }
     }

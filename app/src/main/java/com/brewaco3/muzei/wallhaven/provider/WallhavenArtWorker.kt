@@ -58,18 +58,29 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
     companion object {
         const val LOG_TAG = "ANTONY_WORKER"
         private const val WORKER_TAG = "ANTONY"
-        // Variable that tracks if the artwork cache needs to be cleared
-        private var clearArtwork = false
+
+        private fun parseAspectRatio(values: Set<String>?): Set<Int> {
+            val result = mutableSetOf<Int>()
+            if (values.isNullOrEmpty() || values.contains("")) {
+                result.add(0)
+                return result
+            }
+            for (value in values) {
+                when (value) {
+                    "portrait" -> result.add(1)
+                    "landscape", "21x9" -> result.add(2)
+                    else -> result.add(0)
+                }
+            }
+            if (result.isEmpty()) result.add(0)
+            return result
+        }
 
         internal fun enqueueLoad(
             clearArtworkRequested: Boolean,
             context: Context?,
             existingWorkPolicy: ExistingWorkPolicy = ExistingWorkPolicy.KEEP,
         ): UUID? {
-            if (clearArtworkRequested) {
-                clearArtwork = true
-            }
-
             return context?.let {
                 Constraints.Builder().apply {
                     setRequiredNetworkType(NetworkType.CONNECTED)
@@ -369,13 +380,14 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
     // 0: Anything goes
     // 1: Portrait
     // 2: Landscape
-    private fun isDesiredAspectRatio(width: Int, height: Int, settingAspectRatio: Int): Boolean {
-        return when (settingAspectRatio) {
-            0 -> true
-            1 -> height >= width
-            2 -> height <= width
-            else -> true
+    private fun isDesiredAspectRatio(width: Int, height: Int, settingAspectRatios: Set<Int>): Boolean {
+        if (settingAspectRatios.contains(0)) return true
+        
+        for (ratio in settingAspectRatios) {
+            if (ratio == 1 && height >= width) return true
+            if (ratio == 2 && height <= width) return true
         }
+        return false
     }
 
     // Scalar must match with scalar in SettingsActivity
@@ -432,7 +444,7 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
         val rankingArtwork = filterArtworkRanking(
             contents.data,
             puritySelection,
-            sharedPrefs.getString("pref_aspectRatioSelect", "0")?.toInt() ?: 0,
+            parseAspectRatio(sharedPrefs.getStringSet("pref_aspectRatioSelect_v2", setOf(""))),
             sharedPrefs.getInt("prefSlider_minViews", 0),
             sharedPrefs.getInt("prefSlider_minimumWidth", 0),
             sharedPrefs.getInt("prefSlider_minimumHeight", 0)
@@ -491,7 +503,7 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
     private fun filterArtworkRanking(
         artworkList: List<RankingArtwork>,
         puritySelection: Set<String>,
-        settingAspectRatio: Int,
+        settingAspectRatios: Set<Int>,
         settingMinimumViewCount: Int,
         settingMinimumWidth: Int,
         settingMinimumHeight: Int
@@ -505,14 +517,19 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
             { it.path.isNotBlank() },
             { !isDuplicateArtwork(it.id) },
             { isEnoughViews(it.views, settingMinimumViewCount) },
-            { isDesiredAspectRatio(it.width, it.height, settingAspectRatio) },
+            { isDesiredAspectRatio(it.width, it.height, settingAspectRatios) },
             {
                 isDesiredPixelSize(
                     it.width,
                     it.height,
                     settingMinimumHeight,
                     settingMinimumWidth,
-                    settingAspectRatio
+                    // Pass 0 or a representative value if needed, or update isDesiredPixelSize to handle sets?
+                    // For now, let's assume pixel size check is independent of ratio type or use a default.
+                    // Actually isDesiredPixelSize uses settingAspectRatio to decide checks.
+                    // Let's pass the first valid ratio or 0 if mixed?
+                    // Simplification: if 0 is in set, pass 0. Else pass first.
+                    if (settingAspectRatios.contains(0)) 0 else settingAspectRatios.first()
                 )
             },
             { !isBeenDeleted(it.id) },
@@ -547,7 +564,7 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
             artworkList,
             sharedPrefs.getBoolean("pref_showManga", false),
             sharedPrefs.getStringSet("pref_authFilterSelect", setOf("2")) ?: setOf("2"),
-            sharedPrefs.getString("pref_aspectRatioSelect", "0")?.toInt() ?: 0,
+            parseAspectRatio(sharedPrefs.getStringSet("pref_aspectRatioSelect_v2", setOf(""))),
             sharedPrefs.getInt("prefSlider_minViews", 0),
             isRecommended,
             sharedPrefs.getInt("prefSlider_minimumWidth", 0),
@@ -613,7 +630,7 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
         artworkList: List<AuthArtwork>,
         settingShowManga: Boolean,
         settingNsfwSelection: Set<String>,
-        settingAspectRatio: Int,
+        settingAspectRatios: Set<Int>,
         settingMinimumViews: Int,
         settingIsRecommended: Boolean,
         settingMinimumWidth: Int,
@@ -622,14 +639,14 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
         val predicates: List<(AuthArtwork) -> Boolean> = listOfNotNull(
             { !isDuplicateArtwork(it.id) },
             { settingShowManga || !settingShowManga && it.type != "manga" },
-            { isDesiredAspectRatio(it.width, it.height, settingAspectRatio) },
+            { isDesiredAspectRatio(it.width, it.height, settingAspectRatios) },
             {
                 isDesiredPixelSize(
                     it.width,
                     it.height,
                     settingMinimumWidth,
                     settingMinimumHeight,
-                    settingAspectRatio
+                    if (settingAspectRatios.contains(0)) 0 else settingAspectRatios.first()
                 )
             },
             { isEnoughViews(it.total_view, settingMinimumViews) },
@@ -789,7 +806,8 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
         ) ?: setOf("general", "anime", "people")
         val tagFilter = sharedPrefs.getString("pref_tagFilter", "") ?: ""
         val atleast = sharedPrefs.getString("pref_atleast", "") ?: ""
-        val ratios = sharedPrefs.getString("pref_aspectRatioSelect", "") ?: ""
+        val ratiosSet = sharedPrefs.getStringSet("pref_aspectRatioSelect_v2", setOf("")) ?: setOf("")
+        val ratios = ratiosSet.filter { it.isNotEmpty() }.joinToString(",")
         val topRange = sharedPrefs.getString("pref_topRange", "1M") ?: "1M"
         val order = sharedPrefs.getString("pref_order", "desc") ?: "desc"
         val seed = sharedPrefs.getString("pref_seed", "") ?: ""
@@ -904,12 +922,7 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
         return try {
             with(getProviderClient(applicationContext, WallhavenArtProvider::class.java)) {
                 val artworks = getArtworks() ?: return Result.retry()
-                if (clearArtwork) {
-                    clearArtwork = false
-                    setArtwork(artworks)
-                } else {
-                    addArtwork(artworks)
-                }
+                addArtwork(artworks)
             }
             Log.i(LOG_TAG, "Work completed")
             Result.success()

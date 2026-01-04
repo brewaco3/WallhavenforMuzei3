@@ -21,9 +21,12 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.view.ViewGroup
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.viewpager2.widget.ViewPager2
 import com.brewaco3.muzei.wallhaven.BuildConfig
 import com.brewaco3.muzei.wallhaven.R
@@ -32,6 +35,7 @@ import com.brewaco3.muzei.wallhaven.settings.fragments.AdvOptionsPreferenceFragm
 import com.brewaco3.muzei.wallhaven.util.IntentUtils
 import com.google.android.apps.muzei.api.MuzeiContract.Sources.createChooseProviderIntent
 import com.google.android.apps.muzei.api.MuzeiContract.Sources.isProviderSelected
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayoutMediator
 
 class MainActivity : WallhavenMuzeiActivity(), AdvOptionsPreferenceFragment.NightModePreferenceListener {
@@ -46,6 +50,21 @@ class MainActivity : WallhavenMuzeiActivity(), AdvOptionsPreferenceFragment.Nigh
         )
 
         setContentView(R.layout.activity_main)
+
+        // Setup FAB with window insets for safe area positioning
+        val fab = findViewById<FloatingActionButton>(R.id.fab_delete)
+        val fabParams = fab.layoutParams as ViewGroup.MarginLayoutParams
+        val initialBottomMargin = fabParams.bottomMargin
+        val initialRightMargin = fabParams.rightMargin
+        ViewCompat.setOnApplyWindowInsetsListener(fab) { view, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val params = view.layoutParams as ViewGroup.MarginLayoutParams
+            params.bottomMargin = initialBottomMargin + insets.bottom
+            params.rightMargin = initialRightMargin + insets.right
+            view.layoutParams = params
+            windowInsets
+        }
+
         val viewPager = findViewById<ViewPager2>(R.id.view_pager)
         val sectionsPagerAdapter = SectionsPagerAdapter(this)
         viewPager.adapter = sectionsPagerAdapter
