@@ -1,4 +1,4 @@
-package com.brewaco3.muzei.wallhaven.settings.deleteArtwork
+package com.brewaco3.muzei.wallhaven.settings.artworks
 
 import android.net.Uri
 

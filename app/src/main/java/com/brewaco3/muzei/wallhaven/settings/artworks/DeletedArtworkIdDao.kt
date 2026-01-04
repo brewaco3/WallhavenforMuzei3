@@ -1,4 +1,4 @@
-package com.brewaco3.muzei.wallhaven.settings.deleteArtwork
+package com.brewaco3.muzei.wallhaven.settings.artworks
 
 import androidx.room.Dao
 import androidx.room.Insert

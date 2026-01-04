@@ -14,7 +14,7 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.brewaco3.muzei.wallhaven.settings.deleteArtwork
+package com.brewaco3.muzei.wallhaven.settings.artworks
 
 import android.graphics.Color
 import android.view.LayoutInflater
@@ -31,7 +31,7 @@ import com.google.android.material.color.MaterialColors
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ArtworkDeletionAdapter(private val artworkItems: MutableList<ArtworkItem>) :
+class ArtworksAdapter(private val artworkItems: MutableList<ArtworkItem>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     sealed class DeletionItem {
@@ -132,9 +132,9 @@ class ArtworkDeletionAdapter(private val artworkItems: MutableList<ArtworkItem>)
                     if (item.selected != isChecked) {
                         item.selected = isChecked
                         if (isChecked) {
-                            ArtworkDeletionFragment.SELECTED_ITEMS.add(item)
+                            ArtworksFragment.SELECTED_ITEMS.add(item)
                         } else {
-                            ArtworkDeletionFragment.SELECTED_ITEMS.remove(item)
+                            ArtworksFragment.SELECTED_ITEMS.remove(item)
                         }
                     }
                 }
@@ -170,9 +170,9 @@ class ArtworkDeletionAdapter(private val artworkItems: MutableList<ArtworkItem>)
             if (absoluteAdapterPosition != RecyclerView.NO_POSITION) {
                 mArtworkItem.selected = !mArtworkItem.selected
                 if (mArtworkItem.selected) {
-                    ArtworkDeletionFragment.SELECTED_ITEMS.add(mArtworkItem)
+                    ArtworksFragment.SELECTED_ITEMS.add(mArtworkItem)
                 } else {
-                    ArtworkDeletionFragment.SELECTED_ITEMS.remove(mArtworkItem)
+                    ArtworksFragment.SELECTED_ITEMS.remove(mArtworkItem)
                 }
                 updateSelectionState()
                 // Notify header to update checkbox

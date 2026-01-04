@@ -53,14 +53,30 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_delete"
+    <LinearLayout
+        android:id="@+id/fab_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_margin="16dp"
-        android:visibility="gone"
-        android:contentDescription="@string/fab_delete_selected_artwork"
-        android:src="@drawable/ic_delete_white_24dp"
-        app:rippleColor="?android:attr/colorPressedHighlight" />
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:contentDescription="@string/fab_save_selected_artwork"
+            android:src="@drawable/ic_save_24dp"
+            app:rippleColor="?android:attr/colorPressedHighlight" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/fab_delete_selected_artwork"
+            android:src="@drawable/ic_delete_white_24dp"
+            app:rippleColor="?android:attr/colorPressedHighlight" />
+    </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

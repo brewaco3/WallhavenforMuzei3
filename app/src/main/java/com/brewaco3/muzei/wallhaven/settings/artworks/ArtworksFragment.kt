@@ -14,17 +14,22 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.brewaco3.muzei.wallhaven.settings.deleteArtwork
+package com.brewaco3.muzei.wallhaven.settings.artworks
 
 import android.content.ContentProviderOperation
+import android.content.ContentValues
 import android.content.Context
 import android.content.OperationApplicationException
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.os.RemoteException
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -38,11 +43,12 @@ import com.google.android.apps.muzei.api.provider.ProviderContract.getProviderCl
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.*
+import java.io.File
 import java.util.*
 import kotlin.math.ceil
 
-class ArtworkDeletionFragment : Fragment() {
-    private lateinit var adapter: ArtworkDeletionAdapter
+class ArtworksFragment : Fragment() {
+    private lateinit var adapter: ArtworksAdapter
 
     companion object {
         val SELECTED_ITEMS = mutableListOf<ArtworkItem>()
@@ -56,18 +62,16 @@ class ArtworkDeletionFragment : Fragment() {
             val freshData = getInitialArtworkItemList(requireContext())
             adapter.updateData(freshData)
         }
-        activity?.findViewById<FloatingActionButton>(R.id.fab_delete)?.let { fab ->
-            fab.show()
-            fab.setOnClickListener { deleteSelectedItems() }
-        }
+        activity?.findViewById<LinearLayout>(R.id.fab_container)?.visibility = View.VISIBLE
+        activity?.findViewById<FloatingActionButton>(R.id.fab_delete)?.setOnClickListener { deleteSelectedItems() }
+        activity?.findViewById<FloatingActionButton>(R.id.fab_save)?.setOnClickListener { saveSelectedItems() }
     }
 
     override fun onPause() {
         super.onPause()
-        activity?.findViewById<FloatingActionButton>(R.id.fab_delete)?.let { fab ->
-            fab.setOnClickListener(null)
-            fab.visibility = View.GONE
-        }
+        activity?.findViewById<LinearLayout>(R.id.fab_container)?.visibility = View.GONE
+        activity?.findViewById<FloatingActionButton>(R.id.fab_delete)?.setOnClickListener(null)
+        activity?.findViewById<FloatingActionButton>(R.id.fab_save)?.setOnClickListener(null)
     }
 
     override fun onCreateView(
@@ -85,7 +89,7 @@ class ArtworkDeletionFragment : Fragment() {
         val spanCount = ceil(dpWidth.toDouble() / 200).toInt()
         val layoutManager = GridLayoutManager(context, spanCount)
         recyclerView.layoutManager = layoutManager
-        adapter = ArtworkDeletionAdapter(getInitialArtworkItemList(context))
+        adapter = ArtworksAdapter(getInitialArtworkItemList(context))
 
         // Set span size lookup for headers
         layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
@@ -153,6 +157,85 @@ class ArtworkDeletionFragment : Fragment() {
             requireView(), numberDeleted.toString() + " " + getString(R.string.snackbar_deletedArtworks),
             Snackbar.LENGTH_LONG
         ).show()
+    }
+
+    private fun saveSelectedItems() {
+        if (SELECTED_ITEMS.isEmpty()) {
+            Snackbar.make(
+                requireView(), R.string.snackbar_selectArtworkFirst,
+                Snackbar.LENGTH_LONG
+            ).show()
+            return
+        }
+
+        val context = requireContext()
+        val itemsToSave = SELECTED_ITEMS.toList()
+        val numberToSave = itemsToSave.size
+
+        CoroutineScope(Dispatchers.Main + SupervisorJob()).launch {
+            var savedCount = 0
+            withContext(Dispatchers.IO) {
+                for (item in itemsToSave) {
+                    if (copyToExternalStorage(context, item)) {
+                        savedCount++
+                    }
+                }
+            }
+
+            // Clear selection after saving
+            SELECTED_ITEMS.forEach { it.selected = false }
+            SELECTED_ITEMS.clear()
+            adapter.notifyDataSetChanged()
+
+            Snackbar.make(
+                requireView(),
+                "$savedCount ${getString(R.string.snackbar_savedArtworks)}",
+                Snackbar.LENGTH_LONG
+            ).show()
+        }
+    }
+
+    private fun copyToExternalStorage(context: Context, item: ArtworkItem): Boolean {
+        return try {
+            val inputStream = context.contentResolver.openInputStream(item.persistent_uri)
+                ?: return false
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                // Use MediaStore for Android 10+
+                val contentValues = ContentValues().apply {
+                    put(MediaStore.Images.Media.DISPLAY_NAME, "${item.token}.jpg")
+                    put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+                    put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/WallhavenForMuzei3/Saved")
+                }
+
+                val uri = context.contentResolver.insert(
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    contentValues
+                ) ?: return false
+
+                context.contentResolver.openOutputStream(uri)?.use { outputStream ->
+                    inputStream.copyTo(outputStream)
+                }
+                inputStream.close()
+                true
+            } else {
+                // Legacy file access for Android 9 and below
+                val directory = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "WallhavenForMuzei3/Saved")
+                if (!directory.exists()) {
+                    directory.mkdirs()
+                }
+
+                val outputFile = File(directory, "${item.token}.jpg")
+                outputFile.outputStream().use { outputStream ->
+                    inputStream.copyTo(outputStream)
+                }
+                inputStream.close()
+                true
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
     }
 
     private fun getInitialArtworkItemList(context: Context): MutableList<ArtworkItem> {

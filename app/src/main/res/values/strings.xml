@@ -28,6 +28,7 @@
     <string name="dialog_yes">Yes</string>
 
     <string name="fab_delete_selected_artwork">Delete selected artwork</string>
+    <string name="fab_save_selected_artwork">Save selected artwork</string>
 
     <string name="login_wallhaven_account_hint">Type Wallhaven username</string>
     <string name="login_wallhaven_password_hint">Wallhaven account password</string>
@@ -99,10 +100,11 @@
     <string name="pref_updateMode_default">toplist</string>
 
     <string name="snackbar_deletedArtworks">artworks deleted</string>
-    <string name="snackbar_selectArtworkFirst">Select at least one artwork to delete</string>
+    <string name="snackbar_savedArtworks">artworks saved</string>
+    <string name="snackbar_selectArtworkFirst">Select at least one artwork first</string>
 
     <string name="tab_heading_adv_options">Advanced settings</string>
-    <string name="tab_heading_artwork_delete">Delete Artwork</string>
+    <string name="tab_heading_artwork_delete">Artworks</string>
     <string name="tab_heading_credits">Credits</string>
     <string name="tab_heading_main">Main</string>
     <string name="tab_heading_roadmap">Roadmap</string>
