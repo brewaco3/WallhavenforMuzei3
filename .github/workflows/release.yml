@@ -26,10 +26,21 @@ jobs:
 
       - name: Check if version changed
         id: check
+        env:
+          EVENT_NAME: ${{ github.event_name }}
         run: |
           # Get current version
           CURRENT_VERSION=$(grep 'app.version.name=' gradle.properties | cut -d'=' -f2)
           echo "Current version: $CURRENT_VERSION"
+
+          # A manual run is an explicit request to build this version, even if the commit on
+          # top of the version bump is what changed last
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "Triggered by hand, releasing $CURRENT_VERSION"
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "version_name=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+            exit 0
+          fi
 
           # Get previous version
           git show HEAD~1:gradle.properties > /tmp/old_gradle.properties 2>/dev/null || echo "app.version.name=0.0.0" > /tmp/old_gradle.properties
