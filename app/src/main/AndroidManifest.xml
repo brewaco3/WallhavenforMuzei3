@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission
+        android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"
+        android:minSdkVersion="34" />
+
+    <application
+        android:name=".PixivMuzei"
+        android:allowBackup="false"
+        android:autoRevokePermissions="discouraged"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        tools:targetApi="31">
+        <receiver
+            android:name=".provider.BlockArtistReceiver"
+            android:enabled="true"
+            android:exported="false" />
+        <receiver
+            android:name=".provider.DeleteArtworkReceiver"
+            android:enabled="true"
+            android:exported="false" />
+
+        <activity
+            android:name=".settings.MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".login.LoginActivityWebview"
+            android:theme="@style/AppTheme" />
+
+        <provider
+            android:name=".provider.PixivArtProvider"
+            android:authorities="${PACKAGE}.provider"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:permission="com.google.android.apps.muzei.api.ACCESS_PROVIDER">
+            <intent-filter>
+                <action android:name="com.google.android.apps.muzei.api.MuzeiArtProvider" />
+            </intent-filter>
+
+            <meta-data
+                android:name="settingsActivity"
+                android:value="com.antony.muzei.pixiv.settings.MainActivity" />
+            <meta-data
+                android:name="color"
+                android:value="#0096db" />
+        </provider>
+        <provider
+            android:name="com.google.android.apps.muzei.api.provider.MuzeiArtDocumentsProvider"
+            android:authorities="${PACKAGE}.provider.documents"
+            android:exported="true"
+            android:grantUriPermissions="true"
+            android:permission="android.permission.MANAGE_DOCUMENTS">
+            <intent-filter>
+                <action android:name="android.content.action.DOCUMENTS_PROVIDER" />
+            </intent-filter>
+        </provider>
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${PACKAGE}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
+
+        <service
+            android:name=".provider.AddToBookmarkService"
+            android:foregroundServiceType="dataSync"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service
+            android:name=".provider.DeleteArtworkTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_delete_white_24dp"
+            android:label="@string/tile_delete_artwork"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+    </application>
+
+</manifest>
