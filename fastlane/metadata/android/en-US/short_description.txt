@@ -1,1 +1,1 @@
-Best Wallhaven plugin for Muzei 3
+Wallhaven.cc wallpaper source for Muzei 3

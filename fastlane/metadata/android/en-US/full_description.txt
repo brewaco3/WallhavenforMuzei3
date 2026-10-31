@@ -1,27 +1,29 @@
-Plugin for the new Muzei 3, to display Wallhaven wallpapers on your device
+A Wallhaven source for Muzei 3, so every wallpaper rotation brings a new one from Wallhaven.cc.
 
-Features:
+Sources
+* Toplist, with a range from the last day up to the last year
+* Hot
+* Newest
+* Most viewed and most favourited
+* Random, optionally with a seed you can reuse
 
-* Can pull artworks from a variety of sources:
-	- Daily, Weekly, Monthly, Rookie, Original, Male, or Female Rankings
-	- User's followed artists
-	- User's bookmarked artworks
-	- Artwork's from user's recommended feed
-	- A specified artist ID
-	- A specified tag
-* Can filter against multiple criteria:
-	- Four levels of granular NSFW filtering
-	- Aspect ratio
-	- View count
-	- Manga or illustration
+Filtering
+* Purity: SFW, Sketchy and NSFW. Sketchy and NSFW need a free API key from your Wallhaven account settings
+* Categories: General, Anime and People
+* Search query, using the full Wallhaven API query syntax
+* Aspect ratio, including wide, portrait, ultrawide (21x9) and square
+* Minimum width and height, or a minimum resolution
+* Dominant colour
 
-* Suports Oauth2 authentication
+How it works
+* Choose how many artworks to download per refresh, so a rotation never repeats too soon
+* Downloaded artworks are cached on the device and never fetched twice
+* Browse what has been downloaded, select several at once, then delete or save them
+* Save artworks to your own storage, where the cache cleaner will not touch them
+* Optional daily cache clear, and a force refresh when you want something new immediately
+* Share, show or delete the current wallpaper straight from Muzei's commands
 
-* Option to automatically clear images everyday
-* Option to save artwork to user storage
-
-* Works in China, SNI bypass
-
-Privacy respecting
-* No tracking or collection of user information
-* No advertisements
+Privacy
+* No tracking, no analytics, no ads
+* Nothing leaves the device except the requests to Wallhaven
+* An API key, if you set one, is only ever sent to wallhaven.cc
