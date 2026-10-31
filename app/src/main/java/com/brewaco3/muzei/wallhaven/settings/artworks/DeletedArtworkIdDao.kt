@@ -10,10 +10,10 @@ interface DeletedArtworkIdDao {
     @Query("SELECT artworkId FROM DeletedArtworkIdEntity")
     fun getAllIds(): List<String>
 
-    // Returns true if the passed artworkId is present in the table
-    @Query("SELECT EXISTS(SELECT * FROM DeletedArtworkIdEntity WHERE artworkId = (:artworkId))")
-    fun isRowIsExist(artworkId : String) : Boolean
-
-    @Insert(onConflict = OnConflictStrategy.ABORT)
+    /**
+     * Records artworks the user deleted so the worker never downloads them again.
+     * IGNORE because deleting an artwork that was already deleted is not an error.
+     */
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertDeletedArtworkId(deletedArtworkIds: List<DeletedArtworkIdEntity>)
 }

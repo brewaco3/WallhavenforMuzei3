@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
-    <string name="action_bar_title">Wallhaven for Muzei 设置</string>
-    <string name="action_sign_in">登录</string>
-
     <string name="app_name">Wallhaven for Muzei</string>
 
     <string name="artwork">作品</string>
@@ -10,112 +7,107 @@
     <string name="attr_toplist">排行榜</string>
     <string name="attr_hot">热门</string>
 
-    <string name="button_clearCache">清除图像缓存</string>
-    <string name="button_forceRefresh">强制刷新壁纸</string>
+    <string name="button_clearCache">清除全部缓存的图像</string>
+    <string name="button_forceRefresh">立即刷新壁纸</string>
 
-    <string name="command_addToBookmark">收藏</string>
-    <string name="command_addToPrivateBookmark">非公开收藏</string>
-    <string name="command_delete_artwork">删除作品</string>
+    <string name="command_delete_artwork">删除本张壁纸</string>
     <string name="command_shareImage">分享图像</string>
     <string name="command_viewArtworkDetails">查看详情</string>
 
-    <string name="dialogTitle_muzeiNotActiveSource">Wallhaven for Muzei 3 非当前激活源</string><!--未在 Muzei 中激活本源，需润色通顺-->
-    <string name="dialogTitle_muzeiNotInstalled">Muzei 尚未安装</string>
+    <string name="dialogTitle_muzeiNotActiveSource">Wallhaven for Muzei 3 不是当前使用的壁纸源</string>
+    <string name="dialogTitle_muzeiNotInstalled">尚未安装 Muzei</string>
 
-    <string name="dialog_installMuzei">您想要安装 Muzei 吗？</string>
+    <string name="dialog_installMuzei">是否安装 Muzei？</string>
     <string name="dialog_no">否</string>
-    <string name="dialog_selectSource">请打开 Muzei 中的“源”标签，然后选择 \"Wallhaven for Muzei 3\"</string>
+    <string name="dialog_selectSource">请打开 Muzei 的“来源”页面，选择「Wallhaven for Muzei 3」</string>
     <string name="dialog_yes">是</string>
+    <string name="dialog_clearCache_title">清除图像缓存？</string>
+    <string name="dialog_clearCache_message">这将会删除所有已缓存的图像与壁纸记录，然后重新下载壁纸。是否继续？</string>
 
-    <string name="fab_delete_selected_artwork">删除所选作品</string>
+    <string name="fab_delete_selected_artwork">删除所选壁纸</string>
+    <string name="fab_save_selected_artwork">保存所选壁纸</string>
 
-    <string name="login_wallhaven_account_hint">请输入 Wallhaven 账号</string>
-    <string name="login_wallhaven_password_hint">请输入密码</string>
-
-    <string name="prefCat_about">关于</string>
     <string name="prefCat_advFiltering">高级过滤</string>
+    <string name="prefCat_appSettings">应用设置</string>
     <string name="prefCat_authSettings">Wallhaven API 访问</string>
+    <string name="prefCat_debug">调试信息</string>
     <string name="prefCat_fileOptions">文件选项</string>
     <string name="prefCat_networkingOptions">网络选项</string>
-    <string name="prefCat_pullFeedSettings">作品订阅设置</string>
-    <string name="prefCat_postProcess">后期处理选项</string>
+    <string name="prefCat_pullFeedSettings">壁纸来源设置</string>
 
     <string name="prefTitle_apiKey">Wallhaven API 密钥</string>
-    <string name="prefSummary_apiKey_notSet">尚未设置 API 密钥</string>
+    <string name="prefSummary_apiKey_notSet">尚未设置 API 密钥，没有密钥将无法获取 Sketchy 与 NSFW 壁纸</string>
     <string name="prefSummary_apiKey_set">API 密钥已保存</string>
     <string name="prefDialog_apiKey">请输入 Wallhaven API 密钥</string>
-    <string name="prefSummary_noFileSizeLimit">无限制</string>
-    <string name="prefSummary_storeInExtStorage">保存在此处的图片不会自动清除</string>
-    <string name="prefSummary_stuckApp">如果该应用未工作，请按此处</string>
-    <string name="prefSummary_forceRefresh">立即下载新的壁纸</string>
-    <string name="prefSummary_autoCrop">下载时裁剪作品四周空白，会增加电量消耗</string>
 
-    <string name="prefTitle_MaximumFileSize">作品最大尺寸</string>
-    <string name="prefTitle_artistId">艺术家 ID</string>
-    <string name="prefTitle_aspectRatio">作品纵横比</string>
-    <string name="prefTitle_authFilterSelect">订阅 NSFW 过滤级别</string>
-    <string name="prefTitle_autoClearMode">每天凌晨 1 点自动清除缓存</string>
-    <string name="prefTitle_keyContributor">关键贡献者</string>
-    <string name="prefTitle_mainDeveloper">主要开发者</string>
-    <string name="prefTitle_minimumViews">作品最低浏览量</string>
-    <string name="prefTitle_numToDownload">同时下载的作品数量</string>
-    <string name="prefTitle_openNsfwWiki">NSFW 级别解释</string>
-    <string name="prefTitle_rankingFilterSelect">排行 NSFW 过滤级别</string>
+    <string name="prefTitle_aspectRatio">壁纸长宽比</string>
+    <string name="prefTitle_atleast">最低分辨率</string>
+    <string name="prefDialog_atleast">请输入最低分辨率（例如 1920x1080）</string>
+    <string name="prefTitle_topRange">排行榜时间范围</string>
+    <string name="prefTitle_order">排序方向</string>
+    <string name="prefTitle_seed">随机种子</string>
+    <string name="prefDialog_seed">请输入随机排序使用的种子（可选）</string>
+    <string name="prefTitle_colors">颜色</string>
+    <string name="prefDialog_colors">请输入十六进制颜色代码（例如 663399）</string>
+    <string name="prefTitle_minimumWidth">最低宽度</string>
+    <string name="prefTitle_minimumHeight">最低高度</string>
+    <string name="prefSummary_pixels">%d 像素</string>
+    <string name="prefSummary_noMinimum">不限制</string>
+
+    <string name="prefTitle_autoClearMode">每天凌晨 1 点清除缓存</string>
+    <string name="prefTitle_storeInExtStorage">将图像保存到外部存储</string>
+    <string name="prefSummary_storeInExtStorage">保存到这里的图像不会被自动清除</string>
+    <string name="prefTitle_storingInWhichExtStorage">图像保存位置</string>
+    <string name="prefTitle_numToDownload">每次下载的壁纸数量</string>
+
+    <string name="prefTitle_nightModePreference">深色模式</string>
+    <string name="prefTitle_mobileDataSaver">移动数据省流</string>
+    <string name="prefSummary_mobileDataSaver">在移动数据下不再下载新壁纸</string>
+    <string name="prefTitle_useWallhavenProxy">使用图像代理下载壁纸</string>
+    <string name="prefSummary_useWallhavenProxy">改用 w.wallhaven.cc 的镜像站点下载壁纸</string>
+    <string name="prefTitle_wallhavenProxyHost">图像代理主机</string>
+    <string name="prefDialog_wallhavenProxyHost">请输入与 w.wallhaven.cc 路径结构相同的主机名</string>
+
+    <string name="prefTitle_tagFilter">搜索关键词</string>
+    <string name="prefDialog_tagFilter">请输入搜索关键词（例如 \'landscape\'、\'type:png\'），支持 Wallhaven API 的 \'q\' 参数的全部语法</string>
+    <string name="prefTitle_rankingFilterSelect">排行榜 NSFW 过滤级别</string>
     <string name="prefTitle_rankingCategorySelect">壁纸分类</string>
-    <string name="prefTitle_sendFeedback">发送反馈或建议</string>
-    <string name="prefTitle_showManga">显示漫画</string>
-    <string name="prefTitle_storeInExtStorage">图片保存到手机存储</string>
-    <string name="prefTitle_storingInWhichExtStorage">正在将图片保存到</string>
-    <string name="prefTitle_tagSearch">图像标签</string>
-    <string name="prefTitle_minimumWidth">最小图片宽度</string>
-    <string name="prefTitle_minimumHeight">最小图片高度</string>
-    <string name="prefTitle_autoCrop">自动裁剪</string>
-
-    <string name="pref_aspectRatioDefault_entryValues">0</string>
-    <string name="pref_authFailActionDropDown">验证失败后措施</string>
-    <string name="prefTitle_enableNetworkBypass">绕过网络过滤</string><!--指绕过大陆封锁所用技术，参见 https://gulut.github.io/gulut-blog/post1/2020/05/31/2020-05-31-by-pass-the-gfw-by-sni-->
-    <string name="prefTitle_useWallhavenProxy">使用 Wallhaven 图像代理</string>
-    <string name="pref_updateMode">更新模式</string>
+    <string name="pref_updateMode">壁纸排序方式</string>
     <string name="pref_updateMode_default">toplist</string>
 
-    <string name="snackbar_deletedArtworks">作品已删除</string>
-    <string name="snackbar_selectArtworkFirst">选择至少一幅作品以删除</string>
+    <string name="prefSummary_forceRefresh">丢弃当前排队的壁纸并重新下载一批</string>
+    <string name="prefSummary_stuckApp">如果应用无法工作，请按此处</string>
+    <string name="prefTitle_debugUrl">API 请求地址</string>
+    <string name="prefSummary_debugUrl">点击可复制下载壁纸时使用的请求地址</string>
+    <string name="toast_debugUrlCopied">请求地址已复制到剪贴板</string>
+
+    <string name="preferenceScreen">preferenceScreen</string>
+
+    <plurals name="snackbar_deletedArtworks">
+        <item quantity="other">已删除 %d 张壁纸</item>
+    </plurals>
+    <plurals name="snackbar_savedArtworks">
+        <item quantity="other">已保存 %d 张壁纸</item>
+    </plurals>
+    <plurals name="snackbar_savedArtworksWithSkipped">
+        <item quantity="other">已保存 %1$d 张壁纸，另有 %2$d 张已存在</item>
+    </plurals>
+    <string name="snackbar_selectArtworkFirst">请先选择至少一张壁纸</string>
+    <string name="artworks_empty">还没有下载任何壁纸。Muzei 刷新后壁纸会显示在这里，您可以删除或保存看过的壁纸。</string>
 
     <string name="tab_heading_adv_options">高级设置</string>
-    <string name="tab_heading_artwork_delete">删除作品</string>
-    <string name="tab_heading_credits">贡献者</string>
+    <string name="tab_heading_artwork_delete">壁纸管理</string>
+    <string name="tab_heading_about">关于</string>
     <string name="tab_heading_main">基本设置</string>
-    <string name="tab_heading_roadmap">路线图</string><!--专有-->
 
-
-    <string name="toast_addingToBookmarks">Wallhaven for Muzei: 添加到收藏夹</string>
-    <string name="toast_authFailed">验证失败，请检查您的用户名或密码</string>
-    <string name="toast_authFailedDown">Wallhaven for Muzei: 登录失败，临时下载排行榜</string>
-    <string name="toast_authFailedRetry">Wallhaven for Muzei: 登录失败，再次尝试</string>
-    <string name="toast_authFailedSwitch">Wallhaven for Muzei: 登录失败，更改为排行榜</string>
-    <string name="toast_clearingCache">清除图像缓存</string>
+    <string name="toast_clearingCache">正在清除图像缓存</string>
     <string name="toast_forceRefreshQueued">正在刷新壁纸…</string>
     <string name="toast_forceRefreshComplete">壁纸已刷新</string>
     <string name="toast_forceRefreshFailed">刷新失败：%1$s</string>
     <string name="toast_forceRefreshFailed_generic">刷新失败</string>
     <string name="toast_forceRefreshCancelled">刷新已取消</string>
-    <string name="toast_loginFirst">请先输入 API 密钥</string>
-    <string name="toast_bookmark_success">收藏成功</string>
-    <string name="toast_bookmark_private_success">非公开收藏成功</string>
-    <string name="toast_bookmark_failure">收藏失败</string>
 
-    <string name="login_wallhaven_refresh_hint">刷新令牌</string>
-    <string name="action_sign_in_refresh">刷新令牌以登录</string><!--Refresh Token 用作刷新 Access Token，为 OAuth 中一项术语，此处翻译不确定-->
-    <string name="dialog_logoutConfirm">您确定要登出吗？</string>
-    <string name="prefTitle_nightModePreference">夜间模式偏好</string>
-    <string name="prefSummary_enableNetworkBypass">如果您在 VPN 上遇到问题请禁用</string>
-    <string name="prefTitle_mobileDataSaver">移动数据省流</string>
-    <string name="prefSummary_mobileDataSaver">停止下载新作品</string>
-    <string name="prefCat_appSettings">应用设置</string>
-    <string name="prefSummary_useWallhavenProxy">加速某些地区的图片下载</string>
-
-    <!-- About Settings -->
-    <string name="tab_heading_about">关于</string>
+    <!-- 关于 -->
     <string name="prefCat_appInfo">应用信息</string>
     <string name="prefCat_update">更新</string>
     <string name="prefTitle_version">版本</string>
@@ -127,6 +119,6 @@
     <string name="toast_checking_update">正在检查更新…</string>
     <string name="toast_no_update">您正在使用最新版本</string>
     <string name="toast_update_check_failed">检查更新失败</string>
-    <string name="dialog_new_version_title">新版本可用：%s</string>
+    <string name="dialog_new_version_title">发现新版本：%s</string>
     <string name="dialog_download">下载</string>
 </resources>

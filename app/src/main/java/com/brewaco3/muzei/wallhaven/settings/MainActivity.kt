@@ -1,7 +1,7 @@
 /*
- *     This file is part of PixivforMuzei3.
+ *     This file is part of WallhavenforMuzei3.
  *
- *     PixivforMuzei3 is free software: you can redistribute it and/or modify
+ *     WallhavenforMuzei3 is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
@@ -24,13 +24,13 @@ import android.os.Bundle
 import android.view.ViewGroup
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.viewpager2.widget.ViewPager2
 import com.brewaco3.muzei.wallhaven.BuildConfig
 import com.brewaco3.muzei.wallhaven.R
-import com.brewaco3.muzei.wallhaven.common.WallhavenMuzeiActivity
 import com.brewaco3.muzei.wallhaven.settings.fragments.AdvOptionsPreferenceFragment
 import com.brewaco3.muzei.wallhaven.util.IntentUtils
 import com.google.android.apps.muzei.api.MuzeiContract.Sources.createChooseProviderIntent
@@ -38,7 +38,7 @@ import com.google.android.apps.muzei.api.MuzeiContract.Sources.isProviderSelecte
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayoutMediator
 
-class MainActivity : WallhavenMuzeiActivity(), AdvOptionsPreferenceFragment.NightModePreferenceListener {
+class MainActivity : AppCompatActivity(), AdvOptionsPreferenceFragment.NightModePreferenceListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -70,7 +70,7 @@ class MainActivity : WallhavenMuzeiActivity(), AdvOptionsPreferenceFragment.Nigh
         val sectionsPagerAdapter = SectionsPagerAdapter(this)
         viewPager.adapter = sectionsPagerAdapter
         TabLayoutMediator(findViewById(R.id.tabs), viewPager) { tab, position ->
-            tab.text = applicationContext.resources.getString(tabTitles[position])
+            tab.text = getString(tabTitles[position])
         }.attach()
     }
 

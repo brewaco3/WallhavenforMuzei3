@@ -1,7 +1,7 @@
 /*
- *     This file is part of PixivforMuzei3.
+ *     This file is part of WallhavenforMuzei3.
  *
- *     PixivforMuzei3 is free software: you can redistribute it and/or modify
+ *     WallhavenforMuzei3 is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
@@ -19,178 +19,109 @@ package com.brewaco3.muzei.wallhaven.settings.fragments
 import android.os.Bundle
 import android.os.Environment
 import android.text.InputType
+import android.view.View
 import androidx.appcompat.app.AlertDialog
-import androidx.preference.*
+import androidx.preference.EditTextPreference
+import androidx.preference.MultiSelectListPreference
+import androidx.preference.Preference
+import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.PreferenceManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.work.ExistingWorkPolicy
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import com.brewaco3.muzei.wallhaven.WallhavenMuzeiSupervisor
-import com.brewaco3.muzei.wallhaven.WallhavenProviderConst
-import com.brewaco3.muzei.wallhaven.WallhavenProviderConst.AUTH_MODES
 import com.brewaco3.muzei.wallhaven.R
+import com.brewaco3.muzei.wallhaven.WallhavenPrefs
+import com.brewaco3.muzei.wallhaven.WallhavenProviderConst
 import com.brewaco3.muzei.wallhaven.provider.WallhavenArtProvider
+import com.brewaco3.muzei.wallhaven.provider.WallhavenArtWorker
 import com.brewaco3.muzei.wallhaven.provider.WallhavenArtWorker.Companion.enqueueLoad
+import com.brewaco3.muzei.wallhaven.settings.applyNavigationBarPadding
 import com.google.android.apps.muzei.api.provider.ProviderContract.getProviderClient
 import com.google.android.material.snackbar.Snackbar
+
 class MainPreferenceFragment : PreferenceFragmentCompat() {
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        view.findViewById<RecyclerView>(android.R.id.list)?.applyNavigationBarPadding()
+    }
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.main_preference_layout, rootKey)
 
-        WallhavenMuzeiSupervisor.start(requireContext().applicationContext)
-
         val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
 
-        // Ensures that the user has provided an API key before selecting any update mode requiring authentication
-        // Reveals UI elements as needed depending on Update Mode selection
-        val updateModePref = findPreference<DropDownPreference>("pref_updateMode")
-        updateModePref?.onPreferenceChangeListener =
-            Preference.OnPreferenceChangeListener setOnPreferenceChangeListener@{ _: Preference?, newValue: Any ->
-                // User has selected an authenticated feed mode, but has not yet provided
-                // the API key required for those requests
-                if (AUTH_MODES.contains(newValue) && !WallhavenMuzeiSupervisor.hasApiKey()) {
-                    Snackbar.make(
-                        requireView(), R.string.toast_loginFirst,
-                        Snackbar.LENGTH_SHORT
-                    ).show()
-                    return@setOnPreferenceChangeListener false
-                }
-                // If any of the auth feed modes, reveal login Preference Category, reveal the auth NSFW filtering,
-                // and hide the ranking NSFW filtering
-                val authFeedModeSelected = AUTH_MODES.contains(newValue)
-                findPreference<Preference>("pref_authFilterSelect")?.isVisible =
-                    authFeedModeSelected
-                findPreference<Preference>("pref_rankingFilterSelect")?.isVisible =
-                    !authFeedModeSelected
-                findPreference<Preference>("pref_rankingCategorySelect")?.isVisible =
-                    !authFeedModeSelected
-                findPreference<Preference>("pref_tagFilter")?.isVisible =
-                    !authFeedModeSelected
-                findPreference<Preference>("pref_tagSearch")?.isVisible = newValue == "tag_search"
-                findPreference<Preference>("pref_tagLanguage")?.isVisible = newValue == "tag_search"
-                findPreference<Preference>("pref_artistId")?.isVisible = newValue == "artist"
-                true
-            }
-
-        // All this is needed for the arbitrary selection NSFW filtering
-        // Will default to only SFW if no filtering modes are selected
-        // Prints a summary string based on selection
-        // Updates authFilterSelectPref summary as user updates it
-        // SimpleSummaryProvider does not support MultiSelectListPreference
-        findPreference<MultiSelectListPreference>("pref_authFilterSelect")?.let {
-            it.onPreferenceChangeListener =
-                Preference.OnPreferenceChangeListener setOnPreferenceChangeListener@{ _: Preference?, newValue: Any ->
-                    // Reset to SFW on empty selection
-                    @Suppress("UNCHECKED_CAST")
-                    if ((newValue as Set<String>).isEmpty()) {
-                        it.values = setOf("2")
-                        sharedPrefs.edit().apply {
-                            putStringSet("pref_authFilterSelect", setOf("2"))
-                            apply()
-                        }
-                        it.summary = "SFW"
-                        return@setOnPreferenceChangeListener false
-                    }
-                    it.summary =
-                        authSummaryStringGenerator(newValue)
-
-                    true
-                }
-            it.summary = authSummaryStringGenerator(
-                sharedPrefs.getStringSet(
-                    "pref_authFilterSelect",
-                    setOf("2")
-                ) as Set<String>
-            )
-        }
-
-        // Updates ranking SFW filtering preference
-        // Same manner as above, the auth modes
-        findPreference<MultiSelectListPreference>("pref_rankingFilterSelect")?.let {
-            it.onPreferenceChangeListener =
-                Preference.OnPreferenceChangeListener setOnPreferenceChangeListener@{ _: Preference?, newValue: Any ->
+        // SimpleSummaryProvider does not support MultiSelectListPreference, so both NSFW filters
+        // generate their own summary and refuse to leave the user with nothing selected
+        findPreference<MultiSelectListPreference>("pref_rankingFilterSelect")?.let { pref ->
+            pref.onPreferenceChangeListener =
+                Preference.OnPreferenceChangeListener { _, newValue: Any ->
                     @Suppress("UNCHECKED_CAST")
                     val selection = newValue as Set<String>
                     if (selection.isEmpty()) {
-                        it.values = setOf("sfw")
-                        sharedPrefs.edit().apply {
-                            putStringSet("pref_rankingFilterSelect", setOf("sfw"))
-                            apply()
-                        }
-                        it.summary = "SFW"
-                        return@setOnPreferenceChangeListener false
+                        val fallback = setOf("sfw")
+                        pref.values = fallback
+                        sharedPrefs.edit().putStringSet("pref_rankingFilterSelect", fallback).apply()
+                        pref.summary = rankingSummaryStringGenerator(fallback)
+                        return@OnPreferenceChangeListener false
                     }
-
-                    it.summary = rankingSummaryStringGenerator(selection)
-
+                    pref.summary = rankingSummaryStringGenerator(selection)
                     true
                 }
-            // Generates the ranking NSFW filter summary during activity startup
-            it.summary =
-                rankingSummaryStringGenerator(
-                    sharedPrefs.getStringSet("pref_rankingFilterSelect", setOf("sfw")) as Set<String>
-                )
+            pref.summary = rankingSummaryStringGenerator(
+                sharedPrefs.getStringSet("pref_rankingFilterSelect", setOf("sfw")) ?: setOf("sfw")
+            )
         }
 
         findPreference<MultiSelectListPreference>("pref_rankingCategorySelect")?.let { pref ->
             pref.onPreferenceChangeListener =
-                Preference.OnPreferenceChangeListener setOnPreferenceChangeListener@{ _: Preference?, newValue: Any ->
+                Preference.OnPreferenceChangeListener { _, newValue: Any ->
                     @Suppress("UNCHECKED_CAST")
                     val selection = newValue as Set<String>
                     if (selection.isEmpty()) {
-                        val defaultSelection = setOf("general", "anime", "people")
-                        pref.values = defaultSelection
-                        sharedPrefs.edit().apply {
-                            putStringSet("pref_rankingCategorySelect", defaultSelection)
-                            apply()
-                        }
-                        pref.summary = categorySummaryStringGenerator(defaultSelection)
-                        return@setOnPreferenceChangeListener false
+                        val fallback = setOf("general", "anime", "people")
+                        pref.values = fallback
+                        sharedPrefs.edit().putStringSet("pref_rankingCategorySelect", fallback).apply()
+                        pref.summary = categorySummaryStringGenerator(fallback)
+                        return@OnPreferenceChangeListener false
                     }
                     pref.summary = categorySummaryStringGenerator(selection)
                     true
                 }
+            val defaultSelection = setOf("general", "anime", "people")
             pref.summary = categorySummaryStringGenerator(
-                sharedPrefs.getStringSet(
-                    "pref_rankingCategorySelect",
-                    setOf("general", "anime", "people")
-                ) ?: setOf("general", "anime", "people")
+                sharedPrefs.getStringSet("pref_rankingCategorySelect", defaultSelection) ?: defaultSelection
             )
         }
 
-        // Reveal the tag_search or artist_id EditTextPreference and write the summary if update mode matches
-        val updateMode = sharedPrefs.getString("pref_updateMode", "toplist")
-        if (AUTH_MODES.contains(updateMode)) {
-            findPreference<Preference>("pref_authFilterSelect")?.isVisible = true
-            findPreference<Preference>("prefCat_loginSettings")?.isVisible = true
-            findPreference<Preference>("pref_rankingFilterSelect")?.isVisible = false
-            findPreference<Preference>("pref_rankingCategorySelect")?.isVisible = false
-            if (updateMode == "tag_search") {
-                findPreference<Preference>("pref_tagSearch")?.let {
-                    it.isVisible = true
-                }
-                findPreference<Preference>("pref_tagLanguage")?.let {
-                    it.isVisible = true
-                }
-            } else if (updateMode == "artist") {
-                findPreference<Preference>("pref_artistId")?.let {
-                    it.isVisible = true
-                }
+        // The API key lives in WallhavenPrefs rather than in the preference itself, so the
+        // preference is not persistent and only ever acts as a front end for it
+        findPreference<EditTextPreference>("pref_api_key")?.let { pref ->
+            pref.summary = apiKeySummary()
+            pref.text = WallhavenPrefs.getApiKey()
+            pref.setOnBindEditTextListener { editText ->
+                editText.inputType =
+                    InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD or
+                        InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
             }
-        } else {
-            findPreference<Preference>("pref_rankingFilterSelect")?.isVisible = true
-            findPreference<Preference>("pref_rankingCategorySelect")?.isVisible = true
-            findPreference<Preference>("pref_tagFilter")?.isVisible = true
+            pref.setOnPreferenceChangeListener { preference, newValue ->
+                WallhavenPrefs.setApiKey(newValue as? String)
+                (preference as EditTextPreference).summary = apiKeySummary()
+                true
+            }
         }
 
         // Preference that immediately clears Muzei's image cache when pressed
-        findPreference<Preference>(getString(R.string.button_clearCache))?.onPreferenceClickListener =
+        findPreference<Preference>("pref_clearCache")?.onPreferenceClickListener =
             Preference.OnPreferenceClickListener {
                 AlertDialog.Builder(requireContext())
                     .setTitle(R.string.dialog_clearCache_title)
                     .setMessage(R.string.dialog_clearCache_message)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
                         // Cancel any ongoing work
-                        WorkManager.getInstance(requireContext()).cancelUniqueWork("ANTONY")
+                        WorkManager.getInstance(requireContext())
+                            .cancelUniqueWork(WallhavenArtWorker.WORKER_TAG)
                         // Delete cached image files
                         requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
                             ?.deleteRecursively()
@@ -198,7 +129,7 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
                         getProviderClient(requireContext(), WallhavenArtProvider::class.java)
                             .setArtwork(emptyList())
                         // Download fresh wallpapers
-                        enqueueLoad(false, requireContext())
+                        enqueueLoad(true, requireContext())
                         Snackbar.make(
                             requireView(), R.string.toast_clearingCache,
                             Snackbar.LENGTH_SHORT
@@ -211,6 +142,7 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
 
         findPreference<Preference>("pref_forceRefresh")?.onPreferenceClickListener =
             Preference.OnPreferenceClickListener {
+                // REPLACE so a queued load does not hold up the one the user just asked for
                 val workId = enqueueLoad(true, requireContext(), ExistingWorkPolicy.REPLACE)
                 if (workId == null) {
                     Snackbar.make(
@@ -234,13 +166,11 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
                         return@observe
                     }
                     when (info.state) {
-                        WorkInfo.State.SUCCEEDED -> {
-                            Snackbar.make(
-                                requireView(),
-                                R.string.toast_forceRefreshComplete,
-                                Snackbar.LENGTH_SHORT
-                            ).show()
-                        }
+                        WorkInfo.State.SUCCEEDED -> Snackbar.make(
+                            requireView(),
+                            R.string.toast_forceRefreshComplete,
+                            Snackbar.LENGTH_SHORT
+                        ).show()
 
                         WorkInfo.State.FAILED -> {
                             val errorMessage = info.outputData
@@ -251,21 +181,16 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
                             } else {
                                 getString(R.string.toast_forceRefreshFailed, errorMessage)
                             }
-                            Snackbar.make(requireView(), message, Snackbar.LENGTH_LONG)
-                                .show()
+                            Snackbar.make(requireView(), message, Snackbar.LENGTH_LONG).show()
                         }
 
-                        WorkInfo.State.CANCELLED -> {
-                            Snackbar.make(
-                                requireView(),
-                                R.string.toast_forceRefreshCancelled,
-                                Snackbar.LENGTH_LONG
-                            ).show()
-                        }
+                        WorkInfo.State.CANCELLED -> Snackbar.make(
+                            requireView(),
+                            R.string.toast_forceRefreshCancelled,
+                            Snackbar.LENGTH_LONG
+                        ).show()
 
-                        else -> {
-                            // Ignore other states
-                        }
+                        else -> Unit
                     }
 
                     if (info.state.isFinished) {
@@ -274,82 +199,51 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
                 }
                 true
             }
-
-        findPreference<EditTextPreference>("pref_api_key")?.let { pref ->
-            pref.summaryProvider = Preference.SummaryProvider<EditTextPreference> { preference ->
-                if (preference.text.isNullOrBlank()) {
-                    getString(R.string.prefSummary_apiKey_notSet)
-                } else {
-                    getString(R.string.prefSummary_apiKey_set)
-                }
-            }
-            pref.setOnBindEditTextListener { editText ->
-                editText.inputType =
-                    InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD or
-                        InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
-            }
-            val storedApiKey = WallhavenMuzeiSupervisor.getApiKey()
-            if (pref.text.isNullOrBlank() && storedApiKey.isNotBlank()) {
-                pref.text = storedApiKey
-            }
-            pref.setOnPreferenceChangeListener { preference, newValue ->
-                val sanitized = (newValue as? String).orEmpty().trim()
-                if (sanitized.isEmpty()) {
-                    WallhavenMuzeiSupervisor.clearApiKey()
-                } else {
-                    WallhavenMuzeiSupervisor.setApiKey(sanitized)
-                }
-                if (sanitized != newValue) {
-                    (preference as EditTextPreference).text = sanitized
-                    return@setOnPreferenceChangeListener false
-                }
-                true
-            }
-        }
     }
 
-    // 0 or 1 correspond to SFW or NSFW respectively
-    private fun rankingSummaryStringGenerator(selection: Set<String>): String {
-        val entries = resources.getStringArray(R.array.pref_rankingFilterLevel_entries)
-        val values = resources.getStringArray(R.array.pref_rankingFilterLevel_entryvalues)
-        val valueToEntry = values.indices.associate { values[it] to entries[it] }
-        val orderedSelection = values.filter { selection.contains(it) }
-        val summaryValues = if (orderedSelection.isEmpty()) {
-            listOf(entries.first())
+    private fun apiKeySummary(): String = getString(
+        if (WallhavenPrefs.hasApiKey()) {
+            R.string.prefSummary_apiKey_set
         } else {
-            orderedSelection.mapNotNull { valueToEntry[it] }
+            R.string.prefSummary_apiKey_notSet
         }
-        return summaryValues.joinToString(", ")
-    }
+    )
 
-    private fun categorySummaryStringGenerator(selection: Set<String>): String {
-        val entries = resources.getStringArray(R.array.pref_rankingCategory_entries)
-        val values = resources.getStringArray(R.array.pref_rankingCategory_entryvalues)
+    /** Builds a comma separated summary in the order the entries are declared, never with a trailing comma. */
+    private fun rankingSummaryStringGenerator(selection: Set<String>): String =
+        summaryStringGenerator(
+            selection,
+            R.array.pref_rankingFilterLevel_entries,
+            R.array.pref_rankingFilterLevel_entryvalues,
+            DEFAULT_PURITY
+        )
+
+    private fun categorySummaryStringGenerator(selection: Set<String>): String =
+        summaryStringGenerator(
+            selection,
+            R.array.pref_rankingCategory_entries,
+            R.array.pref_rankingCategory_entryvalues,
+            DEFAULT_CATEGORIES
+        )
+
+    /** Describes [selection] in the order the entries are declared, and never leaves the summary blank. */
+    private fun summaryStringGenerator(
+        selection: Set<String>,
+        entriesRes: Int,
+        valuesRes: Int,
+        fallback: Set<String>
+    ): String {
+        val entries = resources.getStringArray(entriesRes)
+        val values = resources.getStringArray(valuesRes)
         val valueToEntry = values.indices.associate { values[it] to entries[it] }
-        val orderedSelection = values.filter { selection.contains(it) }
-        val summaryValues = if (orderedSelection.isEmpty()) {
-            entries.toList()
-        } else {
-            orderedSelection.mapNotNull { valueToEntry[it] }
-        }
-        return summaryValues.joinToString(", ")
+        val effective = selection.ifEmpty { fallback }
+        // Ordered by the declaration order of the values rather than the order of the set
+        val ordered = values.filter { effective.contains(it) }.mapNotNull { valueToEntry[it] }
+        return ordered.joinToString(", ")
     }
 
-    // Returns a comma delimited string of user selections. There is no trailing comma
-    // newValue is a HashSet that can contain 2, 4, 6, or 8, and corresponds to
-    // SFW, Slightly Ecchi, Fairly Ecchi, and R18 respectively
-    // 2, 4, 6, 8 was selected to match with the values used in Wallhaven JSON
-    private fun authSummaryStringGenerator(selection: Set<String>): String {
-        val authFilterEntriesPossible =
-            resources.getStringArray(R.array.pref_authFilterLevel_entries)
-        return StringBuilder().let {
-            selection.forEachIndexed { _, element ->
-                // Translation from {2, 4, 6, 8} to {0, 1, 2, 3}
-                it.append(authFilterEntriesPossible[(element.toInt() - 2) / 2])
-                it.append(", ")
-            }
-            it.setLength(it.length - 2)
-            it.toString()
-        }
+    companion object {
+        private val DEFAULT_PURITY = setOf("sfw")
+        private val DEFAULT_CATEGORIES = setOf("general", "anime", "people")
     }
 }

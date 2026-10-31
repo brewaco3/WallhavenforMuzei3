@@ -19,19 +19,27 @@ package com.brewaco3.muzei.wallhaven.settings.fragments
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import androidx.recyclerview.widget.RecyclerView
 import com.brewaco3.muzei.wallhaven.BuildConfig
 import com.brewaco3.muzei.wallhaven.R
 import com.brewaco3.muzei.wallhaven.provider.network.github.GithubClient
 import com.brewaco3.muzei.wallhaven.provider.network.github.GithubRelease
+import com.brewaco3.muzei.wallhaven.settings.applyNavigationBarPadding
 import com.google.android.material.snackbar.Snackbar
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class AboutPreferenceFragment : PreferenceFragmentCompat() {
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        view.findViewById<RecyclerView>(android.R.id.list)?.applyNavigationBarPadding()
+    }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.about_preference_layout, rootKey)
@@ -41,8 +49,7 @@ class AboutPreferenceFragment : PreferenceFragmentCompat() {
 
         // Source code link
         findPreference<Preference>("pref_source_code")?.setOnPreferenceClickListener {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.url_source_code)))
-            startActivity(intent)
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.url_source_code))))
             true
         }
 

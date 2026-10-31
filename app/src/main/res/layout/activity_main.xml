@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~     This file is part of PixivforMuzei3.
+  ~     This file is part of WallhavenforMuzei3.
   ~
-  ~     PixivforMuzei3 is free software: you can redistribute it and/or modify
+  ~     WallhavenforMuzei3 is free software: you can redistribute it and/or modify
   ~     it under the terms of the GNU General Public License as published by
   ~     the Free Software Foundation, either version 3 of the License, or
   ~     (at your option) any later version.
@@ -25,7 +25,6 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme"
         android:fitsSystemWindows="true">
 
         <TextView
@@ -34,11 +33,10 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:minHeight="?actionBarSize"
-            android:padding="@dimen/appbar_padding"
+            android:padding="16dp"
             android:text="@string/app_name"
             android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title"
-            app:layout_scrollFlags="scroll|snap"
-            app:layout_scrollEffect="compress" />
+            app:layout_scrollFlags="scroll|snap" />
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabs"

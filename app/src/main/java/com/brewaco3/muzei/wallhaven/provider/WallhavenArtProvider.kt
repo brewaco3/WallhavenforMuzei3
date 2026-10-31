@@ -1,7 +1,7 @@
 /*
- *     This file is part of PixivforMuzei3.
+ *     This file is part of WallhavenforMuzei3.
  *
- *     PixivforMuzei3 is free software: you can redistribute it and/or modify
+ *     WallhavenforMuzei3 is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
@@ -15,31 +15,18 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-@file:Suppress("DEPRECATION")
-
 package com.brewaco3.muzei.wallhaven.provider
 
-import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.net.Uri
-import android.os.Build
-import android.os.Environment
 import android.util.Log
 import androidx.core.app.RemoteActionCompat
-import androidx.core.content.FileProvider
 import androidx.preference.PreferenceManager
-import com.brewaco3.muzei.wallhaven.BuildConfig
-import com.brewaco3.muzei.wallhaven.WallhavenMuzeiSupervisor.start
-import com.brewaco3.muzei.wallhaven.WallhavenProviderConst.WALLHAVEN_ARTWORK_URL
-import com.brewaco3.muzei.wallhaven.util.IntentUtils
-import com.google.android.apps.muzei.api.UserCommand
 import com.google.android.apps.muzei.api.provider.Artwork
 import com.google.android.apps.muzei.api.provider.MuzeiArtProvider
-import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.InputStream
@@ -57,19 +44,17 @@ class WallhavenArtProvider : MuzeiArtProvider() {
     override fun onCreate(): Boolean {
         super.onCreate()
         running = true
-
-        start(checkContext())
-
         return true
     }
 
     override fun onLoadRequested(initial: Boolean) {
-        val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context!!)
+        val providerContext = context ?: return
+        val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(providerContext)
         if (sharedPrefs.getBoolean("pref_dataMode", false) && isOnMobileData()) {
-            Log.i("ANTONY_PROVIDER", "Data saver mode, stopping new artwork download")
+            Log.i(TAG, "Data saver mode, skipping new artwork download")
             return
         }
-        WallhavenArtWorker.enqueueLoad(false, context)
+        WallhavenArtWorker.enqueueLoad(false, providerContext)
     }
 
     override fun getCommandActions(artwork: Artwork): List<RemoteActionCompat> {
@@ -81,7 +66,7 @@ class WallhavenArtProvider : MuzeiArtProvider() {
 
     @Throws(IOException::class)
     override fun openFile(artwork: Artwork): InputStream {
-        val context = try {
+        val currentContext = try {
             checkContext()
         } catch (ex: IllegalStateException) {
             throw IOException("Provider not prepared.", ex)
@@ -91,7 +76,7 @@ class WallhavenArtProvider : MuzeiArtProvider() {
             ?: throw IOException("Require non-null persistent uri in Artwork $artwork")
 
         val inputStream = try {
-            context.contentResolver.openInputStream(artworkPersistentUri)
+            currentContext.contentResolver.openInputStream(artworkPersistentUri)
         } catch (ex: FileNotFoundException) {
             Log.d(TAG, "Fail to open stream: $artworkPersistentUri", ex)
             throw IOException("Fail to open stream: $artworkPersistentUri", ex)
@@ -99,18 +84,15 @@ class WallhavenArtProvider : MuzeiArtProvider() {
         return requireNotNull(inputStream)
     }
 
-    // ConnectivityManager.activeNetworkInfo deprecated in API level 29
+    /**
+     * Whether the active network is the mobile one. Returns false when there is no active network at
+     * all, which is also what happens in airplane mode.
+     */
     private fun isOnMobileData(): Boolean {
-        val cm = context!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        if (Build.VERSION.SDK_INT >= 29) {
-            val networkCapabilities = cm.getNetworkCapabilities(cm.activeNetwork)
-            if (networkCapabilities!!.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
-                return true
-            }
-        } else if (cm.activeNetworkInfo!!.type == ConnectivityManager.TYPE_MOBILE) {
-            return true
-        }
-        return false
+        val connectivityManager = context?.getSystemService(Context.CONNECTIVITY_SERVICE)
+            as? ConnectivityManager ?: return false
+        val capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+        return capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true
     }
 
     /**
@@ -120,68 +102,19 @@ class WallhavenArtProvider : MuzeiArtProvider() {
      */
     @Throws(IllegalStateException::class)
     private fun checkContext(): Context {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            check(running) { "Provider $this not in running." }
-            requireContext()
-        } else {
-            val context = context
-            check(running && context != null) { "Provider $this not in running." }
-            context
-        }
+        val currentContext = context
+        check(running && currentContext != null) { "Provider $this not in running." }
+        return currentContext
     }
 
-    private fun handleCommandLegacy(context: Context, artwork: Artwork, id: Int) {
-        when (id) {
-            MuzeiCommandManager.COMMAND_VIEW_IMAGE_DETAILS -> {
-                artwork.token
-                    ?.takeIf { it.isNotEmpty() }
-                    ?.let { token ->
-                        Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse(WALLHAVEN_ARTWORK_URL + token)
-                        )
-                    }
-                    ?.also { intent ->
-                        IntentUtils.launchActivity(context, intent)
-                    }
-            }
-
-            MuzeiCommandManager.COMMAND_SHARE_IMAGE -> {
-                Log.d("ANTONY_WORKER", "Opening sharing ")
-                artwork.token
-                    ?.takeIf { it.isNotEmpty() }
-                    ?.let { token ->
-                        File(
-                            context.getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-                            "$token.png"
-                        )
-                    }
-                    ?.let { file ->
-                        FileProvider.getUriForFile(
-                            context,
-                            "${BuildConfig.APPLICATION_ID}.fileprovider",
-                            file
-                        )
-                    }
-                    ?.let { uri ->
-                        Intent(Intent.ACTION_SEND).apply {
-                            type = "image/jpg"
-                            putExtra(Intent.EXTRA_STREAM, uri)
-                        }
-                    }
-                    ?.also {
-                        IntentUtils.launchActivity(context, it)
-                    }
-            }
-        }
-    }
-
-    @SuppressLint("InlinedApi")
     override fun getArtworkInfo(artwork: Artwork): PendingIntent? {
-        if (artwork.webUri != null && context != null) {
-            val intent = Intent(Intent.ACTION_VIEW, artwork.webUri)
-            return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-        }
-        return null
+        val webUri = artwork.webUri ?: return null
+        val providerContext = context ?: return null
+        return PendingIntent.getActivity(
+            providerContext,
+            0,
+            Intent(Intent.ACTION_VIEW, webUri),
+            PendingIntent.FLAG_IMMUTABLE
+        )
     }
 }

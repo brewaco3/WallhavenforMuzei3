@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~     This file is part of PixivforMuzei3.
+  ~     This file is part of WallhavenforMuzei3.
   ~
-  ~     PixivforMuzei3 is free software: you can redistribute it and/or modify
+  ~     WallhavenforMuzei3 is free software: you can redistribute it and/or modify
   ~     it under the terms of the GNU General Public License as published by
   ~     the Free Software Foundation, either version 3 of the License, or
   ~     (at your option) any later version.
@@ -15,7 +15,6 @@
   ~     along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/coordinator"
     android:layout_width="match_parent"
@@ -25,10 +24,22 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list"
-        android:name="com.brewaco3.muzei.wallhaven.ui.adapter.ArtworkFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         tools:listitem="@layout/fragment_artwork" />
+
+    <TextView
+        android:id="@+id/empty_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:padding="32dp"
+        android:text="@string/artworks_empty"
+        android:textAppearance="?attr/textAppearanceBodyLarge"
+        android:textColor="?android:attr/textColorSecondary"
+        android:visibility="gone"
+        tools:visibility="visible" />
 </FrameLayout>

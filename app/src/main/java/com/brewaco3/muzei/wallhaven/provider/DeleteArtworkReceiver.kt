@@ -8,24 +8,47 @@ import com.brewaco3.muzei.wallhaven.settings.artworks.DeletedArtworkIdEntity
 import com.google.android.apps.muzei.api.provider.ProviderContract
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
-class DeleteArtworkReceiver : BroadcastReceiver(),
-    CoroutineScope by CoroutineScope(Dispatchers.Main + SupervisorJob()) {
+/**
+ * Removes one artwork from the rotation and remembers the id, so the worker never downloads it again.
+ * Every "delete this artwork" entry point goes through here.
+ */
+class DeleteArtworkReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
-        intent.getStringExtra("artworkId")?.let { artworkId ->
-            context.contentResolver.delete(
-                ProviderContract.getProviderClient(context, WallhavenArtProvider::class.java).contentUri,
-                "${ProviderContract.Artwork.TOKEN} = ?",
-                arrayOf(artworkId)
-            )
+        val artworkId = intent.getStringExtra(EXTRA_ARTWORK_ID) ?: return
 
-            launch(Dispatchers.IO) {
+        context.contentResolver.delete(
+            ProviderContract.getProviderClient(context, WallhavenArtProvider::class.java).contentUri,
+            "${ProviderContract.Artwork.TOKEN} = ?",
+            arrayOf(artworkId)
+        )
+
+        // The process can be torn down as soon as onReceive returns, so keep it alive until the id is stored
+        val pendingResult = goAsync()
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
                 AppDatabase.getInstance(context).deletedArtworkIdDao()
                     .insertDeletedArtworkId(listOf(DeletedArtworkIdEntity(artworkId)))
+            } finally {
+                pendingResult.finish()
             }
         }
+    }
+
+    companion object {
+        private const val ACTION_DELETE_ARTWORK = "com.brewaco3.muzei.wallhaven.action.DELETE_ARTWORK"
+        private const val EXTRA_ARTWORK_ID = "artworkId"
+
+        fun dispatch(context: Context, artworkId: String) {
+            context.sendBroadcast(intentFor(context, artworkId))
+        }
+
+        fun intentFor(context: Context, artworkId: String): Intent =
+            Intent(context, DeleteArtworkReceiver::class.java).apply {
+                action = ACTION_DELETE_ARTWORK
+                putExtra(EXTRA_ARTWORK_ID, artworkId)
+            }
     }
 }

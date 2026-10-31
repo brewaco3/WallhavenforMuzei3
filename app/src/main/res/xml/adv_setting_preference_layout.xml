@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~     This file is part of PixivforMuzei3.
+  ~     This file is part of WallhavenforMuzei3.
   ~
-  ~     PixivforMuzei3 is free software: you can redistribute it and/or modify
+  ~     WallhavenforMuzei3 is free software: you can redistribute it and/or modify
   ~     it under the terms of the GNU General Public License as published by
   ~     the Free Software Foundation, either version 3 of the License, or
   ~     (at your option) any later version.
@@ -15,11 +15,10 @@
   ~     along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     android:key="@string/preferenceScreen">
+
     <PreferenceCategory
         android:key="prefCat_advFiltering"
         android:title="@string/prefCat_advFiltering">
@@ -81,15 +80,10 @@
             android:persistent="true"
             android:title="@string/prefTitle_minimumHeight" />
     </PreferenceCategory>
+
     <PreferenceCategory
         android:key="prefCat_fileOptions"
         android:title="@string/prefCat_fileOptions">
-        <!--        <SeekBarPreference-->
-        <!--            android:defaultValue="0"-->
-        <!--            android:key="prefSlider_maxFileSize"-->
-        <!--            android:max="50"-->
-        <!--            android:persistent="true"-->
-        <!--            android:title="@string/prefTitle_MaximumFileSize" />-->
         <SwitchPreference
             android:key="pref_autoClearMode"
             android:persistent="true"
@@ -116,25 +110,17 @@
             android:title="@string/prefTitle_numToDownload"
             app:min="1" />
     </PreferenceCategory>
-    <PreferenceCategory
-        android:key="prefCat_postProcess"
-        android:title="@string/prefCat_postProcess">
-        <SwitchPreference
-            android:key="pref_autoCrop"
-            android:persistent="true"
-            android:summary="@string/prefSummary_autoCrop"
-            android:title="@string/prefTitle_autoCrop" />
-    </PreferenceCategory>
+
     <PreferenceCategory
         android:key="prefCat_appSettings"
         android:title="@string/prefCat_appSettings">
         <ListPreference
+            android:defaultValue="-1"
+            android:entries="@array/dark_mode_entries"
+            android:entryValues="@array/dark_mode_values"
+            android:key="pref_nightMode"
             android:persistent="true"
-            app:defaultValue="MODE_NIGHT_FOLLOW_SYSTEM"
-            app:entries="@array/dark_mode_entries"
-            app:entryValues="@array/dark_mode_values"
-            app:key="pref_nightMode"
-            app:title="@string/prefTitle_nightModePreference"
+            android:title="@string/prefTitle_nightModePreference"
             app:useSimpleSummaryProvider="true" />
         <SwitchPreference
             android:key="pref_dataMode"
@@ -142,37 +128,35 @@
             android:summary="@string/prefSummary_mobileDataSaver"
             android:title="@string/prefTitle_mobileDataSaver" />
     </PreferenceCategory>
-    <!--    <PreferenceCategory-->
-    <!--        android:key="prefCat_networkOptions"-->
-    <!--        android:title="@string/prefCat_networkingOptions">-->
-    <SwitchPreference
-        android:key="pref_enableNetworkBypass"
-        android:persistent="true"
-        android:summary="@string/prefSummary_enableNetworkBypass"
-        android:title="@string/prefTitle_enableNetworkBypass" />
-    <SwitchPreference
-        android:key="pref_useWallhavenProxy"
-        android:persistent="true"
-        android:summary="@string/prefSummary_useWallhavenProxy"
-        android:title="@string/prefTitle_useWallhavenProxy" />
-    <EditTextPreference
-        android:defaultValue="w.wallhaven.cc"
-        android:key="pref_wallhavenProxyHost"
-        android:singleLine="true"
-        android:title="Wallhaven proxy host"
-        android:inputType="text"
-        app:dependency="pref_useWallhavenProxy"
-        app:persistent="true"
-        app:useSimpleSummaryProvider="true"/>
-    <!--    </PreferenceCategory>-->
+
+    <PreferenceCategory
+        android:key="prefCat_networkOptions"
+        android:title="@string/prefCat_networkingOptions">
+        <SwitchPreference
+            android:key="pref_useWallhavenProxy"
+            android:persistent="true"
+            android:summary="@string/prefSummary_useWallhavenProxy"
+            android:title="@string/prefTitle_useWallhavenProxy" />
+        <EditTextPreference
+            android:defaultValue="w.wallhaven.cc"
+            android:dialogTitle="@string/prefDialog_wallhavenProxyHost"
+            android:dependency="pref_useWallhavenProxy"
+            android:inputType="textUri"
+            android:key="pref_wallhavenProxyHost"
+            android:persistent="true"
+            android:singleLine="true"
+            android:title="@string/prefTitle_wallhavenProxyHost"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
     <PreferenceCategory
         android:key="prefCat_debug"
         android:title="@string/prefCat_debug">
         <Preference
             android:key="pref_debugUrl"
-            android:title="@string/prefTitle_debugUrl"
             android:persistent="false"
             android:selectable="true"
-            app:useSimpleSummaryProvider="true" />
+            android:summary="@string/prefSummary_debugUrl"
+            android:title="@string/prefTitle_debugUrl" />
     </PreferenceCategory>
-</PreferenceScreen>
+</androidx.preference.PreferenceScreen>

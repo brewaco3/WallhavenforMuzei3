@@ -20,9 +20,11 @@ abstract class AppDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                         context.applicationContext,
                         AppDatabase::class.java,
+                        // The name is a leftover from the fork; renaming it would drop every
+                        // user's list of deleted artwork, so it stays
                         "word_database"
                     )
-                    .fallbackToDestructiveMigration()
+                    .fallbackToDestructiveMigration(dropAllTables = true)
                     .build()
                 INSTANCE = instance
                 instance

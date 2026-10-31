@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
-    <string name="action_bar_title">Wallhaven for Muzei Settings</string>
-    <string name="action_sign_in">Login</string>
-
     <string name="app_name">Wallhaven for Muzei</string>
 
     <string name="artwork">Artwork</string>
@@ -13,8 +10,6 @@
     <string name="button_clearCache">Clear all cached artwork</string>
     <string name="button_forceRefresh">Force refresh wallpapers</string>
 
-    <string name="command_addToBookmark">Add to bookmarks</string>
-    <string name="command_addToPrivateBookmark">Bookmark privately</string>
     <string name="command_delete_artwork">Delete this artwork</string>
     <string name="command_shareImage">Share image</string>
     <string name="command_viewArtworkDetails">Show details</string>
@@ -26,139 +21,111 @@
     <string name="dialog_no">No</string>
     <string name="dialog_selectSource">Please open Muzei to the Sources tab, and select \"Wallhaven for Muzei 3\"</string>
     <string name="dialog_yes">Yes</string>
+    <string name="dialog_clearCache_title">Clear image cache?</string>
+    <string name="dialog_clearCache_message">This will delete all cached images and artwork entries, then download fresh wallpapers. Continue?</string>
 
     <string name="fab_delete_selected_artwork">Delete selected artwork</string>
     <string name="fab_save_selected_artwork">Save selected artwork</string>
 
-    <string name="login_wallhaven_account_hint">Type Wallhaven username</string>
-    <string name="login_wallhaven_password_hint">Wallhaven account password</string>
-
-    <string name="prefCat_about">About</string>
     <string name="prefCat_advFiltering">Advanced filtering</string>
+    <string name="prefCat_appSettings">App settings</string>
     <string name="prefCat_authSettings">Wallhaven API access</string>
-    <string name="prefCat_fileOptions">File Options</string>
+    <string name="prefCat_debug">Debug info</string>
+    <string name="prefCat_fileOptions">File options</string>
     <string name="prefCat_networkingOptions">Networking options</string>
     <string name="prefCat_pullFeedSettings">Picture feed settings</string>
-    <string name="prefCat_postProcess">Postprocessing Options</string>
 
     <string name="prefTitle_apiKey">Wallhaven API key</string>
-    <string name="prefSummary_apiKey_notSet">API key not set</string>
+    <string name="prefSummary_apiKey_notSet">API key not set. Sketchy and NSFW artwork is unavailable without one</string>
     <string name="prefSummary_apiKey_set">API key saved</string>
     <string name="prefDialog_apiKey">Enter your Wallhaven API key</string>
-    <string name="prefSummary_noFileSizeLimit">No limit</string>
-    <string name="prefSummary_storeInExtStorage">Pictures saved here will not be automatically cleared</string>
-    <string name="prefSummary_stuckApp">If the app is not working, press here</string>
-    <string name="prefSummary_forceRefresh">Download a fresh wallpaper immediately</string>
-    <string name="prefSummary_autoCrop">Crops blank spaces around artworks. Increased battery drain when downloading.</string>
 
-    <string name="prefTitle_MaximumFileSize">Maximum artwork size</string>
-    <string name="prefTitle_artistId">Artist ID</string>
     <string name="prefTitle_aspectRatio">Artwork aspect ratio</string>
-    <string name="prefTitle_authFilterSelect">Feed NSFW filter level</string>
-    <string name="prefTitle_autoClearMode">Automatically clear cache at 1AM daily</string>
-    <string name="prefTitle_keyContributor">Key contributor</string>
-    <string name="prefTitle_mainDeveloper">Main developer</string>
-    <string name="prefTitle_minimumViews">Artwork minimum views</string>
-    <string name="prefTitle_numToDownload">Number of artwork to download at a time</string>
-    <string name="prefTitle_openNsfwWiki">Explanation of NSFW levels</string>
-    <string name="prefTitle_rankingFilterSelect">Ranking NSFW filter level</string>
-    <string name="prefTitle_rankingCategorySelect">Wallpaper categories</string>
-    <string name="prefTitle_sendFeedback">Send Feedback or Suggestions</string>
-    <string name="prefTitle_showManga">Show manga</string>
-    <string name="prefTitle_storeInExtStorage">Save pictures into external storage</string>
-    <string name="prefTitle_storingInWhichExtStorage">Saving pictures to</string>
-    <string name="prefTitle_tagSearch">Image tag</string>
+    <string name="prefTitle_atleast">Minimum resolution</string>
+    <string name="prefDialog_atleast">Enter minimum resolution (e.g. 1920x1080)</string>
+    <string name="prefTitle_topRange">Toplist range</string>
+    <string name="prefTitle_order">Order</string>
+    <string name="prefTitle_seed">Random seed</string>
+    <string name="prefDialog_seed">Enter a seed for random sorting (optional)</string>
+    <string name="prefTitle_colors">Colours</string>
+    <string name="prefDialog_colors">Enter a hex colour code (e.g. 663399)</string>
     <string name="prefTitle_minimumWidth">Minimum picture width</string>
     <string name="prefTitle_minimumHeight">Minimum picture height</string>
-    <string name="prefTitle_autoCrop">Auto crop</string>
-    <string name="prefTitle_tagFilter">Search Query</string>
+    <string name="prefSummary_pixels">%d px</string>
+    <string name="prefSummary_noMinimum">No minimum</string>
+
+    <string name="prefTitle_autoClearMode">Clear the cache daily at 1AM</string>
+    <string name="prefTitle_storeInExtStorage">Save pictures into external storage</string>
+    <string name="prefSummary_storeInExtStorage">Pictures saved here will not be automatically cleared</string>
+    <string name="prefTitle_storingInWhichExtStorage">Saving pictures to</string>
+    <string name="prefTitle_numToDownload">Number of artworks to download at a time</string>
+
+    <string name="prefTitle_nightModePreference">Night mode preference</string>
+    <string name="prefTitle_mobileDataSaver">Mobile data saver</string>
+    <string name="prefSummary_mobileDataSaver">Stops new artworks from being downloaded</string>
+    <string name="prefTitle_useWallhavenProxy">Use an image proxy for Wallhaven downloads</string>
+    <string name="prefSummary_useWallhavenProxy">Downloads wallpapers from a mirror of w.wallhaven.cc instead</string>
+    <string name="prefTitle_wallhavenProxyHost">Image proxy host</string>
+    <string name="prefDialog_wallhavenProxyHost">Host that serves the same paths as w.wallhaven.cc</string>
+
+    <string name="prefTitle_tagFilter">Search query</string>
     <string name="prefDialog_tagFilter">Enter search query (e.g. \'landscape\', \'type:png\'). Supports all Wallhaven API \'q\' parameter options.</string>
-
-    <string name="prefTitle_atleast">Minimum Resolution</string>
-    <string name="prefDialog_atleast">Enter minimum resolution (e.g. 1920x1080)</string>
-
-    <string name="prefTitle_ratios">Aspect Ratios</string>
-
-    <string name="prefTitle_topRange">Toplist Range</string>
-
-    <string name="prefTitle_order">Order</string>
-
-    <string name="prefTitle_seed">Random Seed</string>
-    <string name="prefDialog_seed">Enter a seed for random sorting (optional)</string>
-
-    <string name="prefTitle_colors">Colors</string>
-    <string name="prefDialog_colors">Enter a hex color code (e.g. 663399)</string>
-
-    <string name="prefCat_debug">Debug Info</string>
-    <string name="prefTitle_debugUrl">API Query URL</string>
-
-    <string name="pref_aspectRatioDefault_entryValues">0</string>
-    <string name="pref_authFailActionDropDown">Authentication failure action</string>
-    <string name="prefTitle_enableNetworkBypass">Enable network filter bypass</string>
-    <string name="prefTitle_useWallhavenProxy">Use image proxy for Wallhaven downloads</string>
-    <string name="pref_updateMode">Update mode</string>
+    <string name="prefTitle_rankingFilterSelect">Ranking NSFW filter level</string>
+    <string name="prefTitle_rankingCategorySelect">Wallpaper categories</string>
+    <string name="pref_updateMode">Sort artworks by</string>
     <string name="pref_updateMode_default">toplist</string>
 
-    <string name="snackbar_deletedArtworks">artworks deleted</string>
-    <string name="snackbar_savedArtworks">artworks saved</string>
-    <string name="snackbar_savedArtworksWithSkipped">artworks saved, %d already existed</string>
-    <string name="snackbar_selectArtworkFirst">Select at least one artwork first</string>
+    <string name="prefSummary_forceRefresh">Replaces the queued artworks with a fresh batch</string>
+    <string name="prefSummary_stuckApp">If the app is not working, press here</string>
+    <string name="prefTitle_debugUrl">API query URL</string>
+    <string name="prefSummary_debugUrl">Tap to copy the query used for downloads</string>
+    <string name="toast_debugUrlCopied">Query URL copied to clipboard</string>
 
-    <string name="tab_heading_adv_options">Advanced settings</string>
+    <string name="preferenceScreen">preferenceScreen</string>
+
+    <plurals name="snackbar_deletedArtworks">
+        <item quantity="one">%d artwork deleted</item>
+        <item quantity="other">%d artworks deleted</item>
+    </plurals>
+    <plurals name="snackbar_savedArtworks">
+        <item quantity="one">%d artwork saved</item>
+        <item quantity="other">%d artworks saved</item>
+    </plurals>
+    <plurals name="snackbar_savedArtworksWithSkipped">
+        <item quantity="one">%1$d artwork saved, %2$d already existed</item>
+        <item quantity="other">%1$d artworks saved, %2$d already existed</item>
+    </plurals>
+    <string name="snackbar_selectArtworkFirst">Select at least one artwork first</string>
+    <string name="artworks_empty">No artwork downloaded yet. Wallpapers appear here after Muzei refreshes, and you can delete or save the ones you have seen.</string>
+
+    <string name="tab_heading_adv_options">Advanced</string>
     <string name="tab_heading_artwork_delete">Artworks</string>
-    <string name="tab_heading_credits">Credits</string>
+    <string name="tab_heading_about">About</string>
     <string name="tab_heading_main">Main</string>
-    <string name="tab_heading_roadmap">Roadmap</string>
 
     <string name="tile_delete_artwork" translatable="false">Delete artwork</string>
 
-    <string name="title_activity_main" translatable="false">MainActivity</string>
-
-    <string name="toast_addingToBookmarks">Wallhaven for Muzei: Adding to bookmark</string>
-    <string name="toast_authFailed">Authentication failed. Check your username or password</string>
-    <string name="toast_authFailedDown">Wallhaven for Muzei: Login failed, temporarily downloading toplist</string>
-    <string name="toast_authFailedRetry">Wallhaven for Muzei: Login failed, will try again</string>
-    <string name="toast_authFailedSwitch">Wallhaven for Muzei: Login failed, switching to toplist</string>
     <string name="toast_clearingCache">Clearing image cache</string>
     <string name="toast_forceRefreshQueued">Refreshing wallpapers…</string>
     <string name="toast_forceRefreshComplete">Wallpapers refreshed</string>
     <string name="toast_forceRefreshFailed">Refresh failed: %1$s</string>
     <string name="toast_forceRefreshFailed_generic">Refresh failed</string>
     <string name="toast_forceRefreshCancelled">Refresh cancelled</string>
-    <string name="toast_loginFirst">Please enter your API key first</string>
-    <string name="toast_bookmark_success">Added to bookmarks</string>
-    <string name="toast_bookmark_private_success">Added to private bookmarks</string>
-    <string name="toast_bookmark_failure">Failed to add to bookmarks</string>
 
-    <string name="preferenceScreen">preferenceScreen</string>
-    <string name="login_wallhaven_refresh_hint">Refresh Token</string>
-    <string name="action_sign_in_refresh">Login using refresh token</string>
-    <string name="dialog_logoutConfirm">Are you sure you want to logout?</string>
-    <string name="dialog_clearCache_title">Clear image cache?</string>
-    <string name="dialog_clearCache_message">This will delete all cached images and artwork entries, then download fresh wallpapers. Continue?</string>
-    <string name="prefTitle_nightModePreference">Night mode preference</string>
-    <string name="prefTitle_mobileDataSaver">Mobile data saver</string>
-    <string name="prefSummary_mobileDataSaver">Stops new artworks from being downloaded</string>
-    <string name="prefCat_appSettings">App settings</string>
-    <string name="prefSummary_enableNetworkBypass">Disable if you are having problems on VPN</string>
-    <string name="prefSummary_useWallhavenProxy">May speed up image downloads in some areas</string>
-    <string name="prefTitle_tagLanguage">Tag language</string>
-
-    <!-- About Settings -->
-    <string name="tab_heading_about">About</string>
-    <string name="prefCat_appInfo">App Info</string>
+    <!-- About tab -->
+    <string name="prefCat_appInfo">App info</string>
     <string name="prefCat_update">Update</string>
     <string name="prefTitle_version">Version</string>
     <string name="prefTitle_author">Author</string>
-    <string name="app_author_name">brewaco3</string>
-    <string name="prefTitle_sourceCode">Source Code</string>
+    <string name="app_author_name" translatable="false">brewaco3</string>
+    <string name="prefTitle_sourceCode">Source code</string>
     <string name="prefSummary_sourceCode">View on GitHub</string>
     <string name="url_source_code" translatable="false">https://github.com/brewaco3/WallhavenforMuzei3</string>
-    <string name="prefTitle_checkUpdate">Check for Update</string>
+    <string name="prefTitle_checkUpdate">Check for update</string>
     <string name="prefSummary_checkUpdate">Check GitHub for the latest release</string>
     <string name="toast_checking_update">Checking for updates…</string>
     <string name="toast_no_update">You are using the latest version</string>
     <string name="toast_update_check_failed">Failed to check for updates</string>
-    <string name="dialog_new_version_title">New Version Available: %s</string>
+    <string name="dialog_new_version_title">New version available: %s</string>
     <string name="dialog_download">Download</string>
 </resources>

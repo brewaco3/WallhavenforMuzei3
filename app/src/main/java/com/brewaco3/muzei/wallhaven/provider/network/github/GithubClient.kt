@@ -26,7 +26,7 @@ object GithubClient {
     val service: GithubService by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .client(OkHttpSingleton.getInstance())
+            .client(OkHttpSingleton.instance)
             .addConverterFactory(MoshiConverterFactory.create())
             .build()
             .create(GithubService::class.java)

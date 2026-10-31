@@ -1,17 +1,18 @@
-<!--
-  ~ Copyright 2018 The app Open Source Project
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~     This file is part of WallhavenforMuzei3.
   ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
+  ~     WallhavenforMuzei3 is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU General Public License as published by
+  ~     the Free Software Foundation, either version 3 of the License, or
+  ~     (at your option) any later version.
   ~
-  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~     This program  is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU General Public License for more details.
   ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
+  ~     You should have received a copy of the GNU General Public License
+  ~     along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
 <androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
@@ -21,7 +22,6 @@
         android:title="@string/prefCat_pullFeedSettings">
         <DropDownPreference
             android:defaultValue="@string/pref_updateMode_default"
-            android:enabled="true"
             android:entries="@array/pref_updateMode_entries"
             android:entryValues="@array/pref_updateMode_entryValues"
             android:key="pref_updateMode"
@@ -34,7 +34,6 @@
             android:key="pref_tagFilter"
             android:persistent="true"
             android:title="@string/prefTitle_tagFilter"
-            app:isPreferenceVisible="true"
             app:useSimpleSummaryProvider="true" />
         <MultiSelectListPreference
             android:defaultValue="@array/pref_rankingFilterDefault_entryvalues"
@@ -42,72 +41,33 @@
             android:entryValues="@array/pref_rankingFilterLevel_entryvalues"
             android:key="pref_rankingFilterSelect"
             android:persistent="true"
-            android:title="@string/prefTitle_rankingFilterSelect"
-            app:isPreferenceVisible="false" />
+            android:title="@string/prefTitle_rankingFilterSelect" />
         <MultiSelectListPreference
             android:defaultValue="@array/pref_rankingCategoryDefault_entryvalues"
             android:entries="@array/pref_rankingCategory_entries"
             android:entryValues="@array/pref_rankingCategory_entryvalues"
             android:key="pref_rankingCategorySelect"
             android:persistent="true"
-            android:title="@string/prefTitle_rankingCategorySelect"
-            app:isPreferenceVisible="false" />
-        <MultiSelectListPreference
-            android:defaultValue="@array/pref_authFilterDefault_entryvalues"
-            android:entries="@array/pref_authFilterLevel_entries"
-            android:entryValues="@array/pref_authFilterLevel_entryvalues"
-            android:key="pref_authFilterSelect"
-            android:persistent="true"
-            android:title="@string/prefTitle_authFilterSelect"
-            app:isPreferenceVisible="false" />
+            android:title="@string/prefTitle_rankingCategorySelect" />
         <Preference
             android:key="pref_forceRefresh"
             android:summary="@string/prefSummary_forceRefresh"
             android:title="@string/button_forceRefresh" />
         <Preference
-            android:key="@string/button_clearCache"
+            android:key="pref_clearCache"
             android:summary="@string/prefSummary_stuckApp"
             android:title="@string/button_clearCache" />
-        <EditTextPreference
-            android:dialogTitle="@string/prefTitle_tagSearch"
-            android:inputType="text"
-            android:key="pref_tagSearch"
-            android:persistent="true"
-            android:title="@string/prefTitle_tagSearch"
-            app:isPreferenceVisible="false"
-            app:useSimpleSummaryProvider="true" />
-        <ListPreference
-            android:key="pref_tagLanguage"
-            android:persistent="true"
-            android:title="@string/prefTitle_tagLanguage"
-            app:entries="@array/pref_tagFilterLanguage_entries"
-            app:entryValues="@array/pref_tagFilterLanguage_entryValues"
-            app:isPreferenceVisible="false"
-            app:useSimpleSummaryProvider="true" />
-        <EditTextPreference
-            android:dialogTitle="@string/prefTitle_artistId"
-            android:inputType="number"
-            android:key="pref_artistId"
-            android:persistent="true"
-            android:title="@string/prefTitle_artistId"
-            app:isPreferenceVisible="false"
-            app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
+
     <PreferenceCategory
-        android:key="prefCat_loginSettings"
+        android:key="prefCat_apiKey"
         android:title="@string/prefCat_authSettings">
+        <!--  The value itself lives in WallhavenMuzeiSupervisor, so this preference is not persistent  -->
         <EditTextPreference
             android:dialogTitle="@string/prefDialog_apiKey"
             android:inputType="textPassword"
             android:key="pref_api_key"
-            android:persistent="true"
+            android:persistent="false"
             android:title="@string/prefTitle_apiKey" />
-        <DropDownPreference
-            android:entries="@array/array_authFailActions_entries"
-            android:entryValues="@array/array_authFailActions_entryvalues"
-            android:key="pref_authFailAction"
-            android:persistent="true"
-            android:title="@string/pref_authFailActionDropDown"
-            app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 </androidx.preference.PreferenceScreen>

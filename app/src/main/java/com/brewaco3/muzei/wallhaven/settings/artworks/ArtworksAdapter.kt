@@ -1,7 +1,7 @@
 /*
- *     This file is part of PixivforMuzei3.
+ *     This file is part of WallhavenforMuzei3.
  *
- *     PixivforMuzei3 is free software: you can redistribute it and/or modify
+ *     WallhavenforMuzei3 is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
@@ -23,60 +23,92 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.brewaco3.muzei.wallhaven.R
 import com.bumptech.glide.Glide
-import com.google.android.material.color.MaterialColors
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 class ArtworksAdapter(private val artworkItems: MutableList<ArtworkItem>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+    /**
+     * Each entry carries a snapshot of the state it was built from, because
+     * [ArtworkItem.selected] is mutated in place and DiffUtil compares whole lists.
+     */
     sealed class DeletionItem {
-        data class Header(val date: String, val items: List<ArtworkItem>) : DeletionItem()
-        data class Item(val artworkItem: ArtworkItem) : DeletionItem()
+        data class Header(
+            val date: String,
+            val items: List<ArtworkItem>,
+            val allSelected: Boolean
+        ) : DeletionItem()
+
+        data class Item(val artworkItem: ArtworkItem, val selected: Boolean) : DeletionItem()
     }
 
-    private var displayItems: MutableList<DeletionItem> = mutableListOf()
+    private val displayItems: MutableList<DeletionItem> = buildDisplayItems().toMutableList()
 
-    init {
-        updateDisplayItems()
+    private fun buildDisplayItems(): List<DeletionItem> {
+        val formatter = SimpleDateFormat(DATE_PATTERN, Locale.getDefault())
+        val grouped = artworkItems.groupBy { formatter.format(Date(it.dateAdded)) }
+
+        // Keys are yyyy-MM-dd, so reverse string order is newest first
+        return grouped.toSortedMap(compareByDescending { it }).flatMap { (date, items) ->
+            buildList {
+                add(DeletionItem.Header(date, items, items.all { it.selected }))
+                items.forEach { add(DeletionItem.Item(it, it.selected)) }
+            }
+        }
     }
 
-    private fun updateDisplayItems() {
+    /** Rebuilds the list and rebinds only the rows that actually changed. */
+    private fun refresh() {
+        val previous = displayItems.toList()
+        val updated = buildDisplayItems()
+        val diff = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+            override fun getOldListSize(): Int = previous.size
+
+            override fun getNewListSize(): Int = updated.size
+
+            override fun areItemsTheSame(oldPosition: Int, newPosition: Int): Boolean =
+                when {
+                    previous[oldPosition] is DeletionItem.Header &&
+                        updated[newPosition] is DeletionItem.Header ->
+                        (previous[oldPosition] as DeletionItem.Header).date ==
+                            (updated[newPosition] as DeletionItem.Header).date
+
+                    previous[oldPosition] is DeletionItem.Item &&
+                        updated[newPosition] is DeletionItem.Item ->
+                        (previous[oldPosition] as DeletionItem.Item).artworkItem.token ==
+                            (updated[newPosition] as DeletionItem.Item).artworkItem.token
+
+                    else -> false
+                }
+
+            override fun areContentsTheSame(oldPosition: Int, newPosition: Int): Boolean =
+                previous[oldPosition] == updated[newPosition]
+        })
+
         displayItems.clear()
-        val grouped = artworkItems.groupBy {
-            SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date(it.dateAdded))
-        }
-        
-        // Sort groups by date descending (keys are yyyy-MM-dd strings)
-        grouped.toSortedMap(compareByDescending { it }).forEach { (date, items) ->
-            displayItems.add(DeletionItem.Header(date, items))
-            items.forEach { displayItems.add(DeletionItem.Item(it)) }
-        }
+        displayItems.addAll(updated)
+        diff.dispatchUpdatesTo(this)
     }
 
-    override fun getItemViewType(position: Int): Int {
-        return when (displayItems[position]) {
-            is DeletionItem.Header -> TYPE_HEADER
-            is DeletionItem.Item -> TYPE_ITEM
-        }
+    override fun getItemViewType(position: Int): Int = when (displayItems[position]) {
+        is DeletionItem.Header -> TYPE_HEADER
+        is DeletionItem.Item -> TYPE_ITEM
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
-            TYPE_HEADER -> {
-                val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.item_artwork_header, parent, false)
-                HeaderViewHolder(view)
-            }
-            TYPE_ITEM -> {
-                val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.fragment_artwork, parent, false)
-                ItemViewHolder(view)
-            }
+            TYPE_HEADER -> HeaderViewHolder(
+                inflater.inflate(R.layout.item_artwork_header, parent, false)
+            )
+
+            TYPE_ITEM -> ItemViewHolder(inflater.inflate(R.layout.fragment_artwork, parent, false))
             else -> throw IllegalArgumentException("Invalid view type")
         }
     }
@@ -84,35 +116,43 @@ class ArtworksAdapter(private val artworkItems: MutableList<ArtworkItem>) :
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = displayItems[position]) {
             is DeletionItem.Header -> (holder as HeaderViewHolder).bind(item)
-            is DeletionItem.Item -> (holder as ItemViewHolder).bind(item.artworkItem)
+            is DeletionItem.Item -> (holder as ItemViewHolder).bind(item)
         }
     }
 
-    override fun getItemCount(): Int {
-        return displayItems.size
-    }
+    override fun getItemCount(): Int = displayItems.size
 
     fun removeItems(artworkItemsToDelete: List<ArtworkItem>) {
-        artworkItems.removeAll(artworkItemsToDelete)
-        updateDisplayItems()
-        notifyDataSetChanged()
+        artworkItems.removeAll(artworkItemsToDelete.toSet())
+        refresh()
     }
 
     fun updateData(newItems: MutableList<ArtworkItem>) {
         artworkItems.clear()
         artworkItems.addAll(newItems)
-        updateDisplayItems()
-        notifyDataSetChanged()
+        refresh()
     }
 
-    // Helper for GridLayoutManager span size
-    val spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-        override fun getSpanSize(position: Int): Int {
-            return when (getItemViewType(position)) {
-                TYPE_HEADER -> 3 // Span full width (assuming 3 columns, will adjust in Fragment)
-                else -> 1
+    /** Drops the current selection without touching the artwork themselves. */
+    fun clearSelection() {
+        artworkItems.forEach { it.selected = false }
+        ArtworksFragment.SELECTED_ITEMS.clear()
+        refresh()
+    }
+
+    /** Selects or clears every artwork of one day at once. */
+    private fun setGroupSelected(items: List<ArtworkItem>, selected: Boolean) {
+        items.forEach { item ->
+            if (item.selected != selected) {
+                item.selected = selected
+                if (selected) {
+                    ArtworksFragment.SELECTED_ITEMS.add(item)
+                } else {
+                    ArtworksFragment.SELECTED_ITEMS.remove(item)
+                }
             }
         }
+        refresh()
     }
 
     inner class HeaderViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -121,74 +161,53 @@ class ArtworksAdapter(private val artworkItems: MutableList<ArtworkItem>) :
 
         fun bind(header: DeletionItem.Header) {
             title.text = header.date
-            
-            // Check state: if all items in this group are selected
-            val allSelected = header.items.all { it.selected }
-            checkBox.isChecked = allSelected
+            checkBox.contentDescription = header.date
+            checkBox.isChecked = header.allSelected
 
-            checkBox.setOnClickListener {
-                val isChecked = checkBox.isChecked
-                header.items.forEach { item ->
-                    if (item.selected != isChecked) {
-                        item.selected = isChecked
-                        if (isChecked) {
-                            ArtworksFragment.SELECTED_ITEMS.add(item)
-                        } else {
-                            ArtworksFragment.SELECTED_ITEMS.remove(item)
-                        }
-                    }
-                }
-                notifyDataSetChanged()
-            }
+            checkBox.setOnClickListener { setGroupSelected(header.items, checkBox.isChecked) }
+            itemView.setOnClickListener { setGroupSelected(header.items, !header.allSelected) }
         }
     }
 
-    inner class ItemViewHolder(private val mView: View) : RecyclerView.ViewHolder(mView), View.OnClickListener {
-        private val mImageView: ImageView = mView.findViewById(R.id.image)
-        private lateinit var mArtworkItem: ArtworkItem
+    inner class ItemViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
+        private val imageView: ImageView = view.findViewById(R.id.image)
 
-        fun bind(artworkItem: ArtworkItem) {
-            mArtworkItem = artworkItem
-            Glide.with(mView)
-                .load(artworkItem.persistent_uri)
+        fun bind(item: DeletionItem.Item) {
+            Glide.with(itemView)
+                .load(item.artworkItem.persistent_uri)
                 .centerCrop()
-                .into(mImageView)
+                .into(imageView)
 
-            updateSelectionState()
-        }
-
-        private fun updateSelectionState() {
-            if (mArtworkItem.selected) {
+            if (item.selected) {
                 // Subtle white overlay for selection
-                mImageView.setColorFilter(Color.argb(80, 255, 255, 255))
+                imageView.setColorFilter(Color.argb(80, 255, 255, 255))
             } else {
-                mImageView.clearColorFilter()
+                imageView.clearColorFilter()
             }
         }
 
         override fun onClick(view: View) {
-            if (absoluteAdapterPosition != RecyclerView.NO_POSITION) {
-                mArtworkItem.selected = !mArtworkItem.selected
-                if (mArtworkItem.selected) {
-                    ArtworksFragment.SELECTED_ITEMS.add(mArtworkItem)
-                } else {
-                    ArtworksFragment.SELECTED_ITEMS.remove(mArtworkItem)
-                }
-                updateSelectionState()
-                // Notify header to update checkbox
-                // Ideally we should find the header position and notifyItemChanged, 
-                // but notifyDataSetChanged is safer/easier for now given the structure
-                notifyDataSetChanged() 
+            val position = bindingAdapterPosition
+            if (position == RecyclerView.NO_POSITION) return
+            val artworkItem = (displayItems[position] as? DeletionItem.Item)?.artworkItem ?: return
+
+            artworkItem.selected = !artworkItem.selected
+            if (artworkItem.selected) {
+                ArtworksFragment.SELECTED_ITEMS.add(artworkItem)
+            } else {
+                ArtworksFragment.SELECTED_ITEMS.remove(artworkItem)
             }
+            refresh()
         }
 
         init {
-            mView.setOnClickListener(this)
+            itemView.setOnClickListener(this)
         }
     }
 
     companion object {
-        private const val TYPE_HEADER = 0
-        private const val TYPE_ITEM = 1
+        const val TYPE_HEADER = 0
+        const val TYPE_ITEM = 1
+        private const val DATE_PATTERN = "yyyy-MM-dd"
     }
 }
