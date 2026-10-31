@@ -131,7 +131,8 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
     }
 
     private fun getArtworks(): List<Artwork> {
-        val updateMode = prefs.getString("pref_updateMode", "toplist") ?: "toplist"
+        // Unknown sorting values return nothing at all rather than an error, so this is normalised
+        val updateMode = ArtworkFilter.sortingQuery(prefs.getString("pref_updateMode", null))
         Log.i(LOG_TAG, "Feed mode: $updateMode")
 
         // Loaded once so every candidate check can use cheap set lookups
@@ -170,18 +171,25 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
         val target = numToDownload * CANDIDATE_BUFFER_FACTOR
         if (matching.size < target) {
             val helper = ContentsHelper(
-                updateMode,
-                ArtworkFilter.purityQuery(puritySelection, hasApiKey),
-                ArtworkFilter.categoryQuery(categorySelection),
-                prefs.getString("pref_tagFilter", "").orEmpty(),
-                prefs.getString("pref_atleast", "").orEmpty(),
-                ArtworkFilter.ratiosQuery(
+                sorting = updateMode,
+                purity = ArtworkFilter.purityQuery(puritySelection, hasApiKey),
+                categories = ArtworkFilter.categoryQuery(categorySelection),
+                tagFilter = prefs.getString("pref_tagFilter", null)?.ifBlank { null },
+                atleast = ArtworkFilter.atleastQuery(prefs.getString("pref_atleast", null)).ifBlank { null },
+                ratios = ArtworkFilter.ratiosQuery(
                     prefs.getStringSet("pref_aspectRatioSelect_v2", emptySet()) ?: emptySet()
-                ),
-                prefs.getString("pref_topRange", "1M") ?: "1M",
-                prefs.getString("pref_order", "desc") ?: "desc",
-                prefs.getString("pref_seed", "").orEmpty(),
-                prefs.getString("pref_colors", "").orEmpty()
+                ).ifBlank { null },
+                // Wallhaven only has a time range for the toplist
+                topRange = if (updateMode == ArtworkFilter.SORTING_TOPLIST) {
+                    prefs.getString("pref_topRange", "1M") ?: "1M"
+                } else {
+                    null
+                },
+                order = prefs.getString("pref_order", "desc") ?: "desc",
+                // And a seed only means something when sorting randomly
+                seed = ArtworkFilter.seedQuery(prefs.getString("pref_seed", null), updateMode)
+                    .ifBlank { null },
+                colors = ArtworkFilter.colorsQuery(prefs.getString("pref_colors", null)).ifBlank { null }
             )
 
             var page = 1
@@ -272,7 +280,7 @@ class WallhavenArtWorker(context: Context, workerParams: WorkerParameters) :
     }
 
     private fun sortingLabel(updateMode: String): String = when (updateMode) {
-        "toplist" -> applicationContext.getString(R.string.attr_toplist)
+        ArtworkFilter.SORTING_TOPLIST -> applicationContext.getString(R.string.attr_toplist)
         "hot" -> applicationContext.getString(R.string.attr_hot)
         else -> updateMode.split('_').joinToString(" ") { it.replaceFirstChar { first -> first.uppercase() } }
     }

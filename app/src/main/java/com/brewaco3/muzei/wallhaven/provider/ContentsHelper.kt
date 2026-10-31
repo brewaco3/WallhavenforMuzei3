@@ -4,18 +4,23 @@ import com.brewaco3.muzei.wallhaven.provider.network.RestClient
 import com.brewaco3.muzei.wallhaven.provider.network.WallhavenSearchService
 import com.brewaco3.muzei.wallhaven.provider.network.moshi.Contents
 
-/** Runs one Wallhaven search query. Page numbers are passed in so the caller owns the paging loop. */
+/**
+ * Runs one Wallhaven search query.
+ *
+ * Page numbers are passed in so the caller owns the paging loop, and every optional parameter is
+ * nullable so it is left out of the URL instead of being sent empty.
+ */
 class ContentsHelper(
     private val sorting: String,
     private val purity: String,
     private val categories: String,
-    private val tagFilter: String = "",
-    private val atleast: String = "",
-    private val ratios: String = "",
-    private val topRange: String = "1M",
+    private val tagFilter: String? = null,
+    private val atleast: String? = null,
+    private val ratios: String? = null,
+    private val topRange: String? = null,
     private val order: String = "desc",
-    private val seed: String = "",
-    private val colors: String = ""
+    private val seed: String? = null,
+    private val colors: String? = null
 ) {
     private val service = RestClient.rankingService
 

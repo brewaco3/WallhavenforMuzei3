@@ -5,7 +5,12 @@ import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-/** Wallhaven's `GET /search` endpoint, also used for the toplist and hot feeds. */
+/**
+ * Wallhaven's `GET /search` endpoint, which also serves the toplist and hot feeds.
+ *
+ * Optional parameters are nullable so Retrofit leaves them out of the URL entirely; Wallhaven's
+ * documentation only accepts some of them in combination with others.
+ */
 interface WallhavenSearchService {
     @GET("search")
     fun getSearchResults(
@@ -14,11 +19,11 @@ interface WallhavenSearchService {
         @Query("categories") categories: String,
         @Query("page") page: Int,
         @Query("order") order: String,
-        @Query("q") query: String,
-        @Query("atleast") atleast: String,
-        @Query("ratios") ratios: String,
-        @Query("topRange") topRange: String,
-        @Query("seed") seed: String,
-        @Query("colors") colors: String
+        @Query("q") query: String?,
+        @Query("atleast") atleast: String?,
+        @Query("ratios") ratios: String?,
+        @Query("topRange") topRange: String?,
+        @Query("seed") seed: String?,
+        @Query("colors") colors: String?
     ): Call<Contents>
 }

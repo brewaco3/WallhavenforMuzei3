@@ -42,13 +42,13 @@
 
     <string name="prefTitle_aspectRatio">Artwork aspect ratio</string>
     <string name="prefTitle_atleast">Minimum resolution</string>
-    <string name="prefDialog_atleast">Enter minimum resolution (e.g. 1920x1080)</string>
+    <string name="prefDialog_atleast">Enter a minimum resolution as WIDTHxHEIGHT (e.g. 1920x1080). Anything else is ignored.</string>
     <string name="prefTitle_topRange">Toplist range</string>
     <string name="prefTitle_order">Order</string>
     <string name="prefTitle_seed">Random seed</string>
-    <string name="prefDialog_seed">Enter a seed for random sorting (optional)</string>
+    <string name="prefDialog_seed">Enter a seed for random sorting, six letters or digits (optional). Only used when sorting randomly.</string>
     <string name="prefTitle_colors">Colours</string>
-    <string name="prefDialog_colors">Enter a hex colour code (e.g. 663399)</string>
+    <string name="prefDialog_colors">Enter a six digit hex colour code without the hash (e.g. 663399). Anything else is ignored.</string>
     <string name="prefTitle_minimumWidth">Minimum picture width</string>
     <string name="prefTitle_minimumHeight">Minimum picture height</string>
     <string name="prefSummary_pixels">%d px</string>

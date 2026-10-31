@@ -42,13 +42,13 @@
 
     <string name="prefTitle_aspectRatio">壁纸长宽比</string>
     <string name="prefTitle_atleast">最低分辨率</string>
-    <string name="prefDialog_atleast">请输入最低分辨率（例如 1920x1080）</string>
+    <string name="prefDialog_atleast">请输入最低分辨率，格式为「宽x高」（例如 1920x1080）。其他格式会被忽略。</string>
     <string name="prefTitle_topRange">排行榜时间范围</string>
     <string name="prefTitle_order">排序方向</string>
     <string name="prefTitle_seed">随机种子</string>
-    <string name="prefDialog_seed">请输入随机排序使用的种子（可选）</string>
+    <string name="prefDialog_seed">请输入随机排序使用的种子，6 位英文字母或数字（可选）。仅在随机排序时生效。</string>
     <string name="prefTitle_colors">颜色</string>
-    <string name="prefDialog_colors">请输入十六进制颜色代码（例如 663399）</string>
+    <string name="prefDialog_colors">请输入 6 位十六进制颜色代码，毋须加上 #（例如 663399）。其他格式会被忽略。</string>
     <string name="prefTitle_minimumWidth">最低宽度</string>
     <string name="prefTitle_minimumHeight">最低高度</string>
     <string name="prefSummary_pixels">%d 像素</string>

@@ -48,20 +48,42 @@
         <item>people</item>
     </string-array>
 
-    <!-- The empty value is "Any", which has to stay paired with the empty entry below -->
+    <!-- The empty value is "Any", which has to stay paired with the empty entry below.
+         landscape and portrait are keywords the API cannot combine with exact ratios,
+         but every value here was checked against the live API. -->
     <string-array name="pref_aspectRatio_entries">
         <item>Any</item>
         <item>All wide</item>
         <item>All portrait</item>
-        <item>Ultrawide (21x9)</item>
-        <item>Square (1x1)</item>
+        <item>16:9</item>
+        <item>16:10</item>
+        <item>3:2</item>
+        <item>4:3</item>
+        <item>5:4</item>
+        <item>21:9 ultrawide</item>
+        <item>32:9</item>
+        <item>48:9</item>
+        <item>9:16</item>
+        <item>10:16</item>
+        <item>9:18</item>
+        <item>Square (1:1)</item>
     </string-array>
 
     <string-array name="pref_aspectRatio_entryValues">
         <item></item>
         <item>landscape</item>
         <item>portrait</item>
+        <item>16x9</item>
+        <item>16x10</item>
+        <item>3x2</item>
+        <item>4x3</item>
+        <item>5x4</item>
         <item>21x9</item>
+        <item>32x9</item>
+        <item>48x9</item>
+        <item>9x16</item>
+        <item>10x16</item>
+        <item>9x18</item>
         <item>1x1</item>
     </string-array>
 

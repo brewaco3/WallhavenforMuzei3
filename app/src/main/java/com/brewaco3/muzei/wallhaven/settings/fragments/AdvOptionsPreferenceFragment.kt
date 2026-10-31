@@ -180,14 +180,27 @@ class AdvOptionsPreferenceFragment : PreferenceFragmentCompat(),
                     @Suppress("UNCHECKED_CAST")
                     val selected = (newValue as Set<String>).toMutableSet()
                     val previous = (preference as MultiSelectListPreference).values
+                    val added = selected - previous
 
-                    if (selected.contains("") && !previous.contains("")) {
+                    when {
                         // "Any" wins on its own, so drop everything else
-                        selected.clear()
-                        selected.add("")
-                    } else {
-                        // Anything else selected alongside "Any" means the user stopped wanting "Any"
-                        selected.remove("")
+                        added.contains("") -> {
+                            selected.clear()
+                            selected.add("")
+                        }
+                        // Picking anything else means the user stopped wanting "Any"
+                        selected.contains("") -> selected.remove("")
+
+                        // Wallhaven cannot combine a keyword like "all wide" with an exact ratio in
+                        // one request: it drops the keyword and keeps the ratio. Rather than let the
+                        // choice be ignored later, the family the user just picked wins here, where
+                        // the change is visible.
+                        added.any { it in ArtworkFilter.RATIO_KEYWORDS } -> selected.removeAll {
+                            it.isNotEmpty() && it !in ArtworkFilter.RATIO_KEYWORDS
+                        }
+
+                        added.any { it.isNotEmpty() && it !in ArtworkFilter.RATIO_KEYWORDS } ->
+                            selected.removeAll(ArtworkFilter.RATIO_KEYWORDS)
                     }
 
                     // An empty selection would mean "Any" to the API as well, so make it explicit
@@ -250,13 +263,12 @@ class AdvOptionsPreferenceFragment : PreferenceFragmentCompat(),
     private fun updateDebugUrl() {
         val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
         val hasApiKey = WallhavenPrefs.hasApiKey()
-        val updateMode = sharedPrefs.getString("pref_updateMode", WallhavenProviderConst.SORTING_TOPLIST)
-            ?: WallhavenProviderConst.SORTING_TOPLIST
+        val sorting = ArtworkFilter.sortingQuery(sharedPrefs.getString("pref_updateMode", null))
 
         val params = mutableListOf<String>()
-        params.add("sorting=$updateMode")
+        params.add("sorting=$sorting")
 
-        sharedPrefs.getString("pref_tagFilter", "").orEmpty().takeIf { it.isNotEmpty() }
+        sharedPrefs.getString("pref_tagFilter", null)?.ifBlank { null }
             ?.let { params.add("q=${Uri.encode(it)}") }
 
         params.add(
@@ -272,23 +284,25 @@ class AdvOptionsPreferenceFragment : PreferenceFragmentCompat(),
             )
         )
 
-        sharedPrefs.getString("pref_atleast", "").orEmpty().takeIf { it.isNotEmpty() }
-            ?.let { params.add("atleast=${Uri.encode(it)}") }
+        // Each of these is built by the same helper the worker uses, so an invalid value is shown
+        // as absent here and is absent from the real request too
+        ArtworkFilter.atleastQuery(sharedPrefs.getString("pref_atleast", null))
+            .takeIf { it.isNotEmpty() }?.let { params.add("atleast=${Uri.encode(it)}") }
 
         ArtworkFilter.ratiosQuery(
             sharedPrefs.getStringSet("pref_aspectRatioSelect_v2", emptySet()) ?: emptySet()
         ).takeIf { it.isNotEmpty() }?.let { params.add("ratios=${Uri.encode(it)}") }
 
-        if (updateMode == WallhavenProviderConst.SORTING_TOPLIST) {
+        if (sorting == ArtworkFilter.SORTING_TOPLIST) {
             params.add("topRange=${sharedPrefs.getString("pref_topRange", "1M")}")
         }
 
         params.add("order=${sharedPrefs.getString("pref_order", "desc")}")
 
-        sharedPrefs.getString("pref_seed", "").orEmpty().takeIf { it.isNotEmpty() }
-            ?.let { params.add("seed=$it") }
-        sharedPrefs.getString("pref_colors", "").orEmpty().takeIf { it.isNotEmpty() }
-            ?.let { params.add("colors=$it") }
+        ArtworkFilter.seedQuery(sharedPrefs.getString("pref_seed", null), sorting)
+            .takeIf { it.isNotEmpty() }?.let { params.add("seed=${Uri.encode(it)}") }
+        ArtworkFilter.colorsQuery(sharedPrefs.getString("pref_colors", null))
+            .takeIf { it.isNotEmpty() }?.let { params.add("colors=$it") }
         if (hasApiKey) {
             params.add("apikey=********")
         }

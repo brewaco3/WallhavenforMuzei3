@@ -26,8 +26,18 @@
         <item>不限</item>
         <item>全部横向</item>
         <item>全部纵向</item>
-        <item>超宽屏 (21x9)</item>
-        <item>正方形 (1x1)</item>
+        <item>16:9</item>
+        <item>16:10</item>
+        <item>3:2</item>
+        <item>4:3</item>
+        <item>5:4</item>
+        <item>21:9 超宽屏</item>
+        <item>32:9</item>
+        <item>48:9</item>
+        <item>9:16</item>
+        <item>10:16</item>
+        <item>9:18</item>
+        <item>正方形 (1:1)</item>
     </string-array>
 
     <string-array name="pref_topRange_entries">

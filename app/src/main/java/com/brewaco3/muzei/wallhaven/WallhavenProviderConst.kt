@@ -20,8 +20,4 @@ object WallhavenProviderConst {
 
     /** Key the worker puts the failure reason under so the settings screen can show it. */
     const val WORK_ERROR_MESSAGE_KEY = "workErrorMessage"
-
-    // Wallhaven search sorting values. See https://wallhaven.cc/help/api
-    const val SORTING_TOPLIST = "toplist"
-    const val SORTING_HOT = "hot"
 }
