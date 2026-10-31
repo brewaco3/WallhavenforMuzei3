@@ -6,6 +6,8 @@ on:
     branches: [ master ]
     paths:
       - 'gradle.properties'  # Only trigger when this file changes
+  # So a release can also be re-run by hand, for example after a failed build
+  workflow_dispatch:
 
 permissions:
   contents: write  # Required for creating releases
