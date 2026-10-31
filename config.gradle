@@ -5,7 +5,6 @@ ext {
                     appcompat            : getProperty('androidx.appcompat'),
                     coordinatorlayout    : getProperty('androidx.coordinatorlayout'),
                     constraintlayout     : getProperty('androidx.constraintlayout'),
-                    localbroadcastmanager: getProperty('androidx.localbroadcastmanager'),
                     material             : getProperty('androidx.material'),
                     preference           : getProperty('androidx.preference'),
                     recyclerview         : getProperty('androidx.recyclerview'),

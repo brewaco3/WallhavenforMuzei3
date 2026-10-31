@@ -12,7 +12,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    compileSdkVersion 35
+    compileSdkVersion 36
 
     signingConfigs {
         release {
@@ -30,8 +30,8 @@ android {
 
     defaultConfig {
         applicationId "com.brewaco3.muzei.wallhaven"
-        minSdkVersion 21
-        targetSdkVersion 35
+        minSdkVersion 24
+        targetSdkVersion 36
         versionCode getProperty('app.version.code') as int
         versionName getProperty('app.version.name')
 
@@ -51,14 +51,16 @@ android {
 
     buildTypes {
         release {
-            signingConfig signingConfigs.release
+            // Without a keystore the release build still assembles, it just comes out unsigned.
+            // CI writes keystore.properties before building, so its APK is signed as usual.
+            if (keystorePropertiesFile.exists()) {
+                signingConfig signingConfigs.release
+            }
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-        debug {
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
+        // No debug build type is declared: minifying a debuggable build only disables every
+        // optimisation R8 would otherwise apply, so it costs build time and buys nothing
     }
 
     compileOptions {
@@ -69,6 +71,12 @@ android {
     buildFeatures {
         viewBinding true
         buildConfig = true
+    }
+
+    lint {
+        // Glide ships a NotificationTarget that this app never touches, and the app posts no
+        // notifications at all, so the check can only report on unreachable library code
+        disable 'NotificationPermission'
     }
 
     kotlinOptions {
@@ -99,7 +107,6 @@ dependencies {
     implementation "androidx.appcompat:appcompat:${libs.androidx.appcompat}"
     implementation "androidx.constraintlayout:constraintlayout:${libs.androidx.constraintlayout}"
     implementation "androidx.coordinatorlayout:coordinatorlayout:${libs.androidx.coordinatorlayout}"
-    implementation "androidx.localbroadcastmanager:localbroadcastmanager:${libs.androidx.localbroadcastmanager}"
     implementation "androidx.preference:preference-ktx:${libs.androidx.preference}"
     implementation "androidx.recyclerview:recyclerview:${libs.androidx.recyclerview}"
     implementation "androidx.room:room-runtime:${libs.libRoom}"
@@ -111,17 +118,15 @@ dependencies {
     implementation "com.google.android.apps.muzei:muzei-api:${libs.libMuzei}"
     implementation "com.squareup.moshi:moshi:${libs.libMoshi}"
     implementation "com.squareup.okhttp3:okhttp:${libs.libOkhttp}"
-    implementation "com.squareup.okhttp3:okhttp-dnsoverhttps:${libs.libOkhttp}"
     implementation "com.squareup.retrofit2:converter-moshi:${libs.libRetrofit}"
     implementation "com.squareup.retrofit2:retrofit:${libs.libRetrofit}"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:${libs.kotlin.coroutines}"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${libs.kotlin.coroutines}"
 
-    implementation 'com.joaomgcd:taskerpluginlibrary:0.4.10'
-
-    annotationProcessor "androidx.room:room-compiler:${libs.libRoom}"
     ksp "androidx.room:room-compiler:${libs.libRoom}"
     ksp "com.squareup.moshi:moshi-kotlin-codegen:${libs.libMoshi}"
+
+    testImplementation "junit:junit:4.13.2"
 }
 
 allprojects {
